@@ -1,0 +1,20 @@
+style "panel" {
+	bg[NORMAL] = "#8C8C88" # "#E0E0DA"
+	ythickness = 0
+}
+widget_class "*Panel*" style "panel"
+widget "*Panel*" style "panel"
+class "*Panel*" style "panel"
+
+style "xfdesktop-icon-view" {
+	XfdesktopIconView::label-alpha = 10
+	# background
+	base[NORMAL] = "#000000"
+	base[SELECTED] = "#6594CF"
+	base[ACTIVE] = "#B0B0B0" # dragging/selected but not in focus
+	# text
+	fg[NORMAL] = "#F0F0F0"
+	fg[SELECTED] = "#101010"
+	fg[ACTIVE] = "#242424"
+}
+widget_class "*XfdesktopIconView*" style "xfdesktop-icon-view"

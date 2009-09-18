@@ -1,0 +1,39 @@
+[changes marked "+]
++ customization # bugfix
+
+pydoc.vim
++ remove highlighting
+
+clipbrd.vim
+# normal with !
++ remove defaut mapping \cb
++ noconfirm for UpdateRegister
+
+taglist.vim
++ toggling folds: nnoremap <buffer> <silent> <C-Space> za
+
+yankring.vim
+# use input() for YRGetSearch
++ no "YR:" messages
++ remove inoremaps for YRGetSearch and YRGetChar
+
+echofunc.vim
++ remove sections: if has("balloon_eval")
+
+NERD_commenter.vim
+# remember to convert leading whitespace when uncommenting
+# one line sexy comment case defaults to CommentLines
+# remove extra whitespace after uncommenting aligned comments
++ g:NERDDefaultAlign
++ g:NERDSexy and toggle
++ YankRing compatibility (normal with no !)
++ remove some maps; full list now ,cc ,c<space> ,cm ,ci ,cy ,cu ,c$ ,cA ,a ,s
+
+NERD_tree.vim
++ add <space> to g:NERDTreeMapActivateNode
+
+matchit.vim
+# vmaps to xmaps
+
+surround.vim
++ reversed whether ({[< and )}]> insert spaces

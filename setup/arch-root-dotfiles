@@ -1,0 +1,42 @@
+#!/bin/bash
+
+IFS=$'\n'
+ADMIN=david
+
+[ $(whoami) != root ] && exit 1
+
+rm -rf /etc/*vimrc
+
+list='
+.bash_aliases
+.bash_profile
+.bashrc
+.inputrc
+.less
+.loadkeys
+.vim
+.vimrc
+'
+
+for file in $list; do
+	if [ -e "/home/$ADMIN/$file" ]; then
+		ln -fs "/home/$ADMIN/$file" "$HOME"
+	fi
+done
+
+cat >"$HOME/.bash_hacks" << -EOF-
+mkbin ()
+{
+	[ -z "\$BIN" ] && return 1
+	if [ ! -d "\$BIN" ]; then
+		mkdir "\$BIN" || return \$?
+	else
+		find "\$BIN" -maxdepth 1 -mindepth 1 -type l -delete
+	fi
+	lnbin /home/$ADMIN/code/repos/[^.]*
+	lnbin /home/$ADMIN/code/scripts
+	lnbin /home/$ADMIN/code/bin
+}
+
+addsource /home/$ADMIN/code/repos/[^.]*/*.sh
+-EOF-

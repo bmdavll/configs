@@ -1,0 +1,20 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+destination=$(zenity --file-selection --directory --title "Create links in...")
+
+[ $? -ne 0 ] && exit 1
+
+if [ -w "$destination" ]; then
+	for file in $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS; do
+		ln -s "$file" "$destination"
+		if [ $? -ne 0 ]; then
+			zenity --error --title "Link" --text "Error creating links in \`$destination'"
+			exit 1
+		fi
+	done
+else
+	zenity --error --title "Link" --text "Can't write to \`$destination'"
+	exit 1
+fi

@@ -1,0 +1,35 @@
+!
+! Remap CapsLock to Control
+!
+remove Lock = Caps_Lock
+add Control = Caps_Lock
+keysym Caps_Lock = Control_L
+
+!
+! Compose key
+!
+remove Mod1 = Alt_R
+keysym Alt_R = Multi_key
+
+!
+! Remap right Control
+!
+remove Control = Control_R
+keysym Control_R = Super_R
+add Mod4 = Super_R
+
+!
+! Back and Forward buttons
+!
+keycode 166 = F13
+keycode 167 = F14
+! keycode 234 = F13
+! keycode 233 = F14
+
+!
+! Lisp hack (swaps brackets and parens)
+!
+! keysym bracketleft = parenleft braceleft
+! keysym bracketright = parenright braceright
+! keysym parenleft = 9 bracketleft
+! keysym parenright = 0 bracketright

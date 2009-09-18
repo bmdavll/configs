@@ -1,0 +1,89 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+add ()
+{
+	for pkg in "$@"; do
+		list+=("$pkg")
+	done
+}
+
+list=()
+
+# rpm to deb conversion
+add alien
+
+# documentation
+add glibc-doc
+add manpages-dev
+add perl-doc
+
+# dev librariies
+add libreadline-dev
+add libssl-dev
+add libflashsupport
+
+# regex library
+add tre-agrep libtre-dev
+
+# python
+add pydb python-lxml
+
+# parsing
+add bison flex
+
+# lint
+add splint
+
+# editors, tags
+add emacs
+add hexedit
+add exuberant-ctags
+
+# networking
+add nfs-kernel-server
+add sshfs
+# samba
+add samba smbfs winbind
+
+# utils
+add ascii               # report character aliases
+add mmv                 # mutiple mv
+add xclip               # X selection command-line interface
+add pv                  # pipe viewer
+add moreutils
+# visualization
+add gnuplot
+add graphviz
+# convertors
+add convmv
+add netpbm
+add pdftk
+# disk recovery
+add recover testdisk
+# tex
+add texinfo texlive
+
+# apps
+add gparted
+add firefox
+add thunderbird
+add inkscape
+add purrr               # batch renamer
+add surfraw
+add vlc
+add w3m
+add wine
+
+# external/build from source
+# gvim
+# vifm
+# eclipse
+# subversion
+# mono
+
+sudo apt-get update
+sudo apt-get install -y "${list[@]}"
+
+# vim:set ts=4 sw=4 et:

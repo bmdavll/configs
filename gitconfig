@@ -1,0 +1,11 @@
+[user]
+	name = David Liang
+	email = bmdavll@gmail.com
+[diff]
+	external = git-external-diff
+[pager]
+	diff =
+[giggle]
+	compact-mode = false
+	main-window-maximized = true
+	main-window-geometry = 0x0+0+0

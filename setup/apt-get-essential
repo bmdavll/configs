@@ -1,0 +1,43 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+add ()
+{
+	for pkg in "$@"; do
+		list+=("$pkg")
+	done
+}
+
+list=()
+
+# GNU toolchain
+add make gcc binutils gdb
+# GNU build system
+add autoconf automake libtool
+
+# build tools
+add fakeroot
+add libusplash-dev librsvg2-bin
+# debian
+add build-essential
+
+# utils
+add gawk
+add xautomation
+add xbindkeys
+
+# fonts
+add ttf-dejavu
+
+# compiz
+add compizconfig-settings-manager
+
+# gnome
+add nautilus-gksu
+add nautilus-image-converter
+add nautilus-open-terminal
+add gnome-do
+
+sudo apt-get update
+sudo apt-get install -y "${list[@]}"

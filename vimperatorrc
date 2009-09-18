@@ -1,0 +1,190 @@
+" Vimperator 1.2 {{{1
+
+" usage notes
+" C-v			pass keystroke
+" o   O			open # with current URL
+" t   T			tabopen # with current URL
+" y   Y			yank # current location # selected text
+" p   P			put from clipboard # in new tab
+" i   v			# caret mode # visual select in caret mode
+" C-[oi]		go # back # forward
+" g[hH]			go home # in new tab
+" g[uU]			go up to parent directory # root
+" r   R			reload # bypass cache
+" x				stop (mapped from default C-c)
+" :sav			save as
+" :xa   ZZ		save session and quit
+" :qa   ZQ		quit without saving
+" g C-g			page info
+" g[fF]			view source # in external editor
+" z[ioz]		zoom # in # out # reset
+" gi			focus last/first input field
+" C-^			select last tab
+" c				select tab (mapped from default b)
+" :tabm N		move tab to position N
+" :tabo			close other tabs
+" :tabd			duplicate tab
+" :tabde		detach tab
+" d   D   u		close tab and focus # right # left # undo close
+" :bd   :u		close/undo with argument selection
+" f   F			open hint # in new tab
+" ;{MODE}		extended hint mode:
+"				s:save		y:yank
+" a				bookmark page
+"				optionally specify -t title -T tag[,tag]... -k keyword
+" A				toggle star (goes into unsorted bookmarks)
+" :bmarks[!]	lookup bookmarks # and open in new tabs
+" :delbm		delete bookmarks
+" {a-zA-Z0-9}	quickmarks
+" M   g[on]		# quickmark current page # open quickmark # in new tab
+" :ha			print
+" :dia			open firefox dialogs
+" :sideb		open the sidebar
+" :exu   :viu	# ex # vi usage
+
+" mappings {{{1
+noremap			L			<Nop>
+noremap			a			<Nop>
+noremap			<C-y>		<Nop>
+noremap			<C-p>		<Nop>
+noremap			<C-n>		<Nop>
+inoremap		<C-j>		<Nop>
+
+noremap			<C-Space>	<Esc>
+inoremap		<C-Space>	<Esc>
+cnoremap		<C-Space>	<Esc>
+
+" command line {{{2
+" cycle thru completion list
+cnoremap		<C-j>		<Tab>
+cnoremap		<C-k>		<S-Tab>
+cnoremap		<A-j>		<Tab>
+cnoremap		<A-k>		<S-Tab>
+" recall commands
+cnoremap		<C-p>		<PageUp>
+cnoremap		<C-n>		<PageDown>
+" reverse search
+cnoremap		<A-p>		<Up>
+cnoremap		<A-n>		<Down>
+
+" moving around {{{2
+cnoremap		<A-h>		<Left>
+inoremap		<A-h>		<Left>
+cnoremap		<A-l>		<Right>
+inoremap		<A-l>		<Right>
+inoremap		<A-j>		<Down>
+inoremap		<A-k>		<Up>
+
+cnoremap		<C-l>		<Right>
+inoremap		<C-l>		<Right>
+
+" word-wise operations {{{2
+cnoremap		<A-b>		<C-Left>
+inoremap		<A-b>		<C-Left>
+cnoremap		<A-f>		<C-Right>
+inoremap		<A-f>		<C-Right>
+cnoremap		<A-d>		<C-Del>
+inoremap		<A-d>		<C-Del>
+cnoremap		<A-BS>		<C-BS>
+inoremap		<A-BS>		<C-BS>
+
+" misc {{{2
+" back, forward, and edit with external editor
+inoremap		<C-o>		<Esc><C-o>
+inoremap		<C-i>		<Esc><C-i>
+inoremap		<C-g>		<C-i>
+
+" tabs
+noremap			<C-A-i>		gT
+noremap			<C-A-o>		gt
+noremap			<C-A-t>		<C-T>
+noremap			<C-A-w>		<C-w>
+
+" history list
+noremap			<C-m>		:jumps<CR>
+
+" bookmarks
+noremap			<C-b>		<C-v><C-b>
+
+" enter command-line mode
+noremap			;			:
+" numeric tab switching
+noremap			c			B:buffer!<Space>
+" page up
+noremap			b			<S-Space>
+" stop
+noremap			x			<C-c>
+" undo
+noremap			U			:undo<Space><Tab>
+" help
+noremap			H			:help<Space>
+" run command
+noremap			!			:!
+
+" toggle toolbars
+noremap<silent>	e			:js toggle_bars(["PersonalToolbar"])<CR>
+noremap<silent>	<C-e>		:js toggle_bars(["toolbar-menubar","nav-bar"])<CR>
+
+" function keys {{{2
+noremap<silent>	<F2>		:emenu Bookmarks.Organize Bookmarks…<CR>
+noremap			<F5>		:nohlsearch<CR>
+noremap			<F13>		<C-o>
+noremap			<F14>		<C-i>
+
+" leader {{{2
+" search/tabopen/open with X clipboard contents
+map				<leader>*	/<S-Insert><CR>/<Up><CR>
+map				<leader>t	t<S-Insert><Home><C-Right><Space>
+map				<leader>o	o<S-Insert><Home><C-Right><Space>
+" quick searches
+map				<leader>g	tg<Space><S-Insert><CR>
+map				<leader>G	og<Space><S-Insert><CR>
+map				<leader>w	tw<Space><S-Insert><CR>
+map				<leader>W	ow<Space><S-Insert><CR>
+map				<leader>d	td<Space><S-Insert><CR>
+map				<leader>c	tc<Space><S-Insert><CR>
+
+" options {{{1
+set complete=l
+set defsearch=g
+set editor='scim-run gvim -f'
+set guioptions+=B
+set guioptions+=n
+set popups=2
+set shellcmdflag=-lc
+set showstatuslinks=2
+set showtabline=1
+set titlestring=Firefox
+" set wildoptions=auto
+
+" about:config
+set! security.dialog_enable_delay=0
+
+" javascript {{{1
+javascript <<EOF
+// toggle toolbars
+toggle_bars = function(bars) {
+	for (var i in bars) document.getElementById(bars[i]).collapsed ^= 1;
+}
+// yank to clipboard
+mappings.addUserMap([modes.NORMAL], ["Y"],
+	"Yank the currently selected text",
+	function() {
+		events.feedkeys("<C-v>" + (/^Mac/.test(navigator.platform) ? "<M-c>" : "<C-c>"), true);
+		setTimeout( function() {
+			liberator.echo("Yanked " + util.readFromClipboard(), commandline.FORCE_SINGLELINE);
+		}, 20 );
+	}
+);
+// rss feed button
+(function() {
+	var feedPanel = document.createElement("statusbarpanel");
+	feedPanel.setAttribute("id", "feed-panel-clone");
+	feedPanel.appendChild(document.getElementById("feed-button"));
+	feedPanel.firstChild.setAttribute("style", "padding: 0; max-height: 16px;");
+	document.getElementById("status-bar")
+	.insertBefore(feedPanel, document.getElementById("security-button"));
+})();
+EOF
+
+" vim:set ts=4 sw=4 noet fdm=marker ft=vimperator:

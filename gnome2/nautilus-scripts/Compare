@@ -1,0 +1,13 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+if [ $# -ne 0 ]; then
+	gvimdiff $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS
+else
+	files=$(zenity --file-selection --multiple --separator="$IFS" --title "Compare")
+	[ $? -ne 0 ] && exit 1
+	set $files
+	cd $(dirname "$1")
+	gvimdiff $files
+fi

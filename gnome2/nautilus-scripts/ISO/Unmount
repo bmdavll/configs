@@ -1,0 +1,18 @@
+#!/bin/bash
+
+gksudo -k echo "Unmount ISO"
+[ $? -ne 0 ] && exit 1
+
+IFS=$'\n'
+
+for arg in $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS
+do
+	basename=$(basename "$arg" .iso)
+	basename=$(basename "$basename" .volume)
+
+	if [ -e "/media/$basename" ]
+	then
+		sudo umount "/media/$basename" && sudo rmdir "/media/$basename"
+		[ $? -eq 0 ] && zenity --info --title "Unmount ISO" --text "Successfully unmounted \`/media/$basename'"
+	fi
+done

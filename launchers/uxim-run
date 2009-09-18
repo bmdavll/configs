@@ -1,0 +1,25 @@
+#!/bin/bash
+
+XCOMPOSE="$HOME/.XCompose"
+UNICODE="$HOME/.XCompose-unicode"
+
+if [ ! -h "$XCOMPOSE" ]; then
+	! echo >&2 "$XCOMPOSE: Not a symlink"
+	exit
+elif [ ! -f "$XCOMPOSE" -o ! -f "$UNICODE" ]; then
+	! echo >&2 "File not found"
+	exit
+elif [ ! -r "$XCOMPOSE" -o ! -r "$UNICODE" ]; then
+	! echo >&2 "Permission denied"
+	exit
+fi
+
+LINK=$(readlink -e "$XCOMPOSE") && rm "$XCOMPOSE" || exit 2
+
+cat "$LINK" "$UNICODE" >"$XCOMPOSE"
+
+XMODIFIERS=@im=local GTK_IM_MODULE=xim QT_IM_MODULE=xim "$@" &
+disown -r
+sleep 3
+
+ln -fs "$LINK" "$XCOMPOSE"

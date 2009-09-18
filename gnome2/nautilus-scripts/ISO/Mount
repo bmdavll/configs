@@ -1,0 +1,27 @@
+#!/bin/bash
+
+gksudo -k echo "Mount ISO"
+[ $? -ne 0 ] && exit 1
+
+IFS=$'\n'
+
+for arg in $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS
+do
+	if [ ! -f "$arg" ]; then
+		continue
+	fi
+
+	basename=$(basename "$arg" .iso)
+
+	if sudo mkdir "/media/$basename" && sudo mount -o loop -t iso9660 "$arg" "/media/$basename"
+	then
+		if zenity --question --title "Mount ISO" --text "\`$basename' successfully mounted. Open Volume?"
+		then
+			nautilus "/media/$basename" --no-desktop
+		fi
+	else
+		sudo rmdir "/media/$basename"
+		zenity --error --title "Mount ISO" --text "Could not mount \`$basename'!"
+		exit 1
+	fi
+done

@@ -1,0 +1,127 @@
+#command
+j		forw-line
+k		back-line
+^J		forw-line
+^K		back-line
+\kd		forw-line
+\ku		back-line
+
+h		left-scroll
+l		right-scroll
+
+d		forw-scroll
+u		back-scroll
+^D		forw-scroll
+^U		back-scroll
+
+\40		forw-screen
+f		forw-screen
+b		back-screen
+^F		forw-screen
+^B		back-screen
+\kD		forw-screen
+\kU		back-screen
+
+F		forw-forever
+R		repaint-flush
+
+{		forw-bracket {}
+}		back-bracket {}
+(		forw-bracket ()
+)		back-bracket ()
+[		forw-bracket []
+]		back-bracket []
+
+/		forw-search
+?		back-search
+n		repeat-search
+\en		repeat-search-all
+N		reverse-search
+\eN		reverse-search-all
+\e[15~	undo-hilite
+
+gg		goto-line
+G		goto-end
+\kh		goto-line
+\ke		goto-end
+p		percent
+%		percent
+=		status
+^G		set-mark zG'z=
+
+m		set-mark
+'		goto-mark
+`		goto-mark
+
+E		examine
+^N		next-file
+^P		prev-file
+:bd		remove-file
+
+-		toggle-option
+s		toggle-option o
+_		display-option
+
+0		digit
+1		digit
+2		digit
+3		digit
+4		digit
+5		digit
+6		digit
+7		digit
+8		digit
+9		digit
+
+v		visual
+!		shell
+H		help
+V		version
+q		quit
+:q		quit
+
+# search macros
+\\t		forw-search \^\\s*(\\w|\\s|$)\eh\eh\eh\eh\eh\eh\eh\eh\eh
+\\T		back-search \^\\s*(\\w|\\s|$)\eh\eh\eh\eh\eh\eh\eh\eh\eh
+\\a		forw-search \^\\s+((-\\w+|--(\\w|[=-])+)[,|]\\s*)*--?
+\\A		back-search \^\\s+((-\\w+|--(\\w|[=-])+)[,|]\\s*)*--?
+\\w		forw-search \\<\\>\eh\eh
+\\W		back-search \\<\\>\eh\eh
+#stop
+
+
+#line-edit
+\t		forw-complete
+^T		back-complete
+^V		literal
+
+\kl		left
+\kr		right
+\eh		left
+\el		right
+^L		right
+
+\eb		word-left
+\ef		word-right
+
+\kx		delete
+^D		delete
+\ed		word-delete
+^W		word-backspace
+
+\kh		home
+\ke		end
+^A		home
+^E		end
+
+^P		up
+^N		down
+\ep		up
+\en		down
+\ku		up
+\kd		down
+
+# search macros
+;w		literal \\<\\>\eh\eh
+;\40	literal \\s+
+#stop

@@ -1,0 +1,5 @@
+# loadkeys config
+# see also dumpkeys, showkey
+
+keymaps 0-15
+keycode 58 = Control

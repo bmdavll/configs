@@ -1,0 +1,9 @@
+#!/bin/bash
+
+list='
+cpufrequtils
+powertop
+tpb
+'
+
+sudo apt-get install -y $list

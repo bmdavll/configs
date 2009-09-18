@@ -1,0 +1,30 @@
+#!/bin/bash
+
+[ ! -d "$LOGDIR" ] && LOGDIR="$HOME/documents/txt"
+
+LOCK="$HOME/.$(basename -- "$0").lock"
+TODO="$LOGDIR/todo"
+
+if [ -e "$LOCK" -o ! -f "$TODO" -o ! -r "$TODO" ]; then
+	exit 1
+fi
+
+cleanUp() {
+	rm -f "$LOCK" "$TEMPFILE"
+	exit $1
+}
+trap "cleanUp 1" 1 2 3 15
+
+> "$LOCK"
+TEMPFILE=$(mktemp)
+
+zenity --text-info --title="TODO" --filename="$TODO" --editable >"$TEMPFILE"
+
+if	[ $? -eq 0 -a -s "$TEMPFILE" ] &&
+	! cmp -s "$TEMPFILE" "$TODO" &&
+	[ "$(head -n1 "$TEMPFILE")" = "#!log" ]
+then
+	cp "$TEMPFILE" "$TODO"
+fi
+
+cleanUp 0

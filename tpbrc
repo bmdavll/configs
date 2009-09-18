@@ -1,0 +1,6 @@
+THINKPAD /usr/bin/Terminal
+MIXER ON
+MIXERSTEPS 20
+OSD OFF
+
+# vim:set ft=conf syn=conf:

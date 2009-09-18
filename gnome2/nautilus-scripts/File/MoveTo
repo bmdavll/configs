@@ -1,0 +1,18 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+destination=$(zenity --file-selection --directory --title "Move to...")
+
+[ $? -ne 0 ] && exit 1
+
+if [ -w "$destination" ]; then
+	mv $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS "$destination"
+	if [ $? -ne 0 ]; then
+		zenity --error --title "Move" --text "Error moving files to \`$destination'"
+		exit 1
+	fi
+else
+	zenity --error --title "Move" --text "Can't write to \`$destination'"
+	exit 1
+fi

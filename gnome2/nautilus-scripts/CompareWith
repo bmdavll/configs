@@ -1,0 +1,9 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+files=$(zenity --file-selection --multiple --separator="$IFS" --title "Compare with...")
+
+[ $? -ne 0 ] && exit 1
+
+gvimdiff $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS $files

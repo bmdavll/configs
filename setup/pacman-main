@@ -1,0 +1,161 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+add ()
+{
+	for pkg in "$@"; do
+		list+=("$pkg")
+	done
+}
+
+list=()
+
+## shells
+add zsh
+
+## languages
+add parrot
+add perl
+add python
+add python3
+add ruby
+add jre jdk
+
+add perl-term-readkey
+add perl-term-readline
+add python-webpy
+
+## editors
+add emacs
+add hexedit
+
+## development
+add gdb
+add ctags
+add git
+add subversion
+
+## libraries
+add mono
+add boost
+add gob2
+add librsvg
+
+## networking
+add gnu-netcat
+add ncftp
+add nmap
+add samba
+add sshfs
+
+## system
+add dosfstools
+add gparted
+add ntfs-3g
+add ntfsprogs
+add sleuthkit
+add testdisk
+
+## utils
+add bc
+add dmenu
+add expect
+add fdupes # find duplicate files
+add gksu
+add gnupg
+add lesspipe
+add pinfo # alternate info viewer
+add pkgtools
+add pv
+add rxvt-unicode-256color
+add screen
+# add scrot
+add units
+add wine
+add xbindkeys
+add xclip
+add xdg-utils
+add xorg-utils
+add zenity
+
+## compression
+add unzip
+add p7zip
+add xarchiver
+add zip
+
+# input
+add gucharmap
+add scim
+add scim-pinyin scim-tables
+add stardict
+
+## office
+add epdfview
+add galculator gcalctool
+add openoffice-base
+add thunderbird
+# add mutt
+add words
+
+# internet
+add skype
+add transmission-gtk # deluge
+add lynx
+add w3m
+
+## graphics and photos
+add netpbm
+add gqview mirage
+add gimp
+add inkscape
+add dia # diagramming tool
+add gphoto2 gtkam
+# add comical # comic book reader
+
+## codecs
+add gstreamer0.10-plugins
+add libdvdcss
+add flashplugin
+
+## multimedia
+add mpg123
+add mpd ncmpcpp # ncmpc mpc
+add gmpc # sonata
+# add cmus
+add xfmedia
+add timidity++ # MIDI player
+
+add mp3info
+add mp3gain
+add audacity
+add gtkpod # yamipod
+
+add vlc # mplayer
+
+## disk burning
+# add cdrkit # includes mkisofs cdda2wav cdrecord etc.
+add cdrdao # for writing cue/bin files
+# add cdemu-client # for cue-bin emulation
+add xfburn
+
+## misc
+# add gourmet
+
+[ $(whoami) = root ] && exit 1
+
+sudo pacman -Sy --needed "${list[@]}"
+
+## replacement packages
+list=()
+
+add fam
+
+sudo pacman -Rdsn --noconfirm "${list[@]}"
+
+list=()
+
+add gamin
+
+sudo pacman -S --needed "${list[@]}"

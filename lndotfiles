@@ -1,0 +1,43 @@
+#!/bin/bash
+
+IFS=$'\n'
+set -e
+
+recurse() {
+	local wd="$PWD" file target
+
+	for file in *
+	do
+		if	[ ! "$1" ] &&
+			[[ "$file" =~ ^("$this"|launchers|setup)$ ]]
+		then
+			continue
+		fi
+
+		target="$HOME/${1:-.}$file"
+
+		if [ -h "$target" ]; then
+			rm "$target"
+		elif [ -d "$target" ]; then
+			if [ -d "$file" ]; then
+				cd "$file"
+				recurse "${1:-.}$file/"
+				cd "$wd"
+				continue
+			else
+				cd "$HOME"
+				ls -d "${1:-.}$file"
+				false
+			fi
+		fi
+
+		ln -s "$wd/$file" "$target"
+	done
+}
+
+path=$(readlink -e -- "$(which "$0")")
+this=$(basename -- "$path")
+
+cd "${path%$this}"
+
+recurse

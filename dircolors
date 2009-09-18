@@ -1,0 +1,4 @@
+SETGID 44;100		# file that is setgid (g+s)
+OTHER_WRITABLE 30;104	# dir that is other-writable (o+w) and not sticky
+
+# vim:set ts=8 sw=8 noet:

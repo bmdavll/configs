@@ -1,0 +1,47 @@
+#!/bin/bash
+
+TERMINALS=(Terminal gnome-terminal)
+
+for arg in "$@"; do
+	if [[ "$arg" =~ ^-[?] ]]; then
+		echo "Usage: $(basename "$0") [1-9] [dir|file] [cmd]"
+		exit
+	fi
+done
+
+if [[ ! -e "$1" && "$1" == [1-9] ]]
+then count=$1 && shift
+else count=1
+fi
+
+if [ $# -gt 0 ]; then
+	dir="${1/#\$HOME/$HOME}" && shift
+	dir="${dir/#\~\//$HOME/}"
+	set -- "$dir" "$@"
+fi
+
+if [ -d "$1" ]; then
+	dir="$1"
+	shift
+elif [ -e "$1" ]; then
+	dir=$(dirname -- "$1")
+	shift
+else
+	dir="$PWD"
+fi
+
+if [ $# -gt 0 ] && type "$1" &>/dev/null; then
+	set -- -x "$@"
+fi
+
+for terminal in "${TERMINALS[@]}"; do
+	if type "$terminal" &>/dev/null; then
+		for count in $(seq 1 $count); do
+			# LANG="en_US.UTF-8" LC_ALL="en_US.UTF-8"
+			$terminal --working-directory="$dir" "$@"
+		done
+		exit
+	fi
+done
+
+exit 1

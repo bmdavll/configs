@@ -1,0 +1,107 @@
+# readline config
+## settings {{{
+# disable bell
+set bell-style none
+
+# append filetype suffix to completions
+set visible-stats on
+
+# 8th bit behavior
+set input-meta on
+set output-meta on
+
+# first tab lists ambiguous choices
+set show-all-if-ambiguous on
+
+# do not show hidden files in completes (use . for hidden files)
+set match-hidden-files off
+
+# ignore case while completing
+# set completion-ignore-case on
+
+# }}}
+## commands {{{
+$if Bash
+space: magic-space
+$endif
+
+# Home/End
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+
+# Insert/Delete
+"\e[2~": quoted-insert
+"\e[3~": delete-char
+
+# }}}
+## custom {{{
+# unbound by default:
+# C-\ C-^ M-a M-e M-g M-h M-i M-j M-k M-m M-o M-q M-s M-v M-w M-x M-z
+# terminal sends Esc prefix for Meta, so use \e in place of \M-
+# basics {{{
+# cycle thru possible completions
+"\C-t": menu-complete
+
+# vi-style movement
+"\eh": backward-char
+"\el": forward-char
+"\C-l": forward-char
+
+# search matching partial command line
+"\ep": history-search-backward
+"\en": history-search-forward
+# }}}
+# previous command/directory {{{
+# add arguments to previous command
+"\ej": "\C-n\C-a\ef"
+"\ek": "\C-p\C-a\ef"
+
+# command substitute
+"\e`": " $(!!) \C-h"
+
+# fifo
+"\e,": " <(!!) \C-h"
+
+# yank-last-arg with space before
+"\e.": " !$ \C-h"
+
+# repeat with sudo
+"\es": "\C-p\C-asudo \ef\C-f"
+
+# cd to a sensible place according to the last command
+"\eg": "\C-a\C-kcll\C-m"
+
+# cd to previous directory
+"\eo": "\C-a\C-kbd\C-m"
+
+# insert previous directory
+"\ei": " $OLDPWD/\t"
+# }}}
+# piping output {{{
+# less
+"\em": "\C-e | less\C-m"
+
+# vim
+"\ev": "\C-e | vim +'set bt=nofile' +'normal zR' -"
+
+# grep highlight
+"\ee": "\C-e | e ''\C-b"
+
+# awk print field
+"\ea": "\C-e | awk '{ print $ }'\C-b\C-b\C-b"
+# }}}
+# misc {{{
+# spawn gui application
+"\e\C-j": "\C-agui \C-m"
+
+# exec on found files
+"\ex": "\C-e -exec  {} +\eb\ef\C-f"
+
+# history search
+"\eq":	"\C-a\C-khist|grep -v 'hist|' | g ''\C-b"
+
+# calculator
+"\ec": '\C-a\C-kcalc "  "\C-b\C-b'
+# }}}
+
+# vim:set ts=4 sw=4 noet fdm=marker:

@@ -1,0 +1,57 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+add ()
+{
+	for pkg in "$@"; do
+		list+=("$pkg")
+	done
+}
+
+list=()
+
+# base
+# base-devel
+
+# core
+add bridge-utils
+add dnsutils
+add glib2
+add gpm
+add inetutils
+add iproute2
+add iptables
+add man-db
+add netcfg
+add nfs-utils
+add openssh
+add wireless_tools
+
+# extra
+add acpid
+add pm-utils
+add hal
+add abs
+add rsync
+add bash-completion
+
+# alsa
+add alsa-utils
+add alsa-oss
+
+[ $(whoami) = root ] && exit 1
+
+echo -n "Download and install packages? [Y/n] "
+read reply
+if [[ "$reply" != [Nn]* ]]; then
+	sudo pacman -Sy --needed --noconfirm "${list[@]}"
+	[ $? -ne 0 ] && exit 1
+
+	echo -n "Update system? [Y/n] "
+	read reply
+	if [[ "$reply" != [Nn]* ]]; then
+		sudo pacman -Su --noconfirm
+		[ $? -ne 0 ] && exit 1
+	fi
+fi

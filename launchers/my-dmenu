@@ -1,0 +1,36 @@
+#!/bin/bash
+
+FILE="$HOME/.dmenu"
+DMENU=$(cat "$FILE") || exit 2
+CHOICES=$(echo "$DMENU" | grep -v '^#' | perl -pe 's/\S+\t//')
+
+OPTS=( -b -nb '#8c8c88' -nf black -sb '#c7c7c4' -sf black
+       -fn '-*-andale mono-medium-r-normal-*-17-*-100-100-*-*-*-uni' )
+
+choice=$(echo "$CHOICES" | dmenu "${OPTS[@]}") || exit $?
+
+if [[ "$choice" =~ ^[^[:alnum:]] ]]; then
+    dmenu_run "${OPTS[@]}"
+    exit
+else
+    command $choice
+fi
+
+echo "$DMENU" | perl -e '
+$choice = qq('"$choice"');
+while (<>) {
+    chomp;
+    @fields = split(/\t/);
+    if (scalar(@fields) != 2) {
+        next;
+    } elsif ($choice eq $fields[1] || $choice =~ m/^$fields[1]\s*\b/) {
+        $_  = ++$fields[0] . "\t" . $fields[1];
+    }
+} continue {
+    push(@lines, "$_$/");
+}
+@sorted = map  { $_->[0] }
+          sort { $b->[1] <=> $a->[1] }
+          map  { [ $_, ($_ =~ m/^(\d+)/)[0] ] }
+          @lines;
+print @sorted;' >"$FILE"

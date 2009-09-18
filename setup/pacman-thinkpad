@@ -1,0 +1,21 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+add ()
+{
+	for pkg in "$@"; do
+		list+=("$pkg")
+	done
+}
+
+list=()
+
+add wicd
+add tpb
+add cpufrequtils
+# add laptop-mode-tools
+
+[ $(whoami) = root ] && exit 1
+
+sudo pacman -Sy --needed "${list[@]}"

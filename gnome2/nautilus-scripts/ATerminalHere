@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# if [ -n "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" ]; then
+#     set $NAUTILUS_SCRIPT_SELECTED_URIS
+#     if [ $# -eq 1 ]; then
+#         # Only one item selected; get PATH from URI
+#         directory=$(echo $1 | sed -e 's#^file://##' -e 's/%20/ /g')
+#         # If it's not a directory, get its parent
+#         [ ! -d "$directory" ] && directory=$(dirname "$directory")
+#     else
+#         # More than one item selected; get current PATH
+#         directory=$(echo $NAUTILUS_SCRIPT_CURRENT_URI | sed -e 's#^file://##' -e 's/%20/ /g')
+#     fi
+# else
+#     # Nothing selected, or selected items not local
+#     directory=$(echo $NAUTILUS_SCRIPT_CURRENT_URI | sed -e 's#^file://##' -e 's/%20/ /g')
+# fi
+# # Void requests from a non-local URI
+# if [ "$(echo $directory | grep '^[^:/]\+:')" ]; then
+#     zenity --error --text="Not in a local directory."
+#     exit 1
+# fi
+# #directory=$(echo "$directory" | sed 's/ /\\ /g')
+
+IFS=$'\n'
+
+if echo "$NAUTILUS_SCRIPT_CURRENT_URI" | grep -v '^file:' > /dev/null; then
+	zenity --error --text="Not in a local directory."
+	exit 1
+fi
+
+set $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS
+
+if [ $# -ne 1 ]; then
+	directory="$PWD"
+elif [ -d "$1" ]; then
+	directory="$1"
+else
+	directory=$(dirname "$1")
+fi
+#directory=$(echo "$directory" | sed 's/ /\\ /g')
+
+gnome-terminal --working-directory="$directory"

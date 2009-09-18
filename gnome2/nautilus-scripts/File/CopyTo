@@ -1,0 +1,18 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+destination=$(zenity --file-selection --directory --title "Copy to...")
+
+[ $? -ne 0 ] && exit 1
+
+if [ -w "$destination" ]; then
+	cp -R --dereference --preserve=mode,timestamps $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS "$destination"
+	if [ $? -ne 0 ]; then
+		zenity --error --title "Copy" --text "Error copying to \`$destination'"
+		exit 1
+	fi
+else
+	zenity --error --title "Copy" --text "Can't write to \`$destination'"
+	exit 1
+fi

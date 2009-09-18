@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# for file in $NAUTILUS_SCRIPT_SELECTED_URIS; do
+#     file_name=$(echo $file | sed -e 's#^file://##' -e 's/%20/ /g')
+#     touch "$file_name"
+# done
+
+IFS=$'\n'
+
+touch $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS

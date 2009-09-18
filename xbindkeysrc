@@ -1,0 +1,12 @@
+# back button
+"/usr/bin/xte 'keydown Alt_L' 'key Left' 'keyup Alt_L'"
+  b:8
+# forward button
+"/usr/bin/xte 'keydown Alt_L' 'key Right' 'keyup Alt_L'"
+  b:9
+
+# shifted mousewheel up/down
+"/usr/bin/xte 'key BackSpace'"
+  b:4 + Shift
+"/usr/bin/xte 'key Return'"
+  b:5 + Shift

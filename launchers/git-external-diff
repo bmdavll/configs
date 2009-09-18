@@ -1,0 +1,5 @@
+#!/bin/bash
+
+opts=(-c 'set diffopt-=iwhite')
+
+gvimdiff -f "${opts[@]}" "$2" "$5"

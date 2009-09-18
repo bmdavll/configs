@@ -1,0 +1,16 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+if [ -x /usr/bin/gksu -o -x /opt/gnome/bin/gksu ]; then
+	sudotool=gksu
+elif [ -x /usr/bin/gnomesu -o -x /opt/gnome/bin/gnomesu ]; then
+	sudotool=gnomesu
+fi
+
+if [ -z "$sudotool" ]; then
+	zenity --error --text="No sudo tool found!"
+	exit 1
+else
+	xargs $sudotool gvim $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS
+fi

@@ -1,0 +1,72 @@
+#!/bin/bash
+
+IFS=$'\n'
+
+add ()
+{
+	for pkg in "$@"; do
+		list+=("$pkg")
+	done
+}
+
+[ $(whoami) = root ] && exit 1
+
+# yaourt
+if ! which yaourt &>/dev/null; then
+	echo -n "Install yaourt? [Y/n] "
+	read reply
+	if [[ "$reply" == [Nn]* ]]; then
+		exit 0
+	fi
+
+	TMP=~/tmp
+	YAOURT=yaourt.tar.gz
+
+	if [ ! -d $TMP ]; then
+		mkdir -p $TMP
+	fi
+	cd $TMP && \
+		wget http://aur.archlinux.org/packages/yaourt/$YAOURT && \
+		tar xzvf $YAOURT && rm $YAOURT && cd yaourt && \
+		vi PKGBUILD yaourt.install
+
+	echo -n "Make package and install? [y/N] "
+	read reply
+	if [[ "$reply" == [Yy]* ]]; then
+		makepkg PKGBUILD && sudo pacman -U yaourt-*.pkg.tar.gz
+	fi
+
+	rm -rf $TMP/yaourt
+	[ -z "$(ls -A $TMP)" ] && rmdir $TMP
+fi
+
+# AUR
+list=()
+
+add ack # grep drop-in
+add ascii
+add aurvote
+add cdrtools # alternative to cdrkit
+add detox # clean up filenames
+add evince-gtk
+add fluidr3 # MIDI soundfont
+add foremost # file recovery tool
+add hot-babe
+# add prename # perl renamer
+add stardict-i2e-es-en
+add stardict-oald stardict-wordnet
+add uzbl-git
+add vifm
+add xautomation
+
+if which yaourt &>/dev/null; then
+	for pkg in "${list[@]}"; do
+		echo -n "Download, make, and install $pkg? [Y/n] "
+		read reply
+		if [[ "$reply" != [Nn]* ]]; then
+			yaourt -S --needed --noconfirm $pkg
+		fi
+	done
+else
+	! echo >&2 "Please install yaourt first."
+fi

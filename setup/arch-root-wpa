@@ -1,0 +1,14 @@
+#!/bin/bash
+
+IFS=$'\n'
+WPA_CONF=/etc/wpa_supplicant.conf
+
+[ $(whoami) != root ] && exit 1
+
+if mv -i $WPA_CONF $WPA_CONF.bak; then
+	echo "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=wheel" >$WPA_CONF
+	echo >>$WPA_CONF
+
+	chmod 0600 $WPA_CONF
+	wpa_passphrase Cecily le0rningcnithum >>$WPA_CONF
+fi

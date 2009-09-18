@@ -1,0 +1,34 @@
+#!/bin/bash
+
+####### Set $directory to target directory
+IFS=$'\n'
+
+if echo "$NAUTILUS_SCRIPT_CURRENT_URI" | grep -v '^file:' > /dev/null; then
+	zenity --error --text="Not in a local directory."
+	exit 1
+fi
+
+set $NAUTILUS_SCRIPT_SELECTED_FILE_PATHS
+
+if [ $# -ne 1 ]; then
+	directory="$PWD"
+elif [ -d "$1" ]; then
+	directory="$1"
+else
+	directory=$(dirname "$1")
+fi
+directory=$(echo "$directory" | sed 's/ /\\ /g')
+#######
+
+if [ -x /usr/bin/gksu -o -x /opt/gnome/bin/gksu ]; then
+	sudotool=gksu
+elif [ -x /usr/bin/gnomesu -o -x /opt/gnome/bin/gnomesu ]; then
+	sudotool=gnomesu
+fi
+
+if [ -z "$sudotool" ]; then
+	zenity --error --text="No sudo tool found!"
+	exit 1
+else
+	$sudotool "nautilus --no-desktop $directory"
+fi

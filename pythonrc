@@ -1,0 +1,28 @@
+# Add auto-completion and a stored history file of commands to the Python
+# interactive interpreter. Requires Python 2.0+, readline.
+
+# default modules
+import os, sys, re
+from os import path
+
+import atexit
+import readline, rlcompleter
+
+readline.parse_and_bind('"\C-t": complete')
+# readline.parse_and_bind('tab: complete')
+
+histfile = os.path.expanduser("~/.python_history")
+
+if os.path.exists(histfile):
+    readline.read_history_file(histfile)
+
+def save_history(histfile=histfile):
+    import readline
+    readline.write_history_file(histfile)
+
+atexit.register(save_history)
+
+del atexit, readline, rlcompleter
+del histfile, save_history
+
+# vim:ft=python syn=python:

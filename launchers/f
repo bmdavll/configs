@@ -1,0 +1,13 @@
+#!/bin/bash
+
+FILEMAN=Thunar
+
+if [ -d "$1" ]; then
+	dir="$1" && shift
+elif [ -e "$1" ]; then
+	dir="$(dirname -- "$1")" && shift
+else
+	dir="$HOME"
+fi
+
+$FILEMAN "$dir"
