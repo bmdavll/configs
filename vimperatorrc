@@ -159,6 +159,7 @@ set titlestring=Firefox
 
 " about:config
 set! security.dialog_enable_delay=0
+set! browser.sessionstore.interval=120000
 
 " javascript {{{1
 javascript <<EOF

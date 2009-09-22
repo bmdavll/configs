@@ -26,7 +26,7 @@ set numberwidth=1		" only use as much space as needed for line numbers
 set shortmess=atToOI	" abbreviate file messages
 set timeoutlen=666		" milliseconds before mapped key sequences time out
 set updatetime=1000		" interval for CursorHold updates and swap file writes
-set listchars=tab:▏\ ,precedes:←,extends:→
+set listchars=tab:▏\ ,precedes:‹,extends:›
 						" display characters for tabs and extended lines
 let &showbreak = '↪ '	" display characters for wrapped lines
 set nobackup			" do not keep a backup file
@@ -511,7 +511,7 @@ function! s:ToggleHex()
 	endif
 	let &mod = mod_save
 	let &ro = ro_save
-	let &modifiable = ma_save
+	let &ma = ma_save
 endfunction " }}}3
 " WordProcess and Ascii: character conversion {{{3
 " convert quotes, apostrophes, and dashes into their unicode counterparts
@@ -576,7 +576,7 @@ endfunction " }}}3
 " externally map CapsLock to Control
 
 " no-ops
-vnoremap	K			<Nop>
+noremap		K			<Nop>
 
 " convenience remappings
 noremap		-			=
@@ -821,11 +821,10 @@ map	<silent><C-F3>		:<C-U>call <SID>ToggleClipBrd()<CR>
 " trim trailing whitespace
 function! <SID>Trim()
 	try " snippetsEmu housekeeping
-		if expand('%:t') !~ '.vimrc\|.XCompose' && exists("*CleanupArgs") &&
+		if expand('%:t') !~ '\.vimrc\|\.XCompose' && exists("*CleanupArgs") &&
 			\ g:snip_start_tag != '' && g:snip_end_tag != ''
 			exec '%s/('.g:snip_start_tag.'\(.*\))/\="(".CleanupArgs(submatch(1)).")"/e'
-			exec '%s/'.g:snip_start_tag.'//eg'
-			exec '%s/'.g:snip_end_tag.'//eg'
+			exec '%s/'.g:snip_start_tag.g:snip_end_tag.'//eg'
 		endif
 	catch | endtry
 	%s/\s\+$//e

@@ -52,6 +52,7 @@ add evince-gtk
 add fluidr3 # MIDI soundfont
 add foremost # file recovery tool
 add hot-babe
+add mit-scheme
 # add prename # perl renamer
 add stardict-i2e-es-en
 add stardict-oald stardict-wordnet

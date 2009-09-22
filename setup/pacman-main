@@ -15,11 +15,14 @@ list=()
 add zsh
 
 ## languages
+add clisp
 add parrot
 add perl
 add python
 add python3
+add lua luajit
 add ruby
+add php
 add jre jdk
 
 add perl-term-readkey
@@ -43,6 +46,7 @@ add gob2
 add librsvg
 
 ## networking
+add curl
 add gnu-netcat
 add ncftp
 add nmap

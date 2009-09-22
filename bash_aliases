@@ -852,10 +852,10 @@ complete -A variable var
 
 # web {{{
 _search() { :
-	($GUI firefox "$1$(echo "${@:2}" | sed 's/[[:space:]]\+/+/g')")
+	uzbl "$1$(echo "${@:2}" | sed 's/[[:space:]]\+/+/g')"
 }
 alias goog='_search "http://google.com/search?q="'
-alias wp='_search "http://en.wikipedia.org/wiki/Special:Search?search="'
+alias wiki='_search "http://en.wikipedia.org/wiki/Special:Search?search="'
 # }}}
 
 # vim {{{
@@ -954,14 +954,16 @@ alias vcc='vc --cd'
 _vc() { : :
 	[ ! -d "$BIN" ] && return 1
 	local IFS=$'\n' path replies=() cur="$2" i
-	for path in "$BIN" $(echo "$CODE_PATH" | tr ':' "$IFS"); do
-		replies=($(compgen -f -- "$path/$cur"))
-		for i in "${!replies[@]}"; do
-			[ -d "${replies[$i]}" -a ! -d "${replies[$i]#$path/}" ] &&
-				replies[$i]+='/'
+	if [ "$COMP_TYPE" -ne 63 ]; then
+		for path in "$BIN" $(echo "$CODE_PATH" | tr ':' "$IFS"); do
+			replies=($(compgen -f -- "$path/$cur"))
+			for i in "${!replies[@]}"; do
+				[ -d "${replies[$i]}" -a ! -d "${replies[$i]#$path/}" ] &&
+					replies[$i]+='/'
+			done
+			COMPREPLY+=("${replies[@]#$path/}")
 		done
-        COMPREPLY+=("${replies[@]#$path/}")
-	done
+	fi
 	if [ ${#COMPREPLY[@]} -eq 0 ]; then
 		COMPREPLY=($(compgen -W "$(gvim --serverlist)" -- "$cur"))
 	fi

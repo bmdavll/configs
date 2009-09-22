@@ -1,10 +1,12 @@
-27	t 
-7	f 
+42	t 
+11	t timer 
+9	f 
+7	t cpuset 
 5	gvim 
-4	t cpuset 
-3	t timer 
 2	scim-run gvim 
 1	scim-run stardict 
+1	clipboard 
+1	galculator 
 0	vlc 
 0	transmission 
 0	thunderbird 
@@ -13,8 +15,6 @@
 0	gqview 
 0	gmpc 
 0	gimp 
-0	galculator 
 0	firefox 
-0	clipboard 
 0	uzbl 
 # vim:set ts=8 sw=8 noet ft=conf list:
