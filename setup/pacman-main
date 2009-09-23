@@ -21,6 +21,7 @@ add perl
 add python
 add python3
 add lua luajit
+add tcl tk
 add ruby
 add php
 add jre jdk

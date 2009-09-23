@@ -75,14 +75,16 @@ function pat_in
 #                  follow an option with '?' if the argument to it is optional
 # parameters until first '--': list of long options that require an argument
 # e.g. split_opts 'tq?cSd?ir?s' cmd servername -- "$@"
+#      split_opts -- "$@"
 function split_opts
 { : :
 	local code=$?
 	unset OPTS ARGV
 	[ "$1" = "-c" ] && return $code
 	code=0 OPTS=() ARGV=()
-	local opt optional longopts=() argopts="$1" && shift
+	local opt optional longopts=() argopts
 	local nocaseglob=$(shopt -p nocaseglob) && shopt -u nocaseglob
+	[ "$1" != "--" ] && argopts="$1" && shift
 	if [[ "$argopts" == *?'?'* ]]; then
 		for opt in $(echo "$argopts" | grep -o '.?'); do
 			optional+="${opt%?}"
@@ -524,7 +526,7 @@ alias rmr='rm -r'
 # secure rm with shred
 function rms
 { :
-	split_opts '' -- "$@" || return $?
+	split_opts -- "$@" || return $?
 	if [ ${#ARGV[@]} -eq 0 ] || pat_in "$HELP_PAT" "$@"; then
 		split_opts -c
 		echo "Usage: rms [rm_option|file|dir]..." && return
@@ -540,7 +542,7 @@ function rms
 # files recursively
 function rmf
 { :
-	split_opts '' -- "$@" || return $?
+	split_opts -- "$@" || return $?
 	if [ ${#ARGV[@]} -eq 0 ] || pat_in "$HELP_PAT" "$@"; then
 		split_opts -c
 		echo "Usage: rmf [rm_option|file|dir]..." && return
@@ -610,7 +612,7 @@ function swap
 	fi
 	local -i code=0
 	local EXT_A EXT_B S='.' file dest sudo
-	split_opts '' -- "$@" || return $?
+	split_opts -- "$@" || return $?
 	str_in '-s' "${OPTS[@]}" && sudo=sudo
 	set -- "${ARGV[@]}"
 	split_opts -c
@@ -820,7 +822,7 @@ function rpn
 }
 # }}}
 
-# variable information {{{
+# variables {{{
 function var
 { :
 	[ $# -eq 0 ] && return 1
@@ -969,6 +971,36 @@ _vc() { : :
 	fi
 }
 complete -F _vc -o nospace -o filenames vc vcc
+# }}}
+
+# git {{{
+function gs
+{ :
+	local IFS=$'\n' WD="$PWD" push dir sep=-n
+	split_opts -- "$@" || return $?
+	if pat_in '^--?([a-z]+)$' "${OPTS[@]}"; then
+		push="${BASH_REMATCH[0]##*-}"
+	fi
+	set -- "${ARGV[@]}"
+	split_opts -c
+	[ $# -eq 0 ] && set -- .
+	for dir in "$@"; do
+		[ -d "$dir/.git" ] && cd "$dir" && echo $sep && unset sep
+		[ $? -ne 0 ] && continue
+		if [ "$PWD" = "$WD" ]
+		then echo "$(basename "$WD")"
+		else echo "${PWD#$WD/}"
+		fi | grep '[^/]*$'
+		git status 2>/dev/null | grep '^#' \
+		| GREP_COLORS='ms=35' grep -P '(?<=^# On branch )\w+|'
+		if [ "$push" ]; then
+			git remote | grep "^$push$" >/dev/null &&
+			git push "$push" HEAD 2>&1 | grep -v '^Everything up-to-date$'
+		fi
+		cd "$WD"
+	done
+	return 0
+}
 # }}}
 
 # gpg {{{

@@ -1,6 +1,6 @@
-42	t 
-11	t timer 
-9	f 
+46	t 
+15	t timer 
+10	f 
 7	t cpuset 
 5	gvim 
 2	scim-run gvim 

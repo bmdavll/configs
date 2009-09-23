@@ -92,8 +92,7 @@ HISTFILESIZE=50000
 HISTSIZE=47000
 
 # commands to exclude from history
-HISTIGNORE='?:l[saltSh]:l[saltSh]l:cls:ls[coh]:[cb]d:CD:oo*(o):cl?(l):popd:pp:dirs:rcd'
-HISTIGNORE+=':[fb]g:hist?(op):df:free:v[ps]:pwd:clear:reset:exit'
+HISTIGNORE='?:??:???:o*(o):dirs:free:clear:reset:exit'
 
 # exclude duplicate commands and command lines starting with space
 HISTCONTROL=ignoreboth
