@@ -37,6 +37,7 @@ $endif
 ## custom {{{
 # unbound by default:
 # C-\ C-^ M-a M-e M-g M-h M-i M-j M-k M-m M-o M-q M-s M-v M-w M-x M-z
+# unused: M-t M-u M-w M-y M-z
 # terminal sends Esc prefix for Meta, so use \e in place of \M-
 # basics {{{
 # cycle thru possible completions
@@ -87,8 +88,11 @@ $endif
 # grep highlight
 "\ee": "\C-e | e ''\C-b"
 
-# awk print field
-"\ea": "\C-e | awk '{ print $ }'\C-b\C-b\C-b"
+# perl
+"\e;": "\C-e | perl -lane ' print  '\C-b\C-b"
+
+# awk
+"\ea": "\C-e | awk '{ print  }'\C-b\C-b\C-b"
 # }}}
 # misc {{{
 # spawn gui application
@@ -98,10 +102,10 @@ $endif
 "\ex": "\C-e -exec  {} +\eb\ef\C-f"
 
 # history search
-"\eq":	"\C-a\C-khist|grep -v 'hist|' | g ''\C-b"
+"\eq":	"\C-a\C-khist|grep -v 'hist|' | e ''\C-b"
 
 # calculator
-"\ec": '\C-a\C-kcalc "  "\C-b\C-b'
+"\ec": '\C-acalc " \C-e "\C-b\C-b'
 # }}}
 
 # vim:set ts=4 sw=4 noet fdm=marker:

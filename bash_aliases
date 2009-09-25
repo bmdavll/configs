@@ -45,9 +45,8 @@ function gui
 	else
 		return $?
 	fi
-}
-eval $(complete -p sudo 2>/dev/null | sed 's/sudo$/gui/')
-GUI=gui
+} && GUI=gui
+complete -c gui
 # }}}
 
 # check if a string or pattern matches any of the arguments that follow {{{
@@ -715,6 +714,17 @@ function path
 }
 complete -A variable path
 
+function typef
+{
+	local -i code=0
+	while [ $# -gt 0 ]; do
+		readlink -e "$(type -p "$1")" || code+=1
+		shift
+	done
+	return $code
+}
+complete -c typef
+
 # file browser/terminal {{{
 function f
 { :
@@ -976,10 +986,10 @@ complete -F _vc -o nospace -o filenames vc vcc
 # git {{{
 function gs
 { :
-	local IFS=$'\n' WD="$PWD" push dir sep=-n
+	local IFS=$'\n' WD="$PWD" dir sep=-n remote
 	split_opts -- "$@" || return $?
 	if pat_in '^--?([a-z]+)$' "${OPTS[@]}"; then
-		push="${BASH_REMATCH[0]##*-}"
+		remote="${BASH_REMATCH[0]##*-}"
 	fi
 	set -- "${ARGV[@]}"
 	split_opts -c
@@ -993,9 +1003,9 @@ function gs
 		fi | grep '[^/]*$'
 		git status 2>/dev/null | grep '^#' \
 		| GREP_COLORS='ms=35' grep -P '(?<=^# On branch )\w+|'
-		if [ "$push" ]; then
-			git remote | grep "^$push$" >/dev/null &&
-			git push "$push" HEAD 2>&1 | grep -v '^Everything up-to-date$'
+		if [ "$remote" ]; then
+			git remote | grep "^$remote$" >/dev/null &&
+			git push "$remote" HEAD 2>&1 | grep -v '^Everything up-to-date$'
 		fi
 		cd "$WD"
 	done

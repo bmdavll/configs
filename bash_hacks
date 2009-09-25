@@ -31,12 +31,12 @@ CODE_PATH+=":$HOME/code/scripts:$HOME/code/scripts/perl:$HOME/code/scripts/pytho
 CODE_PATH+=":$HOME/code/repos:$HOME/code/repos/[^.]*"
 
 alias log='log -i'
-alias lg='log -f'
-complete -F _log -o filenames lg
-
-alias recipes='lg recipes'
-alias birding='lg -e birding'
-complete -F _log_alias recipes birding
+alias list='log -n list'
+alias clip='log clip'
+alias recipes='log recipes'
+alias birding='log -ef birding'
+complete -F _log_alias \
+clip list recipes birding
 
 export LOG_EDITOR='scim-run gvim'
 
