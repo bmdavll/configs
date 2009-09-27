@@ -2,7 +2,7 @@
 # interactive interpreter. Requires Python 2.0+, readline.
 
 # default modules
-import os, sys, re
+import os, sys, re, random
 from os import path
 
 import atexit

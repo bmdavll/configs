@@ -1,6 +1,5 @@
 #!/bin/bash
 # bash aliases and command-line functions
-
 ## convenience variables and utility functions {{{
 NBSP=' '
 
@@ -35,7 +34,6 @@ function max
 	[ "$val" ] && echo "$val"
 	return $code
 } # }}}
-
 # spawn gui application {{{
 function gui
 { :
@@ -48,7 +46,6 @@ function gui
 } && GUI=gui
 complete -c gui
 # }}}
-
 # check if a string or pattern matches any of the arguments that follow {{{
 function str_in
 {	:
@@ -67,7 +64,6 @@ function pat_in
 	done
 }
 # }}}
-
 # function to split an argument list into options and non-options {{{
 # clears and fills arrays OPTS and ARGV (use `split_opts -c' to unset)
 # first parameter: one-character options that take arguments
@@ -176,7 +172,6 @@ function file_glob # {{{
 	COMPREPLY+=("${toks[@]}")
 } # }}}
 ## }}}
-
 ## command line essentials {{{
 # colors {{{
 if [ -x /bin/tput -o -x /usr/bin/tput ] && tput setaf 1 &>/dev/null; then :
@@ -198,7 +193,6 @@ if [ -x /bin/tput -o -x /usr/bin/tput ] && tput setaf 1 &>/dev/null; then :
 	unset COLOR
 fi
 # }}}
-
 # ls {{{
 function l # {{{
 { :
@@ -341,7 +335,6 @@ alias cls='clear && ls'
 # completion
 complete -A directory lh lhl lsc lso lsh
 # }}}
-
 # changing directories {{{
 alias bd='cd - >/dev/null'
 alias CD='cd "$(readlink -m "$PWD")"'
@@ -350,7 +343,7 @@ function c
 { :
 	local IFS=$'\n'
 	if [ $# -gt 0 -a ! -d "$1" ]; then
-		local try=$(ls -d $1*)
+		local try=$(ls -d $1* 2>/dev/null)
 		[ ! -d "$try" ] && try=$(dirname -- "$1")
 		if [ -d "$try" -a ! "$try" -ef "$PWD" ]; then
 			shift
@@ -518,7 +511,6 @@ alias rmed='_rm_special ed'
 complete -F _find -o filenames -o default \
 findg findn findf findd findl findbk findbl finded rmbk rmbl rmed
 # }}}
-
 # rm {{{
 alias rmr='rm -r'
 
@@ -562,7 +554,6 @@ function rmf
 	return $code
 }
 # }}}
-
 # mv {{{
 _echodo() { :
 	echo "$@" && "$@"
@@ -659,7 +650,6 @@ function swap
 alias bak='swap bak ""'
 alias cbak='_swap_hook="cp -a" swap bak ""'
 # }}}
-
 # jobs {{{
 function psgrep
 { :
@@ -740,7 +730,6 @@ function f
 }
 complete -A directory t
 # }}}
-
 # help {{{
 function h
 { :
@@ -778,7 +767,6 @@ function h
 }
 # eval $(complete -p man 2>/dev/null | sed 's/man$/h/')
 # }}}
-
 # alias help {{{
 function ahelp
 { :
@@ -799,7 +787,6 @@ function ahelp
 }
 # }}}
 ## }}}
-
 ## the rest {{{
 alias cat4='expand -t4'
 alias db='diff -bB'
@@ -831,7 +818,6 @@ function rpn
 	return ${PIPESTATUS[0]}
 }
 # }}}
-
 # variables {{{
 function var
 { :
@@ -861,7 +847,6 @@ function var
 }
 complete -A variable var
 # }}}
-
 # web {{{
 _search() { :
 	uzbl "$1$(echo "${@:2}" | sed 's/[[:space:]]\+/+/g')"
@@ -869,7 +854,6 @@ _search() { :
 alias goog='_search "http://google.com/search?q="'
 alias wiki='_search "http://en.wikipedia.org/wiki/Special:Search?search="'
 # }}}
-
 # vim {{{
 function vd { ($GUI gvimdiff "$@") }
 function vp { ($GUI gvim -p  "$@") }
@@ -982,37 +966,50 @@ _vc() { : :
 }
 complete -F _vc -o nospace -o filenames vc vcc
 # }}}
+# ssh {{{
+SSH_ENV="$HOME/.ssh/environment"
 
+function start-ssh-agent
+{
+	/usr/bin/ssh-agent | sed 's/^echo/#echo/' >"$SSH_ENV"
+	chmod 600 "$SSH_ENV"
+	source "$SSH_ENV" >/dev/null
+	/usr/bin/ssh-add
+}
+# }}}
 # git {{{
+type __gitdir &>/dev/null &&
 function gs
 { :
-	local IFS=$'\n' WD="$PWD" dir sep=-n remote
+	local IFS=$'\n' WD="$PWD" OWD dir gitdir sep=-n remote
 	split_opts -- "$@" || return $?
 	if pat_in '^--?([a-z]+)$' "${OPTS[@]}"; then
 		remote="${BASH_REMATCH[0]##*-}"
 	fi
 	set -- "${ARGV[@]}"
 	split_opts -c
+	[ "${OLDPWD+set}" ] && OWD="$OLDPWD"
 	[ $# -eq 0 ] && set -- .
 	for dir in "$@"; do
-		[ -d "$dir/.git" ] && cd "$dir" && echo $sep && unset sep
-		[ $? -ne 0 ] && continue
-		if [ "$PWD" = "$WD" ]
-		then echo "$(basename "$WD")"
-		else echo "${PWD#$WD/}"
-		fi | grep '[^/]*$'
+		cd "$WD"
+		cd "$dir" || continue
+		gitdir=$( (cd "$(__gitdir)" && pwd) 2>/dev/null)
+		[ ! "$gitdir" -o "$gitdir" = "$PWD" ] && continue
+		echo $sep && unset sep
+		echo "${PWD#$(dirname "$(dirname "$gitdir")")/}" | grep '^[^/]*'
 		git status 2>/dev/null | grep '^#' \
 		| GREP_COLORS='ms=35' grep -P '(?<=^# On branch )\w+|'
-		if [ "$remote" ]; then
-			git remote | grep "^$remote$" >/dev/null &&
+		if [ "$remote" ] && git remote | grep "^$remote$" >/dev/null; then
+			[ -f "$SSH_ENV" ] && source "$SSH_ENV" >/dev/null
+			ps -ef	| grep "$SSH_AGENT_PID" \
+					| grep 'ssh-agent$' >/dev/null || start-ssh-agent
 			git push "$remote" HEAD 2>&1 | grep -v '^Everything up-to-date$'
 		fi
-		cd "$WD"
 	done
-	return 0
+	[ "${OWD+set}" ] && cd "$OWD"
+	cd "$WD"
 }
 # }}}
-
 # gpg {{{
 function encrypt
 { :
@@ -1053,7 +1050,6 @@ function decrypt
 	return $code
 }
 # }}}
-
 # samba {{{
 function smbmount
 { :
@@ -1089,5 +1085,4 @@ function smbumount
 }
 # }}}
 ## }}}
-
 # vim:set ts=4 sw=4 noet fdm=marker:

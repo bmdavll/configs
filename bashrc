@@ -119,7 +119,7 @@ export EDITOR=vim
 export VISUAL=vim
 
 # python
-export PYTHONPATH="$HOME/code/py/modules"
+export PYTHONPATH="$HOME/code/lang/py/modules"
 if [ -f "$HOME/.pythonrc" ]; then
 	export PYTHONSTARTUP="$HOME/.pythonrc"
 fi

@@ -234,12 +234,13 @@ else
 	" default group
 	augroup vimrc
 		au!
+		" don't auto-split lines
+		au BufReadPre  * set textwidth=0
+
 		" restore cursor position, except when the position is invalid or
 		" when inside an event handler (when dropping a file on gvim)
 		au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
 
-		" don't auto-split lines
-		au BufReadPost * set textwidth=0
 		" open all folds
 		au BufReadPost * normal! zR
 
@@ -1278,6 +1279,12 @@ augroup java
 	" make
 	au FileType java setl mp=javac\ -g\ $*\ %
 	au FileType java setl efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#,%-G%.%#
+augroup END
+
+" git {{{2
+augroup git
+	au!
+	au FileType git* setl textwidth=72
 augroup END
 
 " }}}1 development

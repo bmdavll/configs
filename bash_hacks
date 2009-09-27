@@ -26,8 +26,8 @@ addsource ~/code/scripts/j.sh
 addsource ~/code/repos/[^.]*/*.sh
 addsource ~/code/repos/[^.]*/examples/*.sh
 
-CODE_PATH="$HOME/code"
-CODE_PATH+=":$HOME/code/scripts:$HOME/code/scripts/perl:$HOME/code/scripts/python"
+CODE_PATH="$HOME/code:$HOME/code/lang"
+CODE_PATH+=":$HOME/code/scripts:$HOME/code/scripts/@(perl|python)"
 CODE_PATH+=":$HOME/code/repos:$HOME/code/repos/[^.]*"
 
 alias log='log -i'
@@ -45,7 +45,11 @@ if which surfraw &>/dev/null; then
 	export SURFRAW_text_browser=/usr/bin/w3m
 fi
 
-cleanup-history.pl &>/dev/null
+if (( RANDOM < 1000 )); then
+	cleanup-history.pl --squash
+elif (( RANDOM < 2000 )); then
+	cleanup-history.pl
+fi
 ## }}}
 ## backups {{{
 function b
@@ -154,24 +158,6 @@ complete -o bashdefault -o default -o nospace -F _git_diff		gd
 complete -o bashdefault -o default -o nospace -F _git_log		gl
 complete -o bashdefault -o default -o nospace -F _git_ls_files	gls
 complete                                      -F _git_merge		gm
-## }}}
-## ssh {{{
-SSH_ENV="$HOME/.ssh/environment"
-
-function start_agent
-{
-	echo "Initializing new SSH agent..."
-	/usr/bin/ssh-agent | sed 's/^echo/#echo/' >"$SSH_ENV"
-	echo "Success"
-	chmod 600 "$SSH_ENV"
-	source "$SSH_ENV" >/dev/null
-	/usr/bin/ssh-add
-}
-
-if [ -f "$SSH_ENV" ]; then
-	source "$SSH_ENV" >/dev/null
-	# ps -ef | grep "$SSH_AGENT_PID" | grep ssh-agent$ >/dev/null || start_agent
-fi
 ## }}}
 ## samba {{{
 _smbmount() {

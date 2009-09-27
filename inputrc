@@ -102,7 +102,7 @@ $endif
 "\ex": "\C-e -exec  {} +\eb\ef\C-f"
 
 # history search
-"\eq":	"\C-a\C-khist|grep -v 'hist|' | e ''\C-b"
+"\eq":	"\C-a\C-khist|tac|grep -v 'hist|' | e ''\C-b"
 
 # calculator
 "\ec": '\C-acalc " \C-e "\C-b\C-b'
