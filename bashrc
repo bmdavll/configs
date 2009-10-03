@@ -65,9 +65,10 @@ function PS1
 #}
 
 # title bar
+PROMPT_COMMAND='history -a'
 case "$TERM" in
 xterm*|*rxvt*)
-	PROMPT_COMMAND='history -a; echo -ne "\033]0;$USER@$HOSTNAME:${PWD/#$HOME/~}\007"'
+	PROMPT_COMMAND+=';echo -ne "\033]0;$USER@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
 	;;
 esac
 ## }}}
@@ -163,7 +164,6 @@ function lnbin
 ## }}}
 
 ## bootstrap other scripts and set PATH {{{
-if [ "$TERM" != "dumb" ]; then
 function addpath
 {
 	[ $# -ne 1 ] && return 2
@@ -187,8 +187,10 @@ function addsource
 	return $code
 }
 addsource "$HOME/.bash_aliases"
-addsource "$HOME/.bash_hacks"
-addpath .
+
+if [ "$TERM" != "dumb" ]; then
+	addsource "$HOME/.bash_hacks"
+	addpath .
 fi
 # }}}
 

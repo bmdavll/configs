@@ -3,22 +3,16 @@
 set nocompatible		" use vim settings instead of vi settings
 set mouse=a				" enable mouse in all modes
 set noinsertmode		" enforce in case of EZ-mode
-set shellcmdflag=-lc	" use login shell (read .profile)
 set noexpandtab			" whether to expand tabs into spaces
 set tabstop=4			" number of spaces for tab character
 set shiftwidth=4		" number of spaces for autoindent and soft tab stops
 set visualbell t_vb=	" disable bell
 set scrolloff=3			" minimum lines of buffer when vertically scrolling
 set sidescroll=1		" redraw with every column when side scrolling
-set winminheight=0		" really minimize split windows
-set winminwidth=0		" really minimize vertically split windows
+set winminheight=0		" fully minimize split windows
+set winminwidth=0		" fully minimize vertically split windows
 set cmdwinheight=12		" set command-line window height
 set cmdheight=1			" number of command lines
-set wildmenu			" enhanced command-line completion menu
-set wildcharm=<C-Z>		" character for command-line completion in mappings
-set wildignore+=*.o		" files to ignore for filename completion
-set wildignore+=*.class
-set wildignore+=*.pyc
 set showcmd				" display incomplete commands
 set ruler				" show the cursor position at all times
 set number				" show line numbers by default
@@ -26,9 +20,21 @@ set numberwidth=1		" only use as much space as needed for line numbers
 set shortmess=atToOI	" abbreviate file messages
 set timeoutlen=666		" milliseconds before mapped key sequences time out
 set updatetime=1000		" interval for CursorHold updates and swap file writes
+set incsearch			" do incremental searching
+set ignorecase			" ignore case for search patterns
+						" (override with \C anywhere in a search pattern)
+set smartcase			" don't ignore case for patterns with uppercase chars
+set hlsearch			" highlight search pattern matches
+set nowrap				" don't wrap lines by default
 set listchars=tab:▏\ ,precedes:‹,extends:›
 						" display characters for tabs and extended lines
 let &showbreak = '↪ '	" display characters for wrapped lines
+set linebreak			" don't break mid-word when wrapping
+set whichwrap=b,<,>,[,] " move freely between lines
+set formatoptions+=r	" auto insert comment leader
+set formatoptions+=n	" recognize numbered lists when formatting
+set backspace=2			" allow backspacing over everything in insert mode
+set virtualedit=block	" allow virtual selection in blockwise visual mode
 set nobackup			" do not keep a backup file
 set history=1000		" lines of command line history to keep
 set viminfo='50,s100,h	" settings for vim cache
@@ -36,21 +42,17 @@ set sessionoptions=curdir,folds,tabpages,winsize,localoptions
 						" what to save with mksession
 set directory=~/tmp//,.,/var/tmp
 						" directories for swap files
-set incsearch			" do incremental searching
-set ignorecase			" ignore case for search patterns
-						" (override with \C anywhere in a search pattern)
-set smartcase			" don't ignore case for patterns with uppercase chars
-set hlsearch			" highlight search pattern matches
-set nowrap				" don't wrap lines by default
-set linebreak			" don't break mid-word when wrapping
-set whichwrap=b,<,>,[,] " move freely between lines
-set formatoptions+=r	" auto insert comment leader
-set formatoptions+=n	" recognize numbered lists when formatting
-set backspace=2			" allow backspacing over everything in insert mode
-set virtualedit=block	" allow virtual selection in blockwise visual mode
+set shell=env\ TERM=dumb\ $SHELL
+						" don't source interactive scripts
+set shellcmdflag=-lc	" use login shell (read .profile)
 set complete-=i			" don't scan included files
 set completeopt+=longest
 						" complete to the longest common match in insert mode
+set wildmenu			" enhanced command-line completion menu
+set wildcharm=<C-Z>		" character for command-line completion in mappings
+set wildignore+=*.o		" files to ignore for filename completion
+set wildignore+=*.class
+set wildignore+=*.pyc
 set cpoptions+=>		" put a line break before appending to a register
 set diffopt+=iwhite		" ignore whitespace in diff mode
 set foldmethod=indent	" define folds automatically based on indent level
@@ -248,8 +250,8 @@ else
 		au BufWinEnter * let &softtabstop=&shiftwidth
 
 		" reading Word documents
-		au BufReadPre  *.doc set readonly
-		au BufReadPost *.doc %! antiword "%"
+		" au BufReadPre  *.doc set readonly
+		" au BufReadPost *.doc %! antiword "%"
 	augroup END
 
 	" automatically enter hex mode and handle file writes properly

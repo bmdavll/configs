@@ -215,6 +215,7 @@ function l # {{{
 } # }}}
 alias la='l -A'
 alias ll='l -lh'
+alias lla='l -lhA'
 alias lt='l -lhtr'
 alias lS='l -lhSr'
 
@@ -369,14 +370,13 @@ function cll
 		echo "Usage: cll [ls_option]..." && return
 	fi
 	local opts=("$@") args=() arg
-	set -- $(tail -n1 "$HISTFILE" 2>/dev/null | sed 's/[&|!<>;]//g')
+	eval "set -- $(tail -n1 "$HISTFILE" 2>/dev/null | sed 's/[&|!<>;]//g')"
 	while [ $# -gt 0 ]; do
 		args[$#]="$1" && shift
 	done
 	for arg in "${args[@]}"; do
 		if [ ! -d "$arg" ]; then
 			arg=$(dirname -- "$arg")
-			[ "$arg" = . ] && continue
 		fi
 		if [ -d "$arg" -a ! "$arg" -ef "$PWD" -a "$arg" != '/' ]; then
 			cl "${opts[@]}" -- "$arg"
@@ -849,8 +849,8 @@ complete -A variable var
 # }}}
 # web {{{
 _search() { :
-	uzbl "$1$(echo "${@:2}" | sed 's/[[:space:]]\+/+/g')"
-}
+	$BROWSER "$1$(echo "${@:2}" | sed 's/[[:space:]]\+/+/g')"
+} && BROWSER=firefox
 alias goog='_search "http://google.com/search?q="'
 alias wiki='_search "http://en.wikipedia.org/wiki/Special:Search?search="'
 # }}}
@@ -994,7 +994,7 @@ function gs
 		cd "$WD"
 		cd "$dir" || continue
 		gitdir=$( (cd "$(__gitdir)" && pwd) 2>/dev/null)
-		[ ! "$gitdir" -o "$gitdir" = "$PWD" ] && continue
+		[[ ! "$gitdir" || "$PWD" == "$gitdir"* ]] && continue
 		echo $sep && unset sep
 		echo "${PWD#$(dirname "$(dirname "$gitdir")")/}" | grep '^[^/]*'
 		git status 2>/dev/null | grep '^#' \

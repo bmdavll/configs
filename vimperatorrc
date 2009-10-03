@@ -108,6 +108,7 @@ noremap			<C-b>		<C-v><C-b>
 
 " enter command-line mode
 noremap			;			:
+cnoremap		<C-;>		<Esc>
 " numeric tab switching
 noremap			c			B:buffer!<Space>
 " page up

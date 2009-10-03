@@ -28,6 +28,7 @@ add jre jdk
 
 add perl-term-readkey
 add perl-term-readline
+add python-simplejson
 add python-webpy
 
 ## editors
@@ -48,6 +49,7 @@ add librsvg
 
 ## networking
 add curl
+add ettercap
 add gnu-netcat
 add ncftp
 add nmap
@@ -98,6 +100,7 @@ add stardict
 
 ## office
 add epdfview
+add pdfedit
 add galculator gcalctool
 add openoffice-base
 add thunderbird

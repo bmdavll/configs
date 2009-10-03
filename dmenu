@@ -1,8 +1,8 @@
-46	t 
-15	t timer 
-11	f 
+47	t 
+16	t timer 
+12	f 
+8	gvim 
 7	t cpuset 
-6	gvim 
 2	scim-run gvim 
 1	scim-run stardict 
 1	clipboard 
