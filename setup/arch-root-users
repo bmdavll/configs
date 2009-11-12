@@ -2,14 +2,16 @@
 
 [ $(whoami) != root ] && exit 1
 
+set -e
+
 passwd
 
 echo "Setting up user: david"
 useradd -m -G \
-users,adm,audio,camera,disk,log,lp,network,optical,power,storage,video,wheel \
--s /bin/bash david && \
+users,adm,audio,disk,log,lp,network,optical,power,storage,video,wheel \
+-s /bin/bash david
 passwd david
 
 echo "Setting up sudo"
-pacman -S sudo && \
+pacman -S sudo
 visudo

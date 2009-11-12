@@ -15,19 +15,30 @@ list=()
 add zsh
 
 ## languages
-add clisp
 add parrot
 add perl
 add python
 add python3
 add lua luajit
 add tcl tk
+add clisp
+add ghc
 add ruby
 add php
 add jre jdk
 
+add mod_perl
+add perl-bit-vector
+add perl-dbd-mysql
+add perl-dbd-sqlite
+add perl-inline
+add perl-mp3-info
 add perl-term-readkey
 add perl-term-readline
+add perl-text-markdown
+add perl-yaml-syck
+add perlxml
+
 add python-simplejson
 add python-webpy
 
@@ -66,16 +77,19 @@ add testdisk
 
 ## utils
 add bc
-add dmenu
+# add dmenu
 add expect
 add fdupes # find duplicate files
+add galculator gcalctool
 add gksu
 add gnupg
 add lesspipe
+add mathomatic
+add partimage
 add pinfo # alternate info viewer
 add pkgtools
 add pv
-add rxvt-unicode-256color
+# add rxvt-unicode-256color
 add screen
 # add scrot
 add units
@@ -100,21 +114,22 @@ add stardict
 
 ## office
 add epdfview
-add pdfedit
-add galculator gcalctool
 add openoffice-base
 add thunderbird
 # add mutt
 add words
 
 # internet
+add irssi
+add lynx
 add skype
 add transmission-gtk # deluge
-add lynx
+add mktorrent
 add w3m
 
 ## graphics and photos
 add netpbm
+add optipng
 add gqview mirage
 add gimp
 add inkscape
@@ -132,18 +147,21 @@ add mpg123
 add mpd ncmpcpp # ncmpc mpc
 add gmpc # sonata
 # add cmus
-add xfmedia
+add xfmedia banshee
 add timidity++ # MIDI player
+add gtkpod
 
-add mp3info
-add mp3gain
 add audacity
-add gtkpod # yamipod
+add easytag
+add mp3gain
+add mp3info
+add mp3splt
+add sox
 
-add vlc # mplayer
+add vlc miro # mplayer
 
 ## disk burning
-# add cdrkit # includes mkisofs cdda2wav cdrecord etc.
+add cdrkit # includes mkisofs cdda2wav cdrecord etc.
 add cdrdao # for writing cue/bin files
 # add cdemu-client # for cue-bin emulation
 add xfburn
@@ -166,4 +184,4 @@ list=()
 
 add gamin
 
-sudo pacman -S --needed "${list[@]}"
+sudo pacman -S --needed --noconfirm "${list[@]}"

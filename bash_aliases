@@ -265,8 +265,8 @@ function lh
 # pipe to less with colors {{{
 function _lsl
 { :
-	local code=0 output ls="$1" && shift
-	output=$([ "$ls" ] && $ls --color=always "$@") || code=$?
+	local code=0 output ls=($1) && shift
+	output=$([ "$ls" ] && "${ls[@]}" --color=always "$@") || code=$?
 	if [ "$output" ]; then
 		printf "%s" "$output" | less -R
 	fi
@@ -370,7 +370,7 @@ function cll
 		echo "Usage: cll [ls_option]..." && return
 	fi
 	local opts=("$@") args=() arg
-	eval "set -- $(tail -n1 "$HISTFILE" 2>/dev/null | sed 's/[&|!<>;]//g')"
+	eval "set -- $(tail -n1 "$HISTFILE" 2>/dev/null | sed 's/[&|!<>$();]//g')"
 	while [ $# -gt 0 ]; do
 		args[$#]="$1" && shift
 	done
@@ -446,7 +446,7 @@ _finder() { :
 	[ ${#paths[@]} -eq 0 ] && paths='.'
 	# }}}
 	# execute {{{
-	[ "$special" = "ed" ] && specs=(-depth -mindepth 1 "${specs[@]}")
+	[ "$special" = "ed" ] && specs=(-depth "${specs[@]}")
 	local args=("${opts[@]}" "${paths[@]}" "${specs[@]}")
 	if [ "$special" ]; then
 		case "$special" in
@@ -500,6 +500,7 @@ _rm_special() { :
 	local line spec="-special $1" && shift
 	_finder "$spec" "$@" | while read line
 	do
+		[ "$line" = "." ] && line="$PWD"
 		rm -r "$line" || code+=$?
 	done
 	return $code
@@ -676,7 +677,7 @@ _psgrep() { :
 	then args=("${@:4}")
 	else args=(-e)
 	fi
-	COMPREPLY=($( compgen -W "$(ps -o comm "${args[@]}" | sort -u
+	COMPREPLY=($( compgen -W "$(ps -o comm "${args[@]}" | sort -u |
 				  egrep -v '^(ps|COMMAND|egrep|sort)$')" -- "$2" ))
 }
 _ka() { :
@@ -805,11 +806,12 @@ _float() { :
 }
 function calc
 { :
-	local constants='
+	local scale constants='
 	pi = 3.14159265358979323846
 	e  = 2.71828182845904523536
 	'
-	echo "$constants; $*" | bc -l | _float
+	[[ "$*" == *%* ]] && scale='scale = 0'
+	echo "$constants; $scale; $*" | bc -l | _float
 	return ${PIPESTATUS[1]}
 }
 function rpn
@@ -849,10 +851,24 @@ complete -A variable var
 # }}}
 # web {{{
 _search() { :
-	$BROWSER "$1$(echo "${@:2}" | sed 's/[[:space:]]\+/+/g')"
-} && BROWSER=firefox
-alias goog='_search "http://google.com/search?q="'
-alias wiki='_search "http://en.wikipedia.org/wiki/Special:Search?search="'
+	local SEP='/' URL="$1" && shift
+	URL=$(echo "$@" | perl -e '
+		$URL = q['"$URL"'];
+		$/ = "";
+		@Q = split(q['"$SEP"'], <>);
+		foreach (@Q) {
+			$_   =~ s/^\s+|\s+$//g;
+			$_   =~ s/\s+/+/g;
+			$URL =~ s/%s/$_/;
+		}
+		$URL =~ s/%s//g;
+		print $URL;
+	')
+	$BROWSER "$URL"
+} && BROWSER="$GUI firefox"
+alias goog='_search "http://google.com/search?q=%s"'
+alias wiki='_search "http://en.wikipedia.org/wiki/Special:Search?search=%s"'
+alias what='_search "http://what.cd/torrents.php?action=advanced&artistname=%s&groupname=&filelist=%s&freetorrent=&taglist=&tags_type=1&order_by=time&order_way=desc"'
 # }}}
 # vim {{{
 function vd { ($GUI gvimdiff "$@") }

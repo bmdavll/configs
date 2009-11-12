@@ -48,7 +48,6 @@ noremap			a			<Nop>
 noremap			<C-y>		<Nop>
 noremap			<C-p>		<Nop>
 noremap			<C-n>		<Nop>
-inoremap		<C-j>		<Nop>
 
 noremap			<C-Space>	<Esc>
 inoremap		<C-Space>	<Esc>
@@ -90,7 +89,9 @@ inoremap		<A-BS>		<C-BS>
 
 " misc {{{2
 " back, forward, and edit with external editor
+cnoremap		<C-o>		<Esc><C-o>
 inoremap		<C-o>		<Esc><C-o>
+cnoremap		<C-i>		<Esc><C-i>
 inoremap		<C-i>		<Esc><C-i>
 inoremap		<C-g>		<C-i>
 
@@ -109,6 +110,11 @@ noremap			<C-b>		<C-v><C-b>
 " enter command-line mode
 noremap			;			:
 cnoremap		<C-;>		<Esc>
+
+" return
+inoremap		<C-j>		<CR>
+inoremap		<C-m>		<CR>
+
 " numeric tab switching
 noremap			c			B:buffer!<Space>
 " page up

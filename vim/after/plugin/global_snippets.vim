@@ -34,16 +34,19 @@ function! Count(haystack, needle)
 	return counter
 endfunction
 
-function! CountIgnoring(haystack, needle, poop)
+" returns the number of contiguous needles in haystack, skipping intermittent poop
+" returns 0 unless all of haystack is matched (from start of string to end, by
+" either needles or poop)
+function! CountSkipping(haystack, needle, poop)
 	let counter = 0
 	let end = 0
 	while 1
-		let list = matchlist(a:haystack, '^\('.a:needle.'\)\|^\('.a:poop.'\)', end)
-		if empty(list) | break | endif
-		if list[1] != ''
+		let list = matchlist(a:haystack, '^\('.a:poop.'\)\|^\('.a:needle.'\)', end)
+		if empty(list) || list[1].list[2] == '' | break | endif
+		if list[1] == ''
 			let counter += 1
 		endif
-		let end = matchend(a:haystack, '^\('.a:needle.'\)\|^\('.a:poop.'\)', end)
+		let end = matchend(a:haystack, '^\('.a:poop.'\)\|^\('.a:needle.'\)', end)
 	endwhile
 	if end != len(a:haystack)
 		return 0
@@ -52,6 +55,7 @@ function! CountIgnoring(haystack, needle, poop)
 	endif
 endfunction
 
+" returns a list of pat occurrences in str
 function! MatchList(str, pat)
 	let matches = []
 	let end = 0
@@ -64,13 +68,16 @@ function! MatchList(str, pat)
 	return matches
 endfunction
 
-function! ReplaceIfMatch(text, match, replacement)
+" returns replacement if text equals match, otherwise returns text
+function! ReplaceIfEqual(text, match, replacement)
 	if a:text ==# a:match
 		return a:replacement
 	endif
 	return a:text
 endfunction
 
+" returns string with all words capitalized
+" uses the first argument, or register z if given no arguments
 function! CapWords(...)
 	if a:0 == 0
 		return substitute(@z,  '\w\+', '\u&', 'g')
@@ -79,6 +86,7 @@ function! CapWords(...)
 	endif
 endfunction
 
+" returns text surrounded by prefix and suffix if it's not empty
 function! PostProcess(text, prefix, suffix)
 	if a:text != ''
 		return a:prefix.a:text.a:suffix
@@ -86,6 +94,7 @@ function! PostProcess(text, prefix, suffix)
 	return a:text
 endfunction
 
+" construct a comma-separated tag list
 function! ArgList(count)
 	if a:count == 0
 		return ''
@@ -93,6 +102,7 @@ function! ArgList(count)
 	return repeat(', '.g:snip_start_tag.g:snip_end_tag, a:count)
 endfunction
 
+" format argument list
 function! CleanupArgs(text)
 	if a:text == '...'
 		return ''
@@ -102,10 +112,13 @@ function! CleanupArgs(text)
 	return     substitute(text, ',*\s\+$', '', '')
 endfunction
 
+" get the indent level of a line
 function! GetIndentLevel(lnum)
     return indent(a:lnum) / &shiftwidth
 endfunction
 
+" given an indent level, return an indent string, taking into account
+" 'expandtab', 'shiftwidth', and 'tabstop'
 function! ConstructIndent(level)
 	if &expandtab
 		let tabs   = 0

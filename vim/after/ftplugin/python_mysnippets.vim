@@ -125,17 +125,17 @@ exec "Snippet ass assert ".se
 " exceptions
 exec "Snippet try try:<CR>".se.
 	\"<CR>except ".st."Exception".et.
-	\st."\"as?\":PostProcess(ReplaceIfMatch(@z, 'as?', ''), ' as ', '')".et.
+	\st."\"as?\":PostProcess(ReplaceIfEqual(@z, 'as?', ''), ' as ', '')".et.
 	\":<CR>".se
 exec "Snippet tryf try:<CR>".se."<CR>finally:<CR>".se
 exec "Snippet exc except ".st."Exception".et.
-	\st."\"as?\":PostProcess(ReplaceIfMatch(@z, 'as?', ''), ' as ', '')".et.
+	\st."\"as?\":PostProcess(ReplaceIfEqual(@z, 'as?', ''), ' as ', '')".et.
 	\":<CR>".se
 exec "Snippet exce except ".st."Exception".et.
-	\st."\"as?\":PostProcess(ReplaceIfMatch(@z, 'as?', ''), ' as ', '')".et.
+	\st."\"as?\":PostProcess(ReplaceIfEqual(@z, 'as?', ''), ' as ', '')".et.
 	\":<CR>".se
 exec "Snippet excep except ".st."Exception".et.
-	\st."\"as?\":PostProcess(ReplaceIfMatch(@z, 'as?', ''), ' as ', '')".et.
+	\st."\"as?\":PostProcess(ReplaceIfEqual(@z, 'as?', ''), ' as ', '')".et.
 	\":<CR>".se
 exec "Snippet fin finally:<CR>".se
 exec "Snippet fina finally:<CR>".se
@@ -159,7 +159,7 @@ exec "Snippet pf '".st."\"%s\"".et."'".st."\"%s\":PyArgList(Count(@z, '%[^%]'), 
 let fmt = '{[^{}]\+\%(:\%({[^{}]\+}\|[^{}]\+\)\+\)\?}'
 let notfmt = '[^{}]\+\|{{\|}}'
 exec "Snippet fmt '".st."\"{0}\"".et."'".st.
-	\"\"{0}\":PyArgList(CountIgnoring(@z, '".fmt."', '".notfmt."'), '.format')".et.se
+	\"\"{0}\":PyArgList(CountSkipping(@z, '".fmt."', '".notfmt."'), '.format')".et.se
 
 exec "Snippet ran range(".se.")"
 exec "Snippet rang range(".se.")"
@@ -172,7 +172,7 @@ exec "Snippet tup tuple(".se.")"
 
 " classes
 exec "Snippet cl class ".st.g:snip_foo.":CapWords()".et.
-	\st."\"base?\":PostProcess(CapWords(CleanupArgs(ReplaceIfMatch(@z, 'base?', ''))), '(', ')')".et.
+	\st."\"base?\":PostProcess(CapWords(CleanupArgs(ReplaceIfEqual(@z, 'base?', ''))), '(', ')')".et.
 	\":<CR><CR>".
 	\"def __init__(self".pargs."):<CR>".se
 
@@ -183,28 +183,28 @@ exec "Snippet opt from optparse import OptionParser<CR><CR>".
 	\st."\"__usage__\"".et." = \"Usage: %prog [options]".st.et."\"<CR>".
 	\st."parser".et." = OptionParser(prog=".st."\"__prog__\"".et.", version=\"%prog \"+".st."\"__version__\"".et.
 	\", usage=".st."\"__usage__\"".et.
-	\st."description:PostProcess(ReplaceIfMatch(@z, 'description', ''), ', description=', '')".et.")<CR>".
+	\st."description:PostProcess(ReplaceIfEqual(@z, 'description', ''), ', description=', '')".et.")<CR>".
 	\"<CR>".st."opts".et.", ".st."args".et." = ".st."parser".et.".parse_args(".st."\"sys.argv\"".et."[1:])<CR>"
 exec "Snippet addopt ".st."parser".et.".add_option(".
-	\st."\"-\":PyOptparse(ReplaceIfMatch(@z, '-', ''), '-')".et.
-	\st."\"--\":PyOptparse(ReplaceIfMatch(@z, '--', ''), '--')".et.
-	\st."metavar:PostProcess(StripFrom(ReplaceIfMatch(@z, 'metavar', ''), \"\\\\(^[\\\"']\\\\|[\\\"']$\\\\)\"), 'metavar=\"', '\", ')".et.
-	\st."dest:PostProcess(StripFrom(ReplaceIfMatch(@z, 'dest', ''), \"\\\\(^[\\\"']\\\\|[\\\"']$\\\\)\"), 'dest=\"', '\", ')".et.
-	\st."default:PostProcess(ReplaceIfMatch(@z, 'default', ''), 'default=', ', ')".et.
+	\st."\"-\":PyOptparse(ReplaceIfEqual(@z, '-', ''), '-')".et.
+	\st."\"--\":PyOptparse(ReplaceIfEqual(@z, '--', ''), '--')".et.
+	\st."metavar:PostProcess(StripFrom(ReplaceIfEqual(@z, 'metavar', ''), \"\\\\(^[\\\"']\\\\|[\\\"']$\\\\)\"), 'metavar=\"', '\", ')".et.
+	\st."dest:PostProcess(StripFrom(ReplaceIfEqual(@z, 'dest', ''), \"\\\\(^[\\\"']\\\\|[\\\"']$\\\\)\"), 'dest=\"', '\", ')".et.
+	\st."default:PostProcess(ReplaceIfEqual(@z, 'default', ''), 'default=', ', ')".et.
 	\"<CR><Tab><Tab><Space><Space>help='".st.et."')"
 exec "Snippet addgrp group = OptionGroup(".st."parser".et.", \"".st.et."\", \"".st."Description".et."\")<CR>".
 	\"<CR>".st."parser".et.".add_option_group(group)"
 exec "Snippet act action=\"".st."store".et."\", ".
-	\st."type:PostProcess(StripFrom(ReplaceIfMatch(@z, 'type', ''), \"\\\\(^[\\\"']\\\\|[\\\"']$\\\\)\"), 'type=\"', '\", ')".et
+	\st."type:PostProcess(StripFrom(ReplaceIfEqual(@z, 'type', ''), \"\\\\(^[\\\"']\\\\|[\\\"']$\\\\)\"), 'type=\"', '\", ')".et
 
 " if there are no long options, replace "help" with a comma
 exec "Snippet getopt import getopt<CR><CR>".
 	\"try:<CR>``PyGetoptReset()``".
 	\"opts, ".st."args".et." = getopt.getopt(".st."\"sys.argv\"".et."[1:], ".
-	\"'".st."\"h?\":ReplaceIfMatch(@z, 'h?', '')".et."', ".
+	\"'".st."\"h?\":ReplaceIfEqual(@z, 'h?', '')".et."', ".
 	\"[".st."help:PostProcess(PyQuoteLongOpts(@z), ' ', ' ')".et."])<CR>".
 	\"for opt, val in opts:<CR>".
-	\st."\"h?\":PyProcessShortOpts(ReplaceIfMatch(@z, 'h?', ''))".et.
+	\st."\"h?\":PyProcessShortOpts(ReplaceIfEqual(@z, 'h?', ''))".et.
 	\st."help:PyProcessLongOpts(@z)".et."<CR>".
 	\"except getopt.GetoptError:<CR>".
 	\st."Usage".et."()<CR>".

@@ -39,8 +39,8 @@ exec "Snippet cons static final ".st."int".et." ".se." = ".se.";"
 " classes
 exec "Snippet enum enum ".se.fbs.braces
 exec "Snippet cl class ".st.g:snip_foo.":CapWords()".et.
-	\st."\"extends?\":PostProcess(CapWords(ReplaceIfMatch(@z, 'extends?', '')), ' extends ', '')".et.
-	\st."\"implements?\":PostProcess(CapWords(ReplaceIfMatch(@z, 'implements?', '')), ' implements ', '')".et.
+	\st."\"extends?\":PostProcess(CapWords(ReplaceIfEqual(@z, 'extends?', '')), ' extends ', '')".et.
+	\st."\"implements?\":PostProcess(CapWords(ReplaceIfEqual(@z, 'implements?', '')), ' implements ', '')".et.
 	\fbs.bo.st.g:snip_foo.":CapWords()".et."(".args.")".fbs.bo."}".bc
 
 " methods

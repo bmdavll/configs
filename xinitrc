@@ -6,9 +6,7 @@ synclient TouchpadOff=1
 
 xbindkeys
 
-if [ -x /usr/bin/tpb -a -r /dev/nvram -a -w /dev/nvram ]; then
-	/usr/bin/tpb -d
-fi
+[ -x /usr/bin/tpb ] && /usr/bin/tpb -d
 
 # exec gnome-session
 # exec startkde

@@ -15,7 +15,7 @@ function mkbin
 	lnbin ~/code/repos/[^.]*/examples	||code+=$?
 	lnbin ~/code/repos/[^.]*			||code+=$?
 	lnbin ~/code/scripts/local			||code+=$?
-	lnbin ~/code/scripts/python			||code+=$?
+	lnbin ~/code/scripts/{perl,python}	||code+=$?
 	lnbin ~/code/scripts				||code+=$?
 	lnbin ~/code/bin					||code+=$?
 	return $code
@@ -74,7 +74,7 @@ function b
 type _man &>/dev/null &&
 _mancached() {
 	local CACHE=~/.mancache
-	[ ! -f "$CACHE" ] && return 3
+	[ ! -f "$CACHE" ] && return 2
 	local cur="$2" sect="${COMP_WORDS[COMP_CWORD-1]}"
 	[[ "$sect" != [0-9ln] ]] && sect='.'
 	if [ "$cur" -o "$sect" != '.' ]; then
@@ -108,6 +108,7 @@ complete -F _yaourt y
 
 function pacinstall
 {
+	[ $# -eq 0 ] && return 1
 	yaourt -S "$@"
 	local code=$?
 	if [ $code -eq 0 ]; then
@@ -117,8 +118,6 @@ function pacinstall
 	return $code
 }
 alias pacremove='sudo pacman -Rs'
-alias pacupdate='yaourt -Syu && sudo clean-pacman-cache.py'
-
 _pacinstall() {
 	COMPREPLY=($(compgen -W "$(pacman -Slq)" -- "$2"))
 }
@@ -128,6 +127,10 @@ _pacremove() {
 complete -F _pacinstall pacinstall
 complete -F _pacremove pacremove
 
+function pacupdate
+{
+	yaourt -Syu "$@" && sudo clean-pacman-cache.py 2
+}
 _pacsearch() {
 	local results=$(pacman -"$1"s "${@:2}")
 	[ -n "$results" ] && echo -e "$( echo "$results" | sed  \
@@ -180,12 +183,19 @@ complete -F _smbmount -o filenames doofie
 ## wine {{{
 function foobar
 {
-	local paths=("$@")
-	gui wine 'C:\users\david\Desktop\foobar2000\foobar2000.exe' "${paths[@]}"
+	$GUI wine 'C:\users\david\Desktop\foobar2000\foobar2000.exe' "$@"
 }
 function tagrename
 {
-	gui wine 'C:\Program Files\TagRename\TagRename.exe'
+	$GUI wine 'C:\Program Files\TagRename\TagRename.exe'
+}
+function mp3directcut
+{
+	local paths=()
+	while [ $# -gt 0 ]; do
+		paths+=('Z:'"$(abspath "$1")") && shift
+	done
+	$GUI wine 'C:\Program Files\mp3DirectCut\mp3DirectCut.exe' "${paths[@]////\\}"
 }
 ## }}}
 ## misc. aliases {{{
@@ -223,11 +233,14 @@ function caps
 
 function uzbl
 {
-	[ "$1" = "-f" ] && shift && set -- "file://$@"
+	local UZBL=uzbl
+	split_opts -- "$@" || return $?
+	str_in '-f' "${OPTS[@]}" && set -- "file://$@"
+	str_in '-t' "${OPTS[@]}" && UZBL=uzbl_tabbed.py
 	XDG_DATA_HOME="$HOME/.uzbl" XDG_CONFIG_HOME="$HOME/.uzbl" \
-	$GUI uzbl_tabbed.py "$@"
+	$GUI $UZBL "${ARGV[@]}"
+	split_opts -c
 }
-BROWSER=uzbl
 
 function comptest
 {
@@ -260,12 +273,13 @@ function reorder-here
 {
 	local IFS=$'\n'
 	renumb.py -zl $( find . -maxdepth 1 -mindepth 1 -type f             \
-							-iregex '.*/[0-9]+[^/]*\.\(jpg\|png\|gif\)' \
+							-iregex '.*/[0-9]+[^/]*\.\(jpg\|png\|gif\|flv\|avi\|mp4\|wmv\)' \
 					 | cut -c 3- | sort -n ) "$@"
 }
 
 function mp3collect
 {
+	local -i code=0
 	[ $# -eq 0 ] && return 1
 	local dir
 	for dir in "$@"; do
@@ -274,8 +288,9 @@ function mp3collect
 		if [ -d "$dir" ]; then
 			findf "$dir" -regextype 'posix-egrep' -iregex '.*\.(m3u|log|cue|nfo|sfv)' -delete &&
 			rmed  "$dir"
-		fi
+		fi || code+=1
 	done
+	return $code
 }
 ## }}}
 ## class {{{

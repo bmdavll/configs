@@ -281,12 +281,12 @@ else
 endif
 
 " Section: utility functions {{{1
-" return text with all instances of 'pat' removed
+" returns text with all instances of 'pat' removed
 function! StripFrom(text, pat)
 	return substitute(a:text, a:pat, '', 'g')
 endfunction
 
-" return a new list with duplicate items removed
+" returns a new list with duplicate items removed
 function! RemoveDuplicates(list)
 	let uniq = []
 	for i in range(len(a:list))
@@ -297,7 +297,19 @@ function! RemoveDuplicates(list)
 	return uniq
 endfunction
 
-" return most recently selected text
+" returns the number of occurrences of needle in haystack
+function! Count(haystack, needle)
+	let counter = 0
+	let index = match(a:haystack, a:needle)
+	while index > -1
+		let counter += 1
+		let end = matchend(a:haystack, a:needle, index)
+		let index = match(a:haystack, a:needle, end)
+	endwhile
+	return counter
+endfunction
+
+" returns most recently selected text
 function! <SID>GetSelection()
 	if has("x11")
 		return @*
@@ -488,6 +500,19 @@ function! s:LeadingSpacesToTabs(line1, line2)
 	for line in range(a:line1, a:line2)
 		while len(matchstr(getline(line), '^\t*\zs \+')) >= &tabstop
 			exec line.'s/^\(\t*\) \{'.&tabstop.'}/\1\t/'
+		endwhile
+	endfor
+endfunction " }}}
+" InternalTabsToSpaces: convert tabs inside lines (used for alignment) to spaces {{{
+command! -range=% -nargs=0 InternalTabsToSpaces
+	\	call s:InternalTabsToSpaces(<line1>, <line2>)
+function! s:InternalTabsToSpaces(line1, line2)
+	let tabpat = '^\t*\([^\t]\+\)\(\t\+\)'
+	for line in range(a:line1, a:line2)
+		while Count(getline(line), tabpat)
+			let list = matchlist(getline(line), tabpat)
+			exec line.'s/^\t*[^\t]\+\zs\t\+/'.
+				\ repeat(' ', len(list[2]) * &tabstop - len(list[1]) % &tabstop).'/'
 		endwhile
 	endfor
 endfunction " }}}
@@ -737,6 +762,7 @@ cnoremap	<M-v>		<C-R>+
 
 " save shortcut
 nnoremap	<C-S>		:w<CR>
+xnoremap	<C-S>		:<C-U>w<CR>gv
 inoremap	<C-S>		<C-O>:w<CR>
 
 " nothing to see here, move along {{{3
@@ -1035,6 +1061,9 @@ map	<silent><leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{Co
 xmap<silent><leader>e		:<C-U>let @z=&et<CR>:set et<CR>gv:retab<CR>:let &et=@z<CR>
 " convert spaces to tabs
 xmap<silent><leader>t		:retab!<CR>
+
+" insert expanded tabs
+imap		<leader><TAB>	<C-R>=repeat(' ', &tabstop - (virtcol('.')-1) % &tabstop)<CR>
 
 " delete into the null register
 map			<leader>d		"_d

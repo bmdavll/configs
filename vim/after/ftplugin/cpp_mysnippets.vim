@@ -47,7 +47,7 @@ exec "Snippet ls list<".se.">".se
 
 " classes
 exec "Snippet cl class ".st.g:snip_foo.":CapWords()".et.
-	\st."\"base?\":PostProcess(substitute(CapWords(CleanupArgs(ReplaceIfMatch(@z, 'base?', ''))), ', ', '\&public ', 'g'), ' : public ', '')".et.
+	\st."\"base?\":PostProcess(substitute(CapWords(CleanupArgs(ReplaceIfEqual(@z, 'base?', ''))), ', ', '\&public ', 'g'), ' : public ', '')".et.
 	\fbs.bo."<BS>public:<CR>".st.g:snip_foo.":CapWords()".et."(".args.");".
 	\"<CR>~".st.g:snip_foo.":CapWords()".et."();".
 	\"<CR>private:<CR>".se.bc.";"

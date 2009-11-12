@@ -40,6 +40,9 @@ $endif
 # unused: M-t M-u M-w M-y M-z
 # terminal sends Esc prefix for Meta, so use \e in place of \M-
 # basics {{{
+# delete words separated by whitespace and slashes
+"\C-w": unix-filename-rubout
+
 # cycle thru possible completions
 "\C-t": menu-complete
 
@@ -102,7 +105,7 @@ $endif
 "\ex": "\C-e -exec  {} +\eb\ef\C-f"
 
 # history search
-"\eq":	"\C-a\C-khist|tac|grep -v 'hist|' | e ''\C-b"
+"\eq": "\C-a\C-khist|tac|grep -v 'hist|' | e ''\C-b"
 
 # calculator
 "\ec": '\C-acalc " \C-e "\C-b\C-b'

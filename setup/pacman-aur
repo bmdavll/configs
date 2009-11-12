@@ -43,19 +43,20 @@ fi
 # AUR
 list=()
 
+add aurvote
 add ack # grep drop-in
 add ascii
-add aurvote
-add cdrtools # alternative to cdrkit
+# add cdrtools # alternative to cdrkit
 add detox # clean up filenames
+add dmenu-vertical
 add evince-gtk
 add fluidr3 # MIDI soundfont
 add foremost # file recovery tool
-add hot-babe
+add libsvg
 add mit-scheme
-# add prename # perl renamer
 add stardict-i2e-es-en
 add stardict-oald stardict-wordnet
+add svg2png
 add uzbl-git
 add vifm
 add xautomation

@@ -88,6 +88,8 @@
 <Multi_key> <o> <greater>				: "♂"	U2642 # MALE SIGN
 <Multi_key> <e> <j> <e> <c>				: "⏏"	U23CF # EJECT SYMBOL
 <Multi_key> <numbersign> <at>			: "⌘"	U2318 # PLACE OF INTEREST SIGN
+<Multi_key> <r> <e> <f>					: "※"	U203B # REFERENCE MARK
+<Multi_key> <slash> <percent>			: "※"	U203B # REFERENCE MARK
 
 ##2 Disciplines
 <Multi_key> <R> <x>						: "℞"	U211E # PRESCRIPTION TAKE
@@ -108,7 +110,7 @@
 <Multi_key> <b> <o> <o> <b>				: "(๏ Y ๏)"	UA66C # THAI CHARACTER FONGMAN
 <Multi_key> <L> <O> <D>					: "ಠ_ಠ"	U0CA0 # LOOK OF DISAPPROVAL
 <Multi_key> <L> <O> <semicolon>			: "ಥ⁔ಥ"	U0CA5 # LOOK OF DISAPPROVAL CRYING
-<Multi_key> <at> <L> <O> <D>			: "Ծ_Ծ"	U053E # ANIME LOOK OF DISAPPROVAL
+<Multi_key> <plus> <L> <O> <D>			: "Ծ_Ծ"	U053E # ANIME LOOK OF DISAPPROVAL
 <Multi_key> <f> <Left>					: "☜"	U261C # WHITE LEFT POINTING INDEX
 <Multi_key> <f> <Up>					: "☝"	U261D # WHITE UP POINTING INDEX
 <Multi_key> <f> <Right>					: "☞"	U261E # WHITE RIGHT POINTING INDEX

@@ -21,7 +21,9 @@ TEMPFILE=$(mktemp)
 zenity --text-info --title="TODO" --height=724 --width=220 \
 --filename="$TODO" --editable >"$TEMPFILE"
 
-if	[ $? -eq 0 -a -s "$TEMPFILE" ] &&
+if	[ $? -eq 0 ] &&
+	type trimfile &>/dev/null && trimfile "$TEMPFILE" &&
+	[ -s "$TEMPFILE" ] &&
 	! cmp -s "$TEMPFILE" "$TODO" &&
 	[ "$(head -n1 "$TEMPFILE")" = "#!log" ]
 then
