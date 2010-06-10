@@ -1,4 +1,4 @@
-" Vimperator 1.2 {{{1
+" Vimperator 2.1 {{{1
 
 " usage notes
 " C-v			pass keystroke
@@ -23,7 +23,7 @@
 " c				select tab (mapped from default b)
 " :tabm N		move tab to position N
 " :tabo			close other tabs
-" :tabd			duplicate tab
+" :tabdu		duplicate tab
 " :tabde		detach tab
 " d   D   u		close tab and focus # right # left # undo close
 " :bd   :u		close/undo with argument selection
@@ -54,6 +54,11 @@ inoremap		<C-Space>	<Esc>
 cnoremap		<C-Space>	<Esc>
 
 " command line {{{2
+" address completion
+cnoremap		<C-CR>		<End>.com<CR>
+cnoremap		<S-CR>		<End>.net<CR>
+cnoremap		<C-S-CR>	<End>.org<CR>
+
 " cycle thru completion list
 cnoremap		<C-j>		<Tab>
 cnoremap		<C-k>		<S-Tab>
@@ -95,6 +100,9 @@ cnoremap		<C-i>		<Esc><C-i>
 inoremap		<C-i>		<Esc><C-i>
 inoremap		<C-g>		<C-i>
 
+" search
+noremap			<C-f>		/
+
 " tabs
 noremap			<C-A-i>		gT
 noremap			<C-A-o>		gt
@@ -135,14 +143,15 @@ noremap<silent>	<C-e>		:js toggle_bars(["toolbar-menubar","nav-bar"])<CR>
 " function keys {{{2
 noremap<silent>	<F2>		:emenu Bookmarks.Organize Bookmarks…<CR>
 noremap			<F5>		:nohlsearch<CR>
+noremap<silent>	<F9>		O<Home><C-Del>delbmarks<Space><CR>
 noremap			<F13>		<C-o>
 noremap			<F14>		<C-i>
 
 " leader {{{2
 " search/tabopen/open with X clipboard contents
 map				<leader>*	/<S-Insert><CR>/<Up><CR>
-map				<leader>t	t<S-Insert><Home><C-Right><Space>
-map				<leader>o	o<S-Insert><Home><C-Right><Space>
+map				<leader>t	t<S-Insert><Home><C-Right><Space><Left>
+map				<leader>o	o<S-Insert><Home><C-Right><Space><Left>
 " quick searches
 map				<leader>g	tg<Space><S-Insert><CR>
 map				<leader>G	og<Space><S-Insert><CR>
@@ -153,20 +162,24 @@ map				<leader>c	tc<Space><S-Insert><CR>
 
 " options {{{1
 set complete=l
-set defsearch=g
+set defsearch=google
 set editor='scim-run gvim -f'
 set guioptions+=B
 set guioptions+=n
-set popups=2
+set hinttags="//*[@onclick or @onmouseover or @onmousedown or @onmouseup or @oncommand or @class='lk' or @role='link' or @role='button' or @role='option'] | //input[not(@type='hidden')] | //a | //area | //iframe | //textarea | //button | //select | //xhtml:input[not(@type='hidden')] | //xhtml:a | //xhtml:area | //xhtml:iframe | //xhtml:textarea | //xhtml:button | //xhtml:select"
 set shellcmdflag=-lc
 set showstatuslinks=2
 set showtabline=1
 set titlestring=Firefox
 " set wildoptions=auto
 
+set visualbell
+hi Bell display: none;
+
 " about:config
 set! security.dialog_enable_delay=0
 set! browser.sessionstore.interval=120000
+set! middlemouse.paste=true
 
 " javascript {{{1
 javascript <<EOF

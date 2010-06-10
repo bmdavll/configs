@@ -44,6 +44,7 @@ fi
 list=()
 
 add aurvote
+
 add ack # grep drop-in
 add ascii
 # add cdrtools # alternative to cdrkit
@@ -53,6 +54,7 @@ add evince-gtk
 add fluidr3 # MIDI soundfont
 add foremost # file recovery tool
 add libsvg
+add mbrola # text-to-speech
 add mit-scheme
 add stardict-i2e-es-en
 add stardict-oald stardict-wordnet

@@ -82,6 +82,9 @@ $endif
 "\ei": " $OLDPWD/\t"
 # }}}
 # piping output {{{
+# /dev/null
+"\ez": "\C-e >/dev/null\eb\eb\C-b\C-b"
+
 # less
 "\em": "\C-e | less\C-m"
 

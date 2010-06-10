@@ -11,17 +11,17 @@ syn sync minlines=300
 syn keyword     customKeywords      contained TODO
 syn match       customEntry         "^\(#\|[A-Z]\w\+,\s[A-Z]\w\+ \d\+, 20\d\d\).*" contains=customDate,customKeywords
 syn match       customDate          "20\d\d-\d\d-\d\d\|[A-Z]\w\+ \d\+, 20\d\d" containedin=customEntry
-syn region      customLeader        start=/^\[\d\d:\d\d\]/ end=/: / contains=customTime,customName,customOrange
+syn region      customLeader        start=/^\[\d\d:\d\d\]/ end=/: / contains=customTime,customName,customUser
 syn match       customTime          containedin=customLeader "\[\d\d:\d\d\]"
 syn match       customName          containedin=customLeader " \zs[^:]\+\ze: "
-syn match       customOrange        containedin=customLeader " \zs\([\x6f][\x72][\x61][\x6e][\x67][\x65][\x66][\x6f][\x6f][\x64][\x69][\x65]\|;\|[\u3070][\u304b][\u307f][\u305f][\u3044][^:]*\)\ze: "
+syn match       customUser          containedin=customLeader " \zs\(\(\w\+@\)\?[\x6f][\x72][\x61][\x6e][\x67][\x65][\x66][\x6f][\x6f][\x64][\x69][\x65]\(\.\w\{3}\)\?\|;\|[\u3070][\u304b][\u307f][\u305f][\u3044][^:]*\)\ze: "
 
 hi def link customKeywords Todo
 hi def link customEntry    Comment
 hi def link customDate     String
 hi def link customTime     Identifier
 hi def link customName     Keyword
-hi def link customOrange   Constant
+hi def link customUser     Constant
 
 " hi! def link String
 

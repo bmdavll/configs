@@ -1063,6 +1063,10 @@ function! s:YRYankCount(...) range
         return
     endif
 
+    if has('gui_win32') "+
+        exec 'let @+ = @'.user_register
+    endif
+
     call s:YRSetPrevOP(op_code, v_count, user_register, 'n')
 
     call YRRecord(user_register)
@@ -1111,6 +1115,10 @@ function! s:YRYankRange(do_delete_selection, ...) range
     if user_register == '_'
         " Black hole register, ignore
         return
+    endif
+
+    if has('gui_win32') "+
+        exec 'let @+ = @'.user_register
     endif
 
     call s:YRSetPrevOP('', '', user_register, 'n')

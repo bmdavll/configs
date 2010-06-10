@@ -1,9 +1,10 @@
-50	t 
-19	t timer 
-13	gvim 
+53	t 
+39	gvim 
+21	t timer 
 12	f 
-7	t cpuset 
+8	t cpuset 
 2	scim-run gvim 
+2	pokerth
 1	scim-run stardict 
 1	clipboard 
 1	galculator 

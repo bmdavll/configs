@@ -46,7 +46,7 @@ function gui
 } && GUI=gui
 complete -c gui
 # }}}
-# check if a string or pattern matches any of the arguments that follow {{{
+# check if a string is among or if a pattern matches any of the arguments that follow {{{
 function str_in
 {	:
 	local arg str="$1" && shift
@@ -174,9 +174,11 @@ function file_glob # {{{
 ## }}}
 ## command line essentials {{{
 # colors {{{
-if [ -x /bin/tput -o -x /usr/bin/tput ] && tput setaf 1 &>/dev/null; then :
+if [ -x /bin/tput -o -x /usr/bin/tput ] && tput setaf 1 &>/dev/null || [ "$CYGWIN" ]
+then :
 	COLOR='--color=auto'
-	if [ "$TERM" != "dumb" ] && [ -x /bin/dircolors -o -x /usr/bin/dircolors ]
+	if	[ "$TERM" != "dumb" -o "$CYGWIN" ] &&
+		[ -x /bin/dircolors -o -x /usr/bin/dircolors ]
 	then
 		if [ -f "$HOME/.dircolors" ]; then
 			eval "$(dircolors -b $HOME/.dircolors)"
@@ -523,7 +525,7 @@ function rms
 		split_opts -c
 		echo "Usage: rms [rm_option|file|dir]..." && return
 	fi
-	find "${ARGV[@]}" -type f -print0 | xargs -0r shred -zn 3
+	find "${ARGV[@]}" -type f -print0 | xargs -0r shred -zn 3 # default is 3
 	if [ "$(max "${PIPESTATUS[@]}")" -eq 0 ]
 	then rm -r "${OPTS[@]}" "${ARGV[@]}"
 	else false
@@ -987,7 +989,8 @@ SSH_ENV="$HOME/.ssh/environment"
 
 function start-ssh-agent
 {
-	/usr/bin/ssh-agent | sed 's/^echo/#echo/' >"$SSH_ENV"
+	echo "Initializing ssh-agent..."
+	/usr/bin/ssh-agent | grep -v '^echo' >"$SSH_ENV"
 	chmod 600 "$SSH_ENV"
 	source "$SSH_ENV" >/dev/null
 	/usr/bin/ssh-add
@@ -997,6 +1000,9 @@ function start-ssh-agent
 type __gitdir &>/dev/null &&
 function gs
 { :
+	if pat_in "$HELP_PAT" "$@"; then
+		echo "Usage: gs [directory]... [--push_remote]" && return
+	fi
 	local IFS=$'\n' WD="$PWD" OWD dir gitdir sep=-n remote
 	split_opts -- "$@" || return $?
 	if pat_in '^--?([a-z]+)$' "${OPTS[@]}"; then
@@ -1016,10 +1022,15 @@ function gs
 		git status 2>/dev/null | grep '^#' \
 		| GREP_COLORS='ms=35' grep -P '(?<=^# On branch )\w+|'
 		if [ "$remote" ] && git remote | grep "^$remote$" >/dev/null; then
-			[ -f "$SSH_ENV" ] && source "$SSH_ENV" >/dev/null
-			ps -ef	| grep "$SSH_AGENT_PID" \
-					| grep 'ssh-agent$' >/dev/null || start-ssh-agent
-			git push "$remote" HEAD 2>&1 | grep -v '^Everything up-to-date$'
+			if [ -f "$SSH_ENV" ]; then
+				source "$SSH_ENV" >/dev/null
+				ps -ef	| grep "$SSH_AGENT_PID" \
+						| grep 'ssh-agent$' >/dev/null \
+				|| start-ssh-agent
+			else
+				start-ssh-agent
+			fi
+			git push "$remote" HEAD 2>&1
 		fi
 	done
 	[ "${OWD+set}" ] && cd "$OWD"
@@ -1038,7 +1049,7 @@ function encrypt
 			echo "$arg"
 			cat "$arg" | gpg -ac --no-options >"$tmp"
 			if [ "$(max "${PIPESTATUS[@]}")" -eq 0 ]; then
-				shred -uzn 8 "$arg" && mv "$tmp" "$arg.pgp" && chmod 600 "$arg.pgp"
+				mv "$tmp" "$arg.pgp" && chmod 600 "$arg.pgp" && shred -zu "$arg"
 			else
 				false
 			fi
@@ -1051,18 +1062,38 @@ function encrypt
 	return $code
 }
 function decrypt
-{ :
+{ : :
 	local -i code=0
-	local arg
+	local arg wflag tmp dest
+	split_opts -- "$@" || return $?
+	if str_in '-f' "${OPTS[@]}"; then
+		wflag=1
+		tmp=$(mktemp) || return $?
+	fi
+	set -- "${ARGV[@]}"
+	split_opts -c
 	for arg in "$@"; do
 		if [ -f "$arg" -a -r "$arg" ]; then
-			cat "$arg" | gpg -d --no-options 2>/dev/null
+			if [ "$wflag" ]; then
+				dest="${arg%.pgp}"
+				if [ -e "$dest" ]; then
+					echo >&2 "decrypt: \`$dest' exists"
+					false
+				else
+					cat "$arg" | gpg -d --no-options >"$tmp" 2>/dev/null \
+					&& cp "$tmp" "$dest" && chmod 600 "$dest"
+				fi
+			else
+				cat "$arg" | gpg -d --no-options 2>/dev/null
+			fi
 		else
 			echo >&2 "decrypt: can't open \`$arg'"
 			false
 		fi
 		code+=$(max "${PIPESTATUS[@]}")
+		[ "$wflag" ] && shred -z "$tmp"
 	done
+	[ "$wflag" ] && rm -f "$tmp"
 	return $code
 }
 # }}}
@@ -1098,6 +1129,16 @@ function smbumount
 		else rmdir $MNT 2>/dev/null
 		fi
 	fi
+}
+# }}}
+# misc. functions {{{
+function tune
+{ :
+	local pitch
+	for pitch in E2 A2 D3 G3 B3 E4; do
+		echo $pitch
+		play -n synth 3 pluck $pitch repeat 42 2>/dev/null
+	done
 }
 # }}}
 ## }}}

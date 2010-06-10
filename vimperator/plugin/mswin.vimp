@@ -1,0 +1,18 @@
+noremap		<C-c>		<C-v><C-c>
+
+noremap		<A-a>		<C-v><C-a>
+noremap		<A-x>		<C-v><C-x>
+noremap		<A-c>		<C-v><C-c>
+noremap		<A-v>		<C-v><C-v>
+
+cnoremap	<A-a>		<C-v><C-a>
+cnoremap	<A-x>		<C-v><C-x>
+cnoremap	<A-c>		<C-v><C-c>
+cnoremap	<A-v>		<C-v><C-v>
+
+inoremap	<A-a>		<C-v><C-a>
+inoremap	<A-x>		<C-v><C-x>
+inoremap	<A-c>		<C-v><C-c>
+inoremap	<A-v>		<C-v><C-v>
+
+" vim:set ts=4 sw=4 noet filetype=vimperator:

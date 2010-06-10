@@ -4,13 +4,27 @@
 umask 0022
 
 # completion
-if [ ! "${BASH_COMPLETION+set}" -a -f "$HOME/.bash_completion" ]; then
-	source "$HOME/.bash_completion"
+if [ ! "${BASH_COMPLETION+set}" ]; then
+	if [ -f "$HOME/.bash_completion" ]; then
+		source "$HOME/.bash_completion"
+	elif [ -f /etc/bash_completion ]; then
+		source /etc/bash_completion
+	fi
 fi
 
 # remap console keys
 if [ -z "$DISPLAY" -a -f "$HOME/.loadkeys" ]; then
 	(loadkeys "$HOME/.loadkeys" || sudo loadkeys "$HOME/.loadkeys") &>/dev/null
+fi
+
+# Cygwin
+if [ "$(uname -o)" = "Cygwin" ]; then
+	CYGWIN=$(uname -s)
+
+	# TMP and TEMP are defined in the Windows environment
+	# leaving them set to the default Windows temporary directory can have
+	# unexpected consequences
+	unset TMP TEMP
 fi
 
 ## prompt {{{
@@ -19,7 +33,8 @@ if [ "$TERM" = "linux" ]; then
 	PS1="\u@\h[\#]\W\$ "
 else
 	# short color prompt if possible (xterm etc.)
-	if [ -x /bin/tput -o -x /usr/bin/tput ] && tput setaf 1 &>/dev/null; then
+	if [ -x /bin/tput -o -x /usr/bin/tput ] && tput setaf 1 &>/dev/null || [ "$CYGWIN" ]
+	then
 		if type __git_ps1 &>/dev/null
 		then GIT_PS1='\[\e['30';1m\]$(__git_ps1 "·%s")\[\e[0m\]'
 		else GIT_PS1=
@@ -188,7 +203,7 @@ function addsource
 }
 addsource "$HOME/.bash_aliases"
 
-if [ "$TERM" != "dumb" ]; then
+if [ "$TERM" != "dumb" ] || [ "$CYGWIN" ]; then
 	addsource "$HOME/.bash_hacks"
 	addpath .
 fi

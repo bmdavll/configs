@@ -11,26 +11,48 @@ add ()
 
 list=()
 
-## shells
+##1 UI
+# add dmenu
+add expect
+add gksu
+# add launchy
+add screen
+add xbindkeys
+add zenity
+
+##1 shells
+# add rxvt-unicode-256color
 add zsh
 
-## languages
-add parrot
-add perl
-add python
-add python3
-add lua luajit
-add tcl tk
+##2 command-line utils
+add bc
+add lesspipe # input filter for less
+add pinfo # alternate info viewer
+add pkgtools
+add pv
+# add scrot
+add units
+add xclip
+
+##1 languages
 add clisp
 add ghc
-add ruby
-add php
 add jre jdk
+add lua luajit
+add parrot
+add perl
+add php
+add python
+add python3
+add ruby
+add tcl tk
 
+##2 perl
 add mod_perl
 add perl-bit-vector
 add perl-dbd-mysql
 add perl-dbd-sqlite
+add perl-exiftool
 add perl-inline
 add perl-mp3-info
 add perl-term-readkey
@@ -39,26 +61,30 @@ add perl-text-markdown
 add perl-yaml-syck
 add perlxml
 
+##2 python
 add python-simplejson
 add python-webpy
 
-## editors
-add emacs
-add hexedit
-
-## development
-add gdb
-add ctags
-add git
-add subversion
-
-## libraries
-add mono
+##1 libraries
 add boost
 add gob2
 add librsvg
+add mono
+add wine
+add xdg-utils
+add xorg-utils
 
-## networking
+##1 development
+add ctags
+add gdb
+add git
+add subversion
+
+##2 editors
+add emacs
+add hexedit
+
+##1 networking
 add curl
 add ettercap
 add gnu-netcat
@@ -67,90 +93,79 @@ add nmap
 add samba
 add sshfs
 
-## system
+##1 filesystem
 add dosfstools
 add gparted
 add ntfs-3g
 add ntfsprogs
+add partimage
 add sleuthkit
 add testdisk
 
-## utils
-add bc
-# add dmenu
-add expect
+##1 files & documents
 add fdupes # find duplicate files
-add galculator gcalctool
-add gksu
-add gnupg
-add lesspipe
-add mathomatic
-add partimage
-add pinfo # alternate info viewer
-add pkgtools
-add pv
-# add rxvt-unicode-256color
-add screen
-# add scrot
-add units
-add wine
-add xbindkeys
-add xclip
-add xdg-utils
-add xorg-utils
-add zenity
+add openoffice-base
+add words
 
-## compression
-add unzip
+##2 compression
 add p7zip
+add unzip
 add xarchiver
 add zip
 
-# input
-add gucharmap
-add scim
-add scim-pinyin scim-tables
-add stardict
+##2 privacy
+add gnupg
+add tor
+add truecrypt
 
-## office
+##2 pdf & tex
 add epdfview
-add openoffice-base
-add thunderbird
-# add mutt
-add words
+add texlive-core
+add texinfo
 
-# internet
-add irssi
+##1 web
 add lynx
-add skype
-add transmission-gtk # deluge
-add mktorrent
 add w3m
 
-## graphics and photos
-add netpbm
-add optipng
-add gqview mirage
+##2 email
+add thunderbird
+# add mutt
+
+##2 chat
+add irssi
+add skype
+
+##2 torrents
+add transmission-gtk # deluge
+add mktorrent
+
+##1 graphics
+##2 viewers
+add gqview # geeqie
+add mirage
+# add comical
+add gphoto2 gtkam
+
+##2 editors
 add gimp
 add inkscape
-add dia # diagramming tool
-add gphoto2 gtkam
-# add comical # comic book reader
+add dia
 
-## codecs
-add gstreamer0.10-plugins
-add libdvdcss
-add flashplugin
+##2 utils
+add netpbm
+add optipng
 
-## multimedia
+##1 multimedia
+##2 audio
+##3 players
 add mpg123
 add mpd ncmpcpp # ncmpc mpc
 add gmpc # sonata
 # add cmus
-add xfmedia banshee
+add xfmedia # banshee
 add timidity++ # MIDI player
-add gtkpod
 
+##3 editors
 add audacity
 add easytag
 add mp3gain
@@ -158,30 +173,57 @@ add mp3info
 add mp3splt
 add sox
 
-add vlc miro # mplayer
+##2 video
+##3 players
+add vlc # mplayer
+# add miro
 
-## disk burning
+##3 editors
+add handbrake
+
+##2 codecs
+add flashplugin
+add gstreamer0.10-plugins
+add libdvdcss
+
+##2 interface
+add gtkpod
+
+##2 optical
 add cdrkit # includes mkisofs cdda2wav cdrecord etc.
 add cdrdao # for writing cue/bin files
 # add cdemu-client # for cue-bin emulation
 add xfburn
 
-## misc
+##1 special
+add anki # supermemo alternative
 # add gourmet
+add pokerth
 
+##2 i18n
+add gucharmap
+add scim
+add scim-pinyin scim-tables
+add stardict
+
+##2 math
+add galculator # gcalctool
+add mathomatic
+
+##1 INSTALL
 [ $(whoami) = root ] && exit 1
 
 sudo pacman -Sy --needed "${list[@]}"
 
-## replacement packages
+##1 REPLACE PACKAGES
 list=()
-
 add fam
 
 sudo pacman -Rdsn --noconfirm "${list[@]}"
 
 list=()
-
 add gamin
 
 sudo pacman -S --needed --noconfirm "${list[@]}"
+
+##1 vim:set ts=4 sw=4 noet fdm=marker fmr=##,##:

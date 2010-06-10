@@ -57,9 +57,7 @@ fi
 ## backups {{{
 function b
 {
-	(cp -a "$(ls -t ~/.mozilla/firefox/*.default/bookmarkbackups/*.json | head -1)" \
-			~/.bookmarks
-	ls -d ~/arch && ls -R ~/arch >~/tmp/arch.manifest) &>/dev/null
+	(ls -d ~/arch && ls -R ~/arch >~/tmp/arch.manifest) &>/dev/null
 	local TIMEFORMAT=$'\n%2Rs'
 	time BACKUP_LOG=~/tmp/backup.log backup "$@"
 	local code=$? disks=$(ls -d /media/disk* 2>/dev/null)

@@ -10,6 +10,7 @@ OPTS=( -b -nb '#8c8c88' -nf black -sb '#c7c7c4' -sf black
 choice=$(echo "$CHOICES" | dmenu "${OPTS[@]}") || exit $?
 
 if [[ "$choice" =~ ^[^[:alnum:]] ]]; then
+	# bring up the system-wide dmenu on non-alphanumeric input
     dmenu_run "${OPTS[@]}"
     exit
 else
@@ -18,6 +19,7 @@ else
 fi
 
 echo "$DMENU" | perl -e '
+$found = 0;
 $choice = qq('"$choice"');
 while (<>) {
     chomp;
@@ -26,9 +28,13 @@ while (<>) {
         next;
     } elsif ($choice eq $fields[1] || $choice =~ m/^$fields[1]\s*\b/) {
         $_  = ++$fields[0] . "\t" . $fields[1];
+		$found = 1;
     }
 } continue {
     push(@lines, "$_$/");
+}
+if (! $found && $choice =~ m/^\w+$/) {
+	push(@lines, "1\t" . $choice . "$/");
 }
 @sorted = map  { $_->[0] }
           sort { $b->[1] <=> $a->[1] }
