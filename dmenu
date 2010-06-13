@@ -1,14 +1,15 @@
-53	t 
-39	gvim 
+55	t 
+48	gvim 
 21	t timer 
 12	f 
 8	t cpuset 
 2	scim-run gvim 
 2	pokerth
+2	firefox 
 1	scim-run stardict 
 1	clipboard 
 1	galculator 
-1	firefox 
+1	chromium
 0	vlc 
 0	transmission 
 0	thunderbird 

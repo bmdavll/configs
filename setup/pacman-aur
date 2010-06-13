@@ -53,6 +53,7 @@ add dmenu-vertical
 add evince-gtk
 add fluidr3 # MIDI soundfont
 add foremost # file recovery tool
+# add gummi
 add libsvg
 add mbrola # text-to-speech
 add mit-scheme
@@ -61,6 +62,7 @@ add stardict-oald stardict-wordnet
 add svg2png
 add uzbl-git
 add vifm
+# add winff
 add xautomation
 
 if which yaourt &>/dev/null; then

@@ -122,6 +122,7 @@ add truecrypt
 add epdfview
 add texlive-core
 add texinfo
+# add lyx
 
 ##1 web
 add lynx
@@ -199,6 +200,7 @@ add xfburn
 add anki # supermemo alternative
 # add gourmet
 add pokerth
+# add tuxguitar
 
 ##2 i18n
 add gucharmap

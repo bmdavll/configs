@@ -1,7 +1,6 @@
 #!/bin/bash
 # host-specific bash functions and environment hacks
-
-## rebuild user bin {{{
+#{{1 rebuild user bin
 function mkbin
 {
 	local -i code=0
@@ -11,25 +10,26 @@ function mkbin
 	else
 		find "$BIN/" -maxdepth 1 -mindepth 1 -type l -delete
 	fi
-	lnbin ~/code/repos/configs/launchers||code+=$?
-	lnbin ~/code/repos/[^.]*/examples	||code+=$?
+	lnbin ~/code/bin					||code+=$?
+	lnbin ~/code/configs/launchers		||code+=$?
 	lnbin ~/code/repos/[^.]*			||code+=$?
+	lnbin ~/code/repos/[^.]*/examples	||code+=$?
+	lnbin ~/code/scripts				||code+=$?
 	lnbin ~/code/scripts/local			||code+=$?
 	lnbin ~/code/scripts/{perl,python}	||code+=$?
-	lnbin ~/code/scripts				||code+=$?
-	lnbin ~/code/bin					||code+=$?
 	return $code
 }
-## }}}
-## source scripts and set environment variables {{{
-addsource /etc/profile.d/pkgfile-hook.sh
-addsource ~/code/scripts/j.sh
+
+#{{1 source scripts and set environment variables
 addsource ~/code/repos/[^.]*/*.sh
 addsource ~/code/repos/[^.]*/examples/*.sh
+addsource ~/code/scripts/j.sh
+addsource /etc/profile.d/pkgfile-hook.sh
 
 CODE_PATH="$HOME/code:$HOME/code/lang"
-CODE_PATH+=":$HOME/code/scripts:$HOME/code/scripts/@(perl|python)"
+CODE_PATH+=":$HOME/code/configs"
 CODE_PATH+=":$HOME/code/repos:$HOME/code/repos/[^.]*"
+CODE_PATH+=":$HOME/code/scripts:$HOME/code/scripts/@(perl|python)"
 
 alias log='log -i'
 
@@ -53,8 +53,8 @@ if (( RANDOM < 1000 )); then
 elif (( RANDOM < 2000 )); then
 	cleanup-history.pl
 fi
-## }}}
-## backups {{{
+
+#{{1 backups
 function b
 {
 	(ls -d ~/arch && ls -R ~/arch >~/tmp/arch.manifest) &>/dev/null
@@ -66,8 +66,8 @@ function b
 	fi
 	return $code
 }
-## }}}
-## completion {{{
+
+#{{1 completion
 # man
 type _man &>/dev/null &&
 _mancached() {
@@ -97,8 +97,8 @@ function mancache
 		return 0
 	fi
 }
-## }}}
-## pacman {{{
+
+#{{1 pacman
 alias pac='pacman'
 alias y='yaourt'
 complete -F _pacman pac
@@ -144,8 +144,8 @@ alias pacsearch='_pacsearch S'
 alias paclsearch='_pacsearch Q'
 alias paclist='pacman -Ql'
 alias pacown='pacman -Qo'
-## }}}
-## git {{{
+
+#{{1 git
 alias ga='git add'
 alias gb='git branch'
 alias gc='git commit -a'
@@ -162,8 +162,8 @@ complete -o bashdefault -o default -o nospace -F _git_diff		gd
 complete -o bashdefault -o default -o nospace -F _git_log		gl
 complete -o bashdefault -o default -o nospace -F _git_ls_files	gls
 complete                                      -F _git_merge		gm
-## }}}
-## samba {{{
+
+#{{1 samba
 _smbmount() {
 	local IFS=$'\n' SERVER="$1"
 	COMPREPLY=$(eval "expr \"\$$SERVER\"")
@@ -177,8 +177,8 @@ _smbmount() {
 alias doofie='smbmount doofie'
 alias udoofie='smbumount doofie'
 complete -F _smbmount -o filenames doofie
-## }}}
-## wine {{{
+
+#{{1 wine
 function foobar
 {
 	$GUI wine 'C:\users\david\Desktop\foobar2000\foobar2000.exe' "$@"
@@ -195,8 +195,8 @@ function mp3directcut
 	done
 	$GUI wine 'C:\Program Files\mp3DirectCut\mp3DirectCut.exe' "${paths[@]////\\}"
 }
-## }}}
-## misc. aliases {{{
+
+#{{1 misc. aliases
 alias tags='ctags --fields=+lS'
 alias dash='PS1="\$ " dash'
 alias zsh='PS1="\$ " zsh'
@@ -214,8 +214,8 @@ alias hot-babe='hot-babe -it 42 -d 200'
 # override commands
 alias more='less'
 alias info='pinfo'
-## }}}
-## misc. functions {{{
+
+#{{1 misc. functions
 function caps
 {
 	if [[ "$(xmodmap | grep '0x42')" == control* ]]; then
@@ -290,8 +290,8 @@ function mp3collect
 	done
 	return $code
 }
-## }}}
-## class {{{
+
+#{{1 class
 # cs162
 # export ARCHDIR=~/class/cs162/mips-x86.linux-xgcc
 
@@ -345,6 +345,6 @@ function cup
 {
 	$CS164/pyunparse $CS164/$TESTFILE
 }
-## }}}
 
-# vim:set ts=4 sw=4 noet fdm=marker:
+#}}1
+# vim:set ts=4 sw=4 noet fmr={{,}} fdm=marker:

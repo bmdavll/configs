@@ -44,7 +44,8 @@ set hlsearch			" highlight search pattern matches
 set nowrap				" don't wrap lines by default
 set listchars=tab:▏\ ,precedes:‹,extends:›
 						" display characters for tabs and extended lines
-set showbreak=↪\ 		" display characters for wrapped lines
+let &showbreak = "\u21aa "
+						" display character for wrapped lines
 set linebreak			" don't break mid-word when wrapping
 " control {{{2
 set whichwrap=b,<,>,[,] " move freely between lines
@@ -88,6 +89,7 @@ endif
 
 " Section: gui {{{1
 if has('gui_running')
+	" options {{{2
 	set mousemodel=popup		" use popup menu when right-clicking
 	set guicursor=a:blinkon0	" disable cursor blinking
 	set guioptions-=m			" disable menu bar and toolbar
@@ -101,14 +103,15 @@ if has('gui_running')
 		set cursorline			" enable current line highlighting
 	endif
 
-	function! <SID>SetGUIFont(font) " {{{
+	" font {{{2
+	function! <SID>SetGUIFont(font)
 		if has('gui_win32') || has('gui_mac')
 			let sep = ':h'
 		else
 			let sep = ' '
 		endif
 		exec 'set guifont='.escape(a:font[0].sep.string(a:font[1]), ' ')
-	endfunction " }}}
+	endfunction
 
 	" display font (:set guifont=* to select interactively)
 	if has('gui_win32')
@@ -119,8 +122,8 @@ if has('gui_running')
 	let g:font_index = 0
 	call <SID>SetGUIFont(g:font_select[g:font_index])
 
-	" pop-up balloon evaluation
-	function! MyBalloonEval() " {{{
+	" pop-up balloon evaluation {{{2
+	function! MyBalloonEval()
 		let beval = <SID>PlugBalloonEval()
 		if beval != '' | return beval | endif
 		" tooltips for spelling suggestions and folds
@@ -143,10 +146,11 @@ if has('gui_running')
 			endif
 		endif
 		return join(lines, has('balloon_multiline') ? "\n" : " ")
-	endfunction " }}}
+	endfunction
 	set balloonexpr=MyBalloonEval()
 	set balloondelay=250
 	set ballooneval
+	" }}}
 endif
 
 " Section: terminal {{{1
@@ -262,7 +266,8 @@ else
 	" also load indent files for language-dependent indenting
 	filetype plugin indent on
 
-	augroup vimrc " {{{
+	" default group {{{2
+	augroup vimrc
 		au!
 		" don't auto-split lines
 		au BufReadPre  * set textwidth=0
@@ -280,9 +285,9 @@ else
 		" reading Word documents
 		" au BufReadPre  *.doc set readonly
 		" au BufReadPost *.doc %! antiword "%"
-	augroup END " }}}
+	augroup END
 
-	" automatically enter hex mode and handle file writes properly {{{
+	" automatically enter hex mode and handle file writes properly {{{2
 	" see vim -b
 	augroup Binary
 		au!
@@ -305,8 +310,8 @@ else
 			\		let &ro = ro_save | let &ma = ma_save |
 			\		unlet ro_save | unlet ma_save |
 			\	endif
-	augroup END " }}}
-
+	augroup END
+	" }}}
 endif
 
 " Section: utility functions {{{1
@@ -566,6 +571,23 @@ function! s:InternalTabsToSpaces(line1, line2)
 	endfor
 endfunction
 
+" CodeReadability: insert whitespace in code for readability {{{3
+command! -range=% -nargs=0 CodeReadability call s:CodeReadability(<line1>, <line2>)
+function! s:CodeReadability(line1, line2)
+	try | for line in range(a:line1, a:line2)
+		exec line.'s/\([^-+*/%&^|=!<>[:space:]]\)\(\%([-+*/%&^|=!<>]\|<<\|>>\)\?=\)\([^=[:space:]]\)/\1 \2 \3/ge'
+		exec line.'s/\(\w\|)\)\([<>]\)\(\w\|(\)/\1 \2 \3/ge'
+		exec line.'s/\(\%(el\|els\|else\)if\|for\|while\|until\)(/\1 (/ge'
+		exec line.'s/){/) {/ge'
+		exec line.'s/}\(else\|\%(el\|els\|else\)if\)/} \1/ge'
+		exec line.'s/\(else\|\%(el\|els\|else\)if\){/\1 {/ge'
+		exec line.'s/\<return\>\(\S\)/return \1/ge'
+		" user confirm:
+		exec line.'s/\(\w\|[]})"'."'".']\)\zs,\ze\(\w\|[[{("'."'".']\)/, /gec'
+	endfor
+	catch /^Interrupted$/ | endtry
+endfunction
+
 " Hexmode: toggle for hex mode {{{3
 command! -nargs=0 -bar Hexmode call s:ToggleHex()
 function! s:ToggleHex()
@@ -791,7 +813,8 @@ function! <SID>ToggleNRFormats()
 	endif
 	set nf?
 endfunction
-map	<silent><C-S-A>		:<C-U>call <SID>ToggleNRFormats()<CR>
+map	<silent><leader><C-A>	:<C-U>call <SID>ToggleNRFormats()<CR>
+map	<silent><leader><C-X>	:<C-U>call <SID>ToggleNRFormats()<CR>
 
 " windows-style clipboard shortcuts emulated with Meta {{{3
 " select all
@@ -1130,6 +1153,8 @@ map	<silent><M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>
 vmap<silent><M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>gv
 
 " <leader> {{{3
+let mapleader = '\'
+
 " replace last search pattern
 map			<leader>s		:%s///gc<Left><Left><Left>
 xmap		<leader>s		:s///gc<Left><Left><Left>
@@ -1142,7 +1167,8 @@ map			<leader>v		:<C-U>TabOpen $MYVIMRC<CR>
 map			<leader>u		:<C-U>source $MYVIMRC<CR>
 " load config files for editing
 map	<silent><leader>b		:<C-U>TabOpen ~/.bash{rc,_aliases,_hacks}<CR>:tabnext 2<CR>
-map	<silent><leader>f		:<C-U>TabOpen {~/.mozilla/firefox,C:/Documents\ and\ Settings/*/Application\ Data/Mozilla/Firefox/Profiles}/*.default/chrome/user{Content,Chrome}.css<CR>
+map	<silent><leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{Content,Chrome}.css
+										\ ~/Application\ Data/Mozilla/Firefox/Profiles/*.default/chrome/userChrome.css<CR>
 
 " tabs {{{4
 " expand tabs in selected lines to spaces
@@ -1236,8 +1262,6 @@ xmap<silent><leader>#		<C-C>?\V<C-R>=substitute(escape(<SID>GetSelection(),'?\')
 " brace multi, non-greedy multi
 cnoremap	<leader>{		\{}<Left>
 cnoremap	<leader>-		\{-}
-" white space
-cnoremap	<leader><Space>	\_s\+
 
 " }}}1 mappings
 " Section: plugins {{{1

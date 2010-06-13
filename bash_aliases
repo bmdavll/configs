@@ -1,6 +1,6 @@
 #!/bin/bash
 # bash aliases and command-line functions
-## convenience variables and utility functions {{{
+#{{1 convenience variables
 NBSP=' '
 
 # patterns
@@ -12,7 +12,8 @@ CODE_PAT='?*.@(c|C|cc|cpp|h|H|hh|hpp|java|cs|py|rb|pl|sh|vim|js|php|l|y)'
 MAKE_PAT='@(*[Mm]akefile|*configure)?(.@(ac|am|in))'
 TEXT_PAT='@(*README|*INSTALL|?*.@(txt|log|rst))'
 
-# return the maximum integer value from a list {{{
+#{{1 utility functions
+#{{2 return the maximum integer value from a list
 function max
 { :
 	if [ $# -eq 0 ]; then
@@ -33,8 +34,9 @@ function max
 	done
 	[ "$val" ] && echo "$val"
 	return $code
-} # }}}
-# spawn gui application {{{
+}
+
+#{{2 spawn gui application
 function gui
 { :
 	if type "$1" &>/dev/null; then
@@ -45,8 +47,8 @@ function gui
 	fi
 } && GUI=gui
 complete -c gui
-# }}}
-# check if a string is among or if a pattern matches any of the arguments that follow {{{
+
+#{{2 check if a string is among or if a pattern matches any of the arguments that follow
 function str_in
 {	:
 	local arg str="$1" && shift
@@ -63,8 +65,8 @@ function pat_in
 		[[ "$arg" =~ $pat ]] && return 0
 	done
 }
-# }}}
-# function to split an argument list into options and non-options {{{
+
+#{{2 function to split an argument list into options and non-options
 # clears and fills arrays OPTS and ARGV (use `split_opts -c' to unset)
 # first parameter: one-character options that take arguments
 #                  follow an option with '?' if the argument to it is optional
@@ -134,9 +136,8 @@ function split_opts
 	fi
 	ARGV+=("$@")
 }
-# }}}
 
-## from /etc/bash_completion
+#{{2 from /etc/bash_completion
 function quote_readline
 {
 	local arg="${1//\\/\\\\}"
@@ -145,7 +146,7 @@ function quote_readline
 # This function performs file and directory completion. It's better than
 # simply using 'compgen -f', because it honors spaces in filenames.
 # If passed -d, it completes only on directories.
-function file_glob # {{{
+function file_glob #{{
 {
 	local IFS=$'\n'
 
@@ -170,10 +171,11 @@ function file_glob # {{{
 	fi
 
 	COMPREPLY+=("${toks[@]}")
-} # }}}
-## }}}
-## command line essentials {{{
-# colors {{{
+}
+#}}2
+
+#{{1 essentials
+#{{2 colors
 if [ -x /bin/tput -o -x /usr/bin/tput ] && tput setaf 1 &>/dev/null || [ "$CYGWIN" ]
 then :
 	COLOR='--color=auto'
@@ -194,9 +196,9 @@ then :
 	fi
 	unset COLOR
 fi
-# }}}
-# ls {{{
-function l # {{{
+
+#{{2 ls
+function l #{{
 { :
 	local IFS=$'\n' arg
 	split_opts 'IkpTw' -- "$@" || return $?
@@ -214,14 +216,14 @@ function l # {{{
 		ls "${OPTS[@]}" "${ARGV[@]}"
 	fi
 	split_opts -c
-} # }}}
+} #}}
 alias la='l -A'
 alias ll='l -lh'
 alias lla='l -lhA'
 alias lt='l -lhtr'
 alias lS='l -lhSr'
 
-# ls links {{{
+#{{ ls links
 function lh
 { :
 	if pat_in "$HELP_PAT" "$@"; then
@@ -245,8 +247,7 @@ function lh
 	ls --color=always -lh "${argv[@]}" | awk '{
 		if ($0 ~ /^total[[:blank:]]+[[:alnum:].]+$/) {
 			next;
-		} else if ( length($1) != 10 || $1 !~ /^.[r-][w-][xsS-]/ ||
-					$7 !~ /^[0-9][0-9]:[0-9][0-9]$/ ) {
+		} else if ( length($1) != 10 || $1 !~ /^.[r-][w-][xsS-]/ ) {
 			if (header ~ /:\n$/)
 				header = "";
 			header = header $0 "\n";
@@ -262,9 +263,9 @@ function lh
 		}
 	}'
 	return ${PIPESTATUS[0]}
-} # }}}
+} #}}
 
-# pipe to less with colors {{{
+#{{ pipe to less with colors
 function _lsl
 { :
 	local code=0 output ls=($1) && shift
@@ -273,7 +274,7 @@ function _lsl
 		printf "%s" "$output" | less -R
 	fi
 	return $code
-} # }}}
+} #}}
 alias lsl='_lsl "l"'
 alias lal='_lsl "l -A"'
 alias lll='_lsl "l -lh"'
@@ -281,7 +282,7 @@ alias ltl='_lsl "l -lhtr"'
 alias lSl='_lsl "l -lhSr"'
 alias lhl='_lsl "lh"'
 
-# selective ls {{{
+#{{ selective ls
 # modes are code, other, hidden
 # option -R will be ignored
 _lsmode() { :
@@ -331,14 +332,14 @@ _ls_special() { :
 alias lsc='_ls_special c'
 alias lso='_ls_special o'
 alias lsh='_ls_special h'
-# }}}
+#}}
 
 alias cls='clear && ls'
 
 # completion
 complete -A directory lh lhl lsc lso lsh
-# }}}
-# changing directories {{{
+
+#{{2 changing directories
 alias bd='cd - >/dev/null'
 alias CD='cd "$(readlink -m "$PWD")"'
 
@@ -355,7 +356,7 @@ function c
 	fi
 	cd "$@"
 }
-# cd and ls in new directory {{{
+#{{ cd and ls in new directory
 function cl
 { :
 	if pat_in "$HELP_PAT" "$@"; then
@@ -389,7 +390,7 @@ function cll
 	done
 	return 1
 }
-# }}}
+#}}
 complete -A directory cd c cl
 
 # push/pop
@@ -397,9 +398,8 @@ alias pu='pushd'
 alias pp='popd'
 alias dirs='dirs -v'
 complete -A directory pu
-# }}}
 
-# mk/rmdir
+#{{2 mk/rmdir
 alias md='mkdir -p'
 alias rd='rmdir'
 complete -A directory rd
@@ -411,14 +411,14 @@ function rcd
 	rmdir "$PWD" && cd ..
 }
 
-# find {{{
+#{{2 find
 _finder() { :
 	if pat_in "$HELP_PAT" "$@"; then
 		echo "Usage: [find_option|path|iname|^exclude]... [find_spec]..." && return
 	fi
 	local IFS=$'\n' specs=() opts=() paths=() special gflag pat i
 	local nocaseglob=$(shopt -p nocaseglob) && shopt -u nocaseglob
-	# parse {{{
+	#{{ parse
 	if [[ "$1" && "$1" != [-\!\(]* || "$1" == -[PLHO]* ]]; then
 		gflag=1
 	elif [[ "$1" == -special* ]]; then
@@ -446,8 +446,8 @@ _finder() { :
 		shift
 	done
 	[ ${#paths[@]} -eq 0 ] && paths='.'
-	# }}}
-	# execute {{{
+	#}}
+	#{{ execute
 	[ "$special" = "ed" ] && specs=(-depth "${specs[@]}")
 	local args=("${opts[@]}" "${paths[@]}" "${specs[@]}")
 	if [ "$special" ]; then
@@ -484,7 +484,7 @@ _finder() { :
 			fi
 		done
 	fi
-	# }}}
+	#}}
 	eval "$nocaseglob"
 }
 alias findg='_finder'
@@ -513,11 +513,11 @@ alias rmed='_rm_special ed'
 
 complete -F _find -o filenames -o default \
 findg findn findf findd findl findbk findbl finded rmbk rmbl rmed
-# }}}
-# rm {{{
+
+#{{2 rm
 alias rmr='rm -r'
 
-# secure rm with shred
+#{{3 secure rm with shred
 function rms
 { :
 	split_opts -- "$@" || return $?
@@ -533,7 +533,7 @@ function rms
 	split_opts -c
 }
 
-# files recursively
+#{{3 files only, recursively
 function rmf
 { :
 	split_opts -- "$@" || return $?
@@ -556,8 +556,8 @@ function rmf
 	split_opts -c
 	return $code
 }
-# }}}
-# mv {{{
+
+#{{2 mv
 _echodo() { :
 	echo "$@" && "$@"
 }
@@ -652,8 +652,8 @@ function swap
 }
 alias bak='swap bak ""'
 alias cbak='_swap_hook="cp -a" swap bak ""'
-# }}}
-# jobs {{{
+
+#{{2 jobs
 function psgrep
 { :
 	if pat_in "$HELP_PAT" "$@"; then
@@ -687,38 +687,8 @@ _ka() { :
 }
 complete -F _ka ka
 complete -F _psgrep psgrep ok
-# }}}
 
-alias ?='echo $?'
-alias p='pwd'
-alias x='xargs -r'
-alias e='egrep --color=always'
-alias g='egrep'
-alias gv='egrep -v'
-alias ch='chmod'
-alias hist='history | sort -nr | less'
-alias histop='history | awk "{print \$2}" | sort | uniq -c | sort -nr | head -n'
-
-function path
-{
-	local var=PATH
-	[ "$1" ] && var="$1"
-	eval "expr \"\$$var\"" | tr ':' $'\n'
-}
-complete -A variable path
-
-function typef
-{
-	local -i code=0
-	while [ $# -gt 0 ]; do
-		readlink -e "$(type -p "$1")" || code+=1
-		shift
-	done
-	return $code
-}
-complete -c typef
-
-# file browser/terminal {{{
+#{{2 file browser/terminal
 function f
 { :
 	local fileman
@@ -732,8 +702,9 @@ function f
 	return 1
 }
 complete -A directory t
-# }}}
-# help {{{
+
+#{{2 help
+#{{3 combined help
 function h
 { :
 	local -i code=0 error
@@ -769,8 +740,8 @@ function h
 	return $code
 }
 # eval $(complete -p man 2>/dev/null | sed 's/man$/h/')
-# }}}
-# alias help {{{
+
+#{{3 alias help
 function ahelp
 { :
 	[ $# -eq 0 ] && set -- ""
@@ -788,9 +759,41 @@ function ahelp
 		}
 	}'
 }
-# }}}
-## }}}
-## the rest {{{
+
+#{{2 misc.
+alias ?='echo $?'
+alias p='pwd'
+alias x='xargs -r'
+alias e='egrep --color=always'
+alias g='egrep'
+alias gv='egrep -v'
+alias ch='chmod'
+alias hist='history | sort -nr | less'
+alias histop='history | awk "{print \$2}" | sort | uniq -c | sort -nr | head -n'
+
+# list path
+function path
+{
+	local var=PATH
+	[ "$1" ] && var="$1"
+	eval "expr \"\$$var\"" | tr ':' $'\n'
+}
+complete -A variable path
+
+# get real paths of executables
+function typef
+{
+	local -i code=0
+	while [ $# -gt 0 ]; do
+		readlink -e "$(type -p "$1")" || code+=1
+		shift
+	done
+	return $code
+}
+complete -c typef
+#}}2
+
+#{{1 the rest
 alias cat4='expand -t4'
 alias db='diff -bB'
 alias df='df -h'
@@ -802,7 +805,7 @@ alias py='python'
 alias wcL='wc -L'
 alias wcl='wc -l'
 
-# calculators {{{
+#{{2 calculators
 _float() { :
 	sed -e 's/\.0\+$//' -e 's/\(\.[0-9]*[1-9]\)0\+$/\1/'
 }
@@ -821,8 +824,8 @@ function rpn
 	dc -e "20 k $* p" | _float
 	return ${PIPESTATUS[0]}
 }
-# }}}
-# variables {{{
+
+#{{2 variables
 function var
 { :
 	[ $# -eq 0 ] && return 1
@@ -850,8 +853,8 @@ function var
 	done
 }
 complete -A variable var
-# }}}
-# web {{{
+
+#{{2 web
 _search() { :
 	local SEP='/' URL="$1" && shift
 	URL=$(echo "$@" | perl -e '
@@ -871,12 +874,12 @@ _search() { :
 alias goog='_search "http://google.com/search?q=%s"'
 alias wiki='_search "http://en.wikipedia.org/wiki/Special:Search?search=%s"'
 alias what='_search "http://what.cd/torrents.php?action=advanced&artistname=%s&groupname=&filelist=%s&freetorrent=&taglist=&tags_type=1&order_by=time&order_way=desc"'
-# }}}
-# vim {{{
+
+#{{2 vim
 function vd { ($GUI gvimdiff "$@") }
 function vp { ($GUI gvim -p  "$@") }
 
-# open in a new tab in existing gvim server {{{
+#{{3 open in a new tab in existing gvim server
 function vs
 { : :
 	if pat_in "$HELP_PAT" "$@"; then
@@ -900,7 +903,8 @@ function vs
 	else ($GUI gvim "${server[@]}" "${OPTS[@]}" --remote-tab-silent "$@")
 	fi
 	split_opts -c
-} # }}}
+}
+#{{3 ↪completion
 _vs() { :
 	if [ $COMP_CWORD -eq 1 ]; then
 		COMPREPLY=($(compgen -W "$(gvim --serverlist)" -- "$2"))
@@ -916,7 +920,7 @@ _devlib() { :
 }
 complete -F _devlib -o filenames -o default dev lib
 
-# edit code {{{
+#{{3 edit code
 function vc
 { : :
 	[ "$1" = "--cd" ] && local cd="$1" && shift
@@ -964,7 +968,7 @@ function vc
 	 "${vopts[@]}" --remote-tab-silent "${vargs[@]}")
 }
 alias vcc='vc --cd'
-# }}}
+#{{3 ↪completion
 _vc() { : :
 	[ ! -d "$BIN" ] && return 1
 	local IFS=$'\n' path replies=() cur="$2" i
@@ -983,8 +987,8 @@ _vc() { : :
 	fi
 }
 complete -F _vc -o nospace -o filenames vc vcc
-# }}}
-# ssh {{{
+
+#{{2 ssh
 SSH_ENV="$HOME/.ssh/environment"
 
 function start-ssh-agent
@@ -995,8 +999,8 @@ function start-ssh-agent
 	source "$SSH_ENV" >/dev/null
 	/usr/bin/ssh-add
 }
-# }}}
-# git {{{
+
+#{{2 git
 type __gitdir &>/dev/null &&
 function gs
 { :
@@ -1014,7 +1018,7 @@ function gs
 	[ $# -eq 0 ] && set -- .
 	for dir in "$@"; do
 		cd "$WD"
-		cd "$dir" || continue
+		cd "$dir" 2>/dev/null || continue
 		gitdir=$( (cd "$(__gitdir)" && pwd) 2>/dev/null)
 		[[ ! "$gitdir" || "$PWD" == "$gitdir"* ]] && continue
 		echo $sep && unset sep
@@ -1036,8 +1040,8 @@ function gs
 	[ "${OWD+set}" ] && cd "$OWD"
 	cd "$WD"
 }
-# }}}
-# gpg {{{
+
+#{{2 gpg
 function encrypt
 { :
 	[ $# -eq 0 ] && return 2
@@ -1096,8 +1100,8 @@ function decrypt
 	[ "$wflag" ] && rm -f "$tmp"
 	return $code
 }
-# }}}
-# samba {{{
+
+#{{2 samba
 function smbmount
 { :
 	[ $# -lt 2 ] && return 2
@@ -1130,8 +1134,8 @@ function smbumount
 		fi
 	fi
 }
-# }}}
-# misc. functions {{{
+
+#{{2 misc. functions
 function tune
 { :
 	local pitch
@@ -1140,6 +1144,6 @@ function tune
 		play -n synth 3 pluck $pitch repeat 42 2>/dev/null
 	done
 }
-# }}}
-## }}}
-# vim:set ts=4 sw=4 noet fdm=marker:
+
+#}}1
+# vim:set ts=4 sw=4 noet fmr={{,}} fdm=marker:

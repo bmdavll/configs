@@ -3,7 +3,7 @@
 
 umask 0022
 
-# completion
+#{{1 completion
 if [ ! "${BASH_COMPLETION+set}" ]; then
 	if [ -f "$HOME/.bash_completion" ]; then
 		source "$HOME/.bash_completion"
@@ -12,12 +12,12 @@ if [ ! "${BASH_COMPLETION+set}" ]; then
 	fi
 fi
 
-# remap console keys
+#{{1 remap console keys
 if [ -z "$DISPLAY" -a -f "$HOME/.loadkeys" ]; then
 	(loadkeys "$HOME/.loadkeys" || sudo loadkeys "$HOME/.loadkeys") &>/dev/null
 fi
 
-# Cygwin
+#{{1 Cygwin
 if [ "$(uname -o)" = "Cygwin" ]; then
 	CYGWIN=$(uname -s)
 
@@ -27,7 +27,7 @@ if [ "$(uname -o)" = "Cygwin" ]; then
 	unset TMP TEMP
 fi
 
-## prompt {{{
+#{{1 prompt
 if [ "$TERM" = "linux" ]; then
 	# long prompt (system console)
 	PS1="\u@\h[\#]\W\$ "
@@ -86,9 +86,8 @@ xterm*|*rxvt*)
 	PROMPT_COMMAND+=';echo -ne "\033]0;$USER@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
 	;;
 esac
-## }}}
 
-## options and variables {{{
+#{{1 options and variables
 shopt -s no_empty_cmd_completion
 shopt -s checkwinsize	# if necessary, update LINES/COLUMNS after each command
 shopt -s cmdhist		# multi-line histories
@@ -139,9 +138,8 @@ export PYTHONPATH="$HOME/code/lang/py/modules"
 if [ -f "$HOME/.pythonrc" ]; then
 	export PYTHONSTARTUP="$HOME/.pythonrc"
 fi
-## }}}
 
-## user bin directory {{{
+#{{1 user bin directory
 BIN="$HOME/bin"
 
 function abspath
@@ -176,9 +174,8 @@ function lnbin
 	done
 	return $code
 }
-## }}}
 
-## bootstrap other scripts and set PATH {{{
+#{{1 bootstrap other scripts and set PATH
 function addpath
 {
 	[ $# -ne 1 ] && return 2
@@ -207,9 +204,8 @@ if [ "$TERM" != "dumb" ] || [ "$CYGWIN" ]; then
 	addsource "$HOME/.bash_hacks"
 	addpath .
 fi
-# }}}
+#}}1
 
 # done
 true
-
-# vim:set ts=4 sw=4 noet fdm=marker:
+# vim:set ts=4 sw=4 noet fmr={{,}} fdm=marker:

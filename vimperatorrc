@@ -1,202 +1,260 @@
 " Vimperator 2.1 {{{1
 
-" usage notes
-" C-v			pass keystroke
-" o   O			open # with current URL
-" t   T			tabopen # with current URL
-" y   Y			yank # current location # selected text
-" p   P			put from clipboard # in new tab
-" i   v			# caret mode # visual select in caret mode
-" C-[oi]		go # back # forward
-" g[hH]			go home # in new tab
-" g[uU]			go up to parent directory # root
-" r   R			reload # bypass cache
-" x				stop (mapped from default C-c)
+" Usage notes
+" C-v C-z		pass next keystroke / pass all keystrokes
+" y   Y			yank current location / yank selected text
+" p   P  gP		open from clipboard / open in new tab / in background
+" C-a C-x		increment / decrement URL
+" gh  gH		go home / in new tab
+" gu  gU		go to parent page / to main page
+" r   R			reload / bypass cache
 " :sav			save as
-" :xa   ZZ		save session and quit
-" :qa   ZQ		quit without saving
-" g C-g			page info
-" g[fF]			view source # in external editor
-" z[ioz]		zoom # in # out # reset
-" gi			focus last/first input field
-" C-^			select last tab
-" c				select tab (mapped from default b)
-" :tabm N		move tab to position N
-" :tabo			close other tabs
-" :tabdu		duplicate tab
-" :tabde		detach tab
-" d   D   u		close tab and focus # right # left # undo close
-" :bd   :u		close/undo with argument selection
-" f   F			open hint # in new tab
-" ;{MODE}		extended hint mode:
-"				s:save		y:yank
-" a				bookmark page
-"				optionally specify -t title -T tag[,tag]... -k keyword
+" ZZ  ZQ		quit, saving session / without saving
+" g C-g			:pageinfo
+" gf  gF		toggle source view / view source in external editor
+" 0   $			scroll left / right
+" gi			focus input field
+" [[  ]]		follow previous / next links
+" zi  zo		zoom in / out by level
+" zm  zr		zoom more / zoom reduce
+" zz			set zoom to [100]%
+" use zI zO zM zR zZ for full-page zoom instead of text-only zoom
+" C-^			select previously selected tab
+" g0  g$		select first / last tab
+" ;{MODE}		hint mode:
+"				o	open		t	in new tab		b	in background	F	open multiple
+"				s	save		y	yank link		Y	yank text description
 " A				toggle star (goes into unsorted bookmarks)
-" :bmarks[!]	lookup bookmarks # and open in new tabs
-" :delbm		delete bookmarks
-" {a-zA-Z0-9}	quickmarks
-" M   g[on]		# quickmark current page # open quickmark # in new tab
+" {a-zA-Z0-9}	quickmarks for URLs (persistent across sessions)
+" M   go  gn	quickmark current page / open quickmark / open in new tab
 " :ha			print
 " :dia			open firefox dialogs
-" :sideb		open the sidebar
-" :exu   :viu	# ex # vi usage
+" :sa!			clear private items
 
 " mappings {{{1
-noremap			L			<Nop>
-noremap			a			<Nop>
-noremap			<C-y>		<Nop>
-noremap			<C-p>		<Nop>
-noremap			<C-n>		<Nop>
+let mapleader = ','
 
+" no-ops {{{2
+map				F			<Nop>
+map				L			<Nop>
+
+map				<C-y>		<Nop>
+map				<C-j>		<Nop>
+map				<C-k>		<Nop>
+
+imap			<C-p>		<Nop>
+imap			<C-n>		<Nop>
+imap			<C-f>		<Nop>
+
+cmap			<C-f>		<Nop>
+
+" basic {{{2
 noremap			<C-Space>	<Esc>
 inoremap		<C-Space>	<Esc>
 cnoremap		<C-Space>	<Esc>
 
+inoremap		<C-m>		<CR>
+inoremap		<C-j>		<CR>
+cnoremap		<C-j>		<CR>
+
+" search
+noremap			<C-f>		/
+noremap			*			<C-v><C-c>/<S-Insert><CR>
+noremap			#			<C-v><C-c>?<S-Insert><CR>
+
+" scrolling {{{2
+nnoremap		h			3h
+nnoremap		l			3l
+nnoremap		j			2j
+nnoremap		k			2k
+
+" scroll up/down quarter-page
+nnoremap		f			10k
+nnoremap		v			10j
+
+" page up
+noremap			b			<S-Space>
+
 " command line {{{2
+" recall commands
+cnoremap		<C-p>		<PageUp>
+cnoremap		<C-n>		<PageDown>
+" recall matching commands
+cnoremap		<A-p>		<Up>
+cnoremap		<A-n>		<Down>
+
+" cycle thru completion list
+cnoremap		<A-j>		<Tab>
+cnoremap		<A-k>		<S-Tab>
+
 " address completion
 cnoremap		<C-CR>		<End>.com<CR>
 cnoremap		<S-CR>		<End>.net<CR>
 cnoremap		<C-S-CR>	<End>.org<CR>
 
-" cycle thru completion list
-cnoremap		<C-j>		<Tab>
-cnoremap		<C-k>		<S-Tab>
-cnoremap		<A-j>		<Tab>
-cnoremap		<A-k>		<S-Tab>
-" recall commands
-cnoremap		<C-p>		<PageUp>
-cnoremap		<C-n>		<PageDown>
-" reverse search
-cnoremap		<A-p>		<Up>
-cnoremap		<A-n>		<Down>
-
-" moving around {{{2
-cnoremap		<A-h>		<Left>
-inoremap		<A-h>		<Left>
-cnoremap		<A-l>		<Right>
-inoremap		<A-l>		<Right>
-inoremap		<A-j>		<Down>
-inoremap		<A-k>		<Up>
-
-cnoremap		<C-l>		<Right>
-inoremap		<C-l>		<Right>
-
-" word-wise operations {{{2
-cnoremap		<A-b>		<C-Left>
-inoremap		<A-b>		<C-Left>
-cnoremap		<A-f>		<C-Right>
-inoremap		<A-f>		<C-Right>
-cnoremap		<A-d>		<C-Del>
-inoremap		<A-d>		<C-Del>
-cnoremap		<A-BS>		<C-BS>
-inoremap		<A-BS>		<C-BS>
-
-" misc {{{2
-" back, forward, and edit with external editor
-cnoremap		<C-o>		<Esc><C-o>
-inoremap		<C-o>		<Esc><C-o>
-cnoremap		<C-i>		<Esc><C-i>
-inoremap		<C-i>		<Esc><C-i>
-inoremap		<C-g>		<C-i>
-
-" search
-noremap			<C-f>		/
-
-" tabs
-noremap			<C-A-i>		gT
-noremap			<C-A-o>		gt
-noremap			<C-A-t>		<C-T>
-noremap			<C-A-w>		<C-w>
-
-" history list
-noremap			<C-m>		:jumps<CR>
-
-" bookmarks
-noremap			<C-b>		<C-v><C-b>
-
-" enter command-line mode
-noremap			;			:
-cnoremap		<C-;>		<Esc>
-
-" return
-inoremap		<C-j>		<CR>
-inoremap		<C-m>		<CR>
-
-" numeric tab switching
-noremap			c			B:buffer!<Space>
-" page up
-noremap			b			<S-Space>
-" stop
-noremap			x			<C-c>
-" undo
-noremap			U			:undo<Space><Tab>
-" help
+" macros {{{3
+" search bookmarks
+noremap			B			:bmarks<Space>
+" vimperator help
 noremap			H			:help<Space>
 " run command
 noremap			!			:!
 
+" text entry {{{2
+" edit with external editor
+inoremap		<C-g>		<C-i>
+
+" cursor movement {{{3
+inoremap		<A-j>		<Down>
+inoremap		<A-k>		<Up>
+
+inoremap		<A-h>		<Left>
+cnoremap		<A-h>		<Left>
+
+inoremap		<A-l>		<Right>
+cnoremap		<A-l>		<Right>
+
+inoremap		<C-l>		<Right>
+cnoremap		<C-l>		<Right>
+
+" word-wise movement/deletion {{{3
+inoremap		<A-b>		<C-Left>
+cnoremap		<A-b>		<C-Left>
+
+inoremap		<A-f>		<C-Right>
+cnoremap		<A-f>		<C-Right>
+
+inoremap		<A-d>		<C-Del>
+cnoremap		<A-d>		<C-Del>
+
+inoremap		<A-BS>		<C-BS>
+cnoremap		<A-BS>		<C-BS>
+
+" navigation {{{2
+" stop
+noremap			x			<C-c>
+
+" go back/forward starting in non-normal modes
+inoremap		<C-o>		<Esc><C-o>
+cnoremap		<C-o>		<Esc><C-o>
+inoremap		<C-i>		<Esc><C-i>
+cnoremap		<C-i>		<Esc><C-i>
+
+" view jump list
+noremap<silent>	<C-m>		:jumps<CR>
+
+" follow previous/next links
+noremap			<			[[
+noremap			>			]]
+
+" tabs {{{2
+" previous/next tab
+noremap			<C-A-i>		gT
+noremap			<C-A-o>		gt
+
+" open/close
+noremap			<C-A-t>		<C-T>
+noremap			<C-A-w>		<C-w>
+
+" undo close
+noremap			U			:undo<Space><Tab>
+
+" tab switching by buffer number
+noremap			e			b
+noremap			<C-e>		B:buffer!<Space>
+
+" move the current tab
+noremap<silent>	<leader>h	:tabmove! -1<CR>
+noremap<silent>	<leader>l	:tabmove! +1<CR>
+
+" duplicate, detach, attach
+noremap<silent>	<leader>d	:tabduplicate<CR>
+noremap<silent>	<leader>w	:tabdetach<CR>
+noremap<silent>	<leader>W	:tabattach 1<CR>
+
+" interface {{{2
+" bookmarks sidebar
+noremap			<C-b>		<C-v><C-b>
+
 " toggle toolbars
-noremap<silent>	e			:js toggle_bars(["PersonalToolbar"])<CR>
-noremap<silent>	<C-e>		:js toggle_bars(["toolbar-menubar","nav-bar"])<CR>
+" Menu Bar, Navigation Toolbar
+noremap<silent>	c			:js toggle_bars(["toolbar-menubar","nav-bar"])<CR>
+" Bookmarks Toolbar (PersonalToolbar)
+noremap<silent>	C			:toolbartoggle Bookmarks Toolbar<CR>
 
 " function keys {{{2
-noremap<silent>	<F2>		:emenu Bookmarks.Organize Bookmarks…<CR>
-noremap			<F5>		:nohlsearch<CR>
-noremap<silent>	<F9>		O<Home><C-Del>delbmarks<Space><CR>
+noremap<silent>	<F4>		:emenu Bookmarks.Organize Bookmarks…<CR>
+noremap<silent>	<F5>		:nohlsearch<CR>
 noremap			<F13>		<C-o>
 noremap			<F14>		<C-i>
 
-" leader {{{2
-" search/tabopen/open with X clipboard contents
-map				<leader>*	/<S-Insert><CR>/<Up><CR>
-map				<leader>t	t<S-Insert><Home><C-Right><Space><Left>
-map				<leader>o	o<S-Insert><Home><C-Right><Space><Left>
-" quick searches
-map				<leader>g	tg<Space><S-Insert><CR>
-map				<leader>G	og<Space><S-Insert><CR>
-map				<leader>w	tw<Space><S-Insert><CR>
-map				<leader>W	ow<Space><S-Insert><CR>
-map				<leader>d	td<Space><S-Insert><CR>
-map				<leader>c	tc<Space><S-Insert><CR>
+" macros {{{2
+" paste-n-go from selection or clipboard
+noremap			p			<C-v><C-c>p
+noremap			P			<C-v><C-c>gP
+
+" quick search in background tab
+" google/wikipedia/special/dictionary
+noremap<silent>	s			<C-v><C-c>:set act!=tabopen<CR>tg<Space><S-Insert><CR>:set act!=tabopen<CR>
+noremap<silent>	w			<C-v><C-c>:set act!=tabopen<CR>tw<Space><S-Insert><CR>:set act!=tabopen<CR>
+noremap<silent>	S			<C-v><C-c>:set act!=tabopen<CR>ts<Space><S-Insert><CR>:set act!=tabopen<CR>
+noremap<silent>	W			<C-v><C-c>:set act!=tabopen<CR>td<Space><S-Insert><CR>:set act!=tabopen<CR>
+
+" search with selection or clipboard contents
+noremap			a			<C-v><C-c>o<S-Insert><Home><C-Right><Space><Left>
+noremap			<leader>a	<C-v><C-c>t<S-Insert><Home><C-Right><Space><Left>
+noremap			<leader>t	<C-v><C-c>t<S-Insert><Home><C-Right><Space><Left>
+
+" bookmarklets {{{2
+" readability
+noremap<silent>	<leader>r	:emenu Bookmarks.Bookmarks Toolbar.Read<CR>
+
+" invert colors
+noremap<silent>	<leader>i	:emenu Bookmarks.Bookmarks Toolbar.Macros.Invert colors<CR>
+
+" }}}
 
 " options {{{1
-set complete=l
-set defsearch=google
+" vimperator {{{2
+set complete=lS
 set editor='scim-run gvim -f'
+set followhints=0
 set guioptions+=B
 set guioptions+=n
-set hinttags="//*[@onclick or @onmouseover or @onmousedown or @onmouseup or @oncommand or @class='lk' or @role='link' or @role='button' or @role='option'] | //input[not(@type='hidden')] | //a | //area | //iframe | //textarea | //button | //select | //xhtml:input[not(@type='hidden')] | //xhtml:a | //xhtml:area | //xhtml:iframe | //xhtml:textarea | //xhtml:button | //xhtml:select"
-set shellcmdflag=-lc
+set hlsearch
+set newtab=all
+set nextpattern=\\bnext\\b,\\bsiguiente\\b,\\bposterior\\b,^>$,^(>>|»)$,^(>|»),(>|»)$,\\bmore\\b
+set previouspattern=\\b(prev|previous)\\b,\\banterior\\b,^<$,^(<<|«)$,^(<|«),(<|«)$
+set sanitizeitems=cache,commandline,cookies,downloads,formdata,history,macros,marks,offlineapps,sitesettings
+set sanitizetimespan=0
 set showstatuslinks=2
 set showtabline=1
 set titlestring=Firefox
+set urlseparator=;
+set visualbell
+" set wildmode=list:longest
 " set wildoptions=auto
 
-set visualbell
-hi Bell display: none;
-
-" about:config
-set! security.dialog_enable_delay=0
-set! browser.sessionstore.interval=120000
+" about:config {{{2
+set! browser.sessionstore.interval=60000
+set! browser.tabs.loadInBackground=true
 set! middlemouse.paste=true
+set! security.dialog_enable_delay=0
+
+" styling {{{1
+hi! Bell			display: none;
+hi! StatusLine		color: black; background: #d0d0d0;
+hi! CmdLine -a		color: black; background: #eeeeee;
+hi! Normal			color: black; background: #eeeeee;
 
 " javascript {{{1
 javascript <<EOF
+
 // toggle toolbars
 toggle_bars = function(bars) {
 	for (var i in bars) document.getElementById(bars[i]).collapsed ^= 1;
-}
-// yank to clipboard
-mappings.addUserMap([modes.NORMAL], ["Y"],
-	"Yank the currently selected text",
-	function() {
-		events.feedkeys("<C-v>" + (/^Mac/.test(navigator.platform) ? "<M-c>" : "<C-c>"), true);
-		setTimeout( function() {
-			liberator.echo("Yanked " + util.readFromClipboard(), commandline.FORCE_SINGLELINE);
-		}, 20 );
-	}
-);
+};
+
 // rss feed button
 (function() {
 	var feedPanel = document.createElement("statusbarpanel");
@@ -204,8 +262,12 @@ mappings.addUserMap([modes.NORMAL], ["Y"],
 	feedPanel.appendChild(document.getElementById("feed-button"));
 	feedPanel.firstChild.setAttribute("style", "padding: 0; max-height: 16px;");
 	document.getElementById("status-bar")
-	.insertBefore(feedPanel, document.getElementById("security-button"));
+		.insertBefore(feedPanel, document.getElementById("security-button"));
 })();
+
 EOF
+
+" environment {{{1
+cd ~
 
 " vim:set ts=4 sw=4 noet fdm=marker ft=vimperator:
