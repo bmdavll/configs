@@ -764,7 +764,6 @@ function ahelp
 alias ?='echo $?'
 alias p='pwd'
 alias x='xargs -r'
-alias e='egrep --color=always'
 alias g='egrep'
 alias gv='egrep -v'
 alias ch='chmod'

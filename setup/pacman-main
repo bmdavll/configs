@@ -78,6 +78,7 @@ add xorg-utils
 add ctags
 add gdb
 add git
+add mercurial
 add subversion
 
 ##2 editors
@@ -182,12 +183,14 @@ add vlc # mplayer
 ##3 editors
 add handbrake
 
-##2 codecs
-add flashplugin
+##2 codecs/plugins
 add gstreamer0.10-plugins
 add libdvdcss
 
-##2 interface
+add flashplugin
+add gecko-mediaplayer
+
+##2 peripherals
 add gtkpod
 
 ##2 optical

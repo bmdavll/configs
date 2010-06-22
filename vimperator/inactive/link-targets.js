@@ -1,13 +1,29 @@
-/*
- * Adds indicators to links based on where they lead.
- *
- * @author	Kris Maglione <maglione.k at Gmail>
- * @version	0.1
- */
+var INFO =
+<plugin name="link-targets" version="0.1"
+        href="http://ticket.vimperator.org/6"
+        summary="Link Target File Types"
+        xmlns="http://vimperator.org/namespaces/liberator">
+    <author email="maglione.k@gmail.com">Kris Maglione</author>
+    <license href="http://people.freebsd.org/~phk/">BEER-WARE</license>
+    <project name="Vimperator" minVersion="2.0"/>
+    <p>
+	This plugin provides decorates icons to unusual file
+	types with icons to alert you before you click. The
+	indicators only appear when you hover over a link.
+	Types include:
+    </p>
+    <ul>
+	<li>PDF</li>
+	<li>Email</li>
+	<li>RSS</li>
+	<li>Internal target</li>
+	<li>JavaScript</li>
+	<li>New window/tab</li>
+	<li>Secure or unsecure, depending on the context</li>
+    </ul>
+</plugin>;
 
-(function() {
-
-const icons = {
+var icons = {
     aim:
         "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACaElEQVQ4jZWST0iTARjGn++bdqlE" +
         "0fVNU1OW21zuM61Asz+ucGVIhZPsUEK5i5SUXcKDrMAOjmUmui5lUKPWocus4aEpikKSJGgHAyFC" +
@@ -24,7 +40,7 @@ const icons = {
     java:
         "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAuUlEQVQ4jZ1SQQ7DIAwz1V7T456w" +
         "Y4+8J0fva+FZ6WEFpaHQapYiIQN2YgDuYUddYnlwGSQf+ASQrM7TDtKd+935yxEO98hNvK7djaTx" +
-        "PMZwlE5AVc0AMyCKjOGDM1f0HYXxfAZtw6w38pwXeVVCRJDz1g59SUAEAPBRbXzOG9b1XQ1TXbQW" +
+       "PMZwlE5AVc0AMyCKjOGDM1f0HYXxfAZtw6w38pwXeVVCRJDz1g59SUAEAPBRbXzOG9b1XQ1TXbQW" +
         "Z0AfqCESM6hqJ7CQ/O+rHlhEpPtdpRSklE7lAvSG3V3/VP4pWkaBP3/lqiy/9L36aI0d80KynYgL" +
         "q8EAAAAASUVORK5CYII",
     excel:
@@ -236,17 +252,16 @@ const icons = {
 
 function css([selectors, icon]) {
     return selectors.map(function (s) "a" + s + ":hover:after").join(", ")
-        + " { display: inline-block; width: 0px; vertical-align: middle; margin: -5px 0;"
-        + " content: url(data:image/png;base64," + icons[icon] + "); }";
+        + " { display: inline-block; width: 0px; vertical-align: middle; margin: -5px 0; content: url(data:image/png;base64," + icons[icon] + ") }";
 }
 
-const PROTOCOLS = [
+var PROTOCOLS = [
     ["aim", "aim"],
     ["javascript", "warn"],
     ["mailto", "email"],
 ];
 
-const EXTENSIONS = [
+var EXTENSIONS = [
     ["xls xlt", "excel"],
     ["java", "java"],
     ["js", "javascript"],
@@ -266,22 +281,22 @@ const EXTENSIONS = [
 
 let style = [];
 style.push(EXTENSIONS.map(function ([ext, icon])
-    [ext.split(" ").map(function (e) '[href$=".' + e + '"]'), icon]));
+    [ext.split(" ").map(function (e) <>[href$=".{e}"]</>), icon]));
 style.push(PROTOCOLS.map(function ([ext, icon])
-    [ext.split(" ").map(function (e) '[href^="' + e + ':"]'), icon]));
+    [ext.split(" ").map(function (e) <>[href^="{e}:"]</>), icon]));
 
 style = util.Array.flatten(style);
-style.push([["[onClick]", "[onclick]"], "hand"]);
-style.push([["[target=_" + k + "]" for each (k in ["SELF", "PARENT", "TOP", "CONTENT"])],
+style.push([['[href^="#"]'], "internal"]);
+style.push([['[onClick]', '[onclick]'], "hand"]);
+style.push([[<>[target=_{k}]</> for each (k in ["SELF", "PARENT", "TOP", "CONTENT"])],
             "new"]);
 style.push([["[rel=nofollow]"], "nofollow"]);
 
 style = style.map(css).join("\n");
-let styleSecure = css([[':not([href^="https:"])'], "insecure"]);
+let styleSecure = css([[':not([href^="https:"])[href*=":"]'], "insecure"]);
 let styleInsecure = css([['[href^="https:"]'], "secure"]);
 
-storage.styles.addSheet("link-targets", "*", style, true, true);
-storage.styles.addSheet("link-targets-secure", "https:*", styleSecure, true, true);
-storage.styles.addSheet("link-targets-insecure", "http:*", styleInsecure, true, true);
+storage.styles.addSheet(true, "link-targets", "*", style);
+storage.styles.addSheet(true, "link-targets-secure", "https:*", styleSecure);
+storage.styles.addSheet(true, "link-targets-insecure", "http:*", styleInsecure);
 
-})();

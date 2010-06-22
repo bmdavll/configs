@@ -581,7 +581,7 @@ function! s:CodeReadability(line1, line2)
 		exec line.'s/){/) {/ge'
 		exec line.'s/}\(else\|\%(el\|els\|else\)if\)/} \1/ge'
 		exec line.'s/\(else\|\%(el\|els\|else\)if\){/\1 {/ge'
-		exec line.'s/\<return\>\(\S\)/return \1/ge'
+		exec line.'s/\<return\>\([^;[:space:]]\)/return \1/ge'
 		" user confirm:
 		exec line.'s/\(\w\|[]})"'."'".']\)\zs,\ze\(\w\|[[{("'."'".']\)/, /gec'
 	endfor
@@ -674,7 +674,6 @@ endfunction
 " see :help map-modes
 " temp marks: 'a, 'z
 " temp registers: @z
-
 " general {{{2
 " externally map CapsLock to Control
 " basic {{{3
@@ -734,6 +733,9 @@ noremap!	<M-h>		<Left>
 noremap!	<M-l>		<Right>
 inoremap	<M-j>		<C-O>gj
 inoremap	<M-k>		<C-O>gk
+" recall command history, matching current command line
+cnoremap	<M-j>		<Down>
+cnoremap	<M-k>		<Up>
 " switch between windows in normal mode
 nnoremap	<M-h>		<C-W>h
 nnoremap	<M-l>		<C-W>l
@@ -849,10 +851,6 @@ inoremap	<C-S>		<C-O>:w<CR>
 
 " paste X selection register
 noremap!	<S-Insert>	<C-R>*
-
-" recall command history, matching current command line
-cnoremap	<M-p>		<Up>
-cnoremap	<M-n>		<Down>
 
 " nothing to see here; move along {{{3
 if !has('gui_running') && &term =~ 'xterm' && &t_Co == 256

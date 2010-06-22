@@ -41,6 +41,8 @@ map				L			<Nop>
 map				<C-y>		<Nop>
 map				<C-j>		<Nop>
 map				<C-k>		<Nop>
+map				<C-p>		<Nop>
+map				<C-n>		<Nop>
 
 imap			<C-p>		<Nop>
 imap			<C-n>		<Nop>
@@ -48,7 +50,7 @@ imap			<C-f>		<Nop>
 
 cmap			<C-f>		<Nop>
 
-" basic {{{2
+" basics {{{2
 noremap			<C-Space>	<Esc>
 inoremap		<C-Space>	<Esc>
 cnoremap		<C-Space>	<Esc>
@@ -57,10 +59,10 @@ inoremap		<C-m>		<CR>
 inoremap		<C-j>		<CR>
 cnoremap		<C-j>		<CR>
 
-" search
-noremap			<C-f>		/
-noremap			*			<C-v><C-c>/<S-Insert><CR>
-noremap			#			<C-v><C-c>?<S-Insert><CR>
+" use as another <C-v>
+noremap			<C-b>		<C-v>
+inoremap		<C-b>		<C-v>
+cnoremap		<C-b>		<C-v>
 
 " scrolling {{{2
 nnoremap		h			3h
@@ -73,32 +75,38 @@ nnoremap		f			10k
 nnoremap		v			10j
 
 " page up
-noremap			b			<S-Space>
+nnoremap		b			<S-Space>
+
+" mark before jumping
+nnoremap		gg			mzgg
+nnoremap		G			mzG
+nnoremap		``			`z
+
+" search {{{2
+noremap			/			mz/
+noremap			<C-f>		mz/
+noremap			*			<C-v><C-c>mz/<S-Insert><CR>
+noremap			#			<C-v><C-c>mz?<S-Insert><CR>
 
 " command line {{{2
 " recall commands
 cnoremap		<C-p>		<PageUp>
 cnoremap		<C-n>		<PageDown>
+" recall and position cursor behind command
+cnoremap		<A-p>		<PageUp><C-a><C-Right>
+cnoremap		<A-n>		<PageDown><C-a><C-Right>
 " recall matching commands
-cnoremap		<A-p>		<Up>
-cnoremap		<A-n>		<Down>
+cnoremap		<A-j>		<Down>
+cnoremap		<A-k>		<Up>
 
 " cycle thru completion list
-cnoremap		<A-j>		<Tab>
-cnoremap		<A-k>		<S-Tab>
+cnoremap		<C-i>		<Tab>
+cnoremap		<C-o>		<S-Tab>
 
 " address completion
 cnoremap		<C-CR>		<End>.com<CR>
 cnoremap		<S-CR>		<End>.net<CR>
 cnoremap		<C-S-CR>	<End>.org<CR>
-
-" macros {{{3
-" search bookmarks
-noremap			B			:bmarks<Space>
-" vimperator help
-noremap			H			:help<Space>
-" run command
-noremap			!			:!
 
 " text entry {{{2
 " edit with external editor
@@ -136,9 +144,7 @@ noremap			x			<C-c>
 
 " go back/forward starting in non-normal modes
 inoremap		<C-o>		<Esc><C-o>
-cnoremap		<C-o>		<Esc><C-o>
 inoremap		<C-i>		<Esc><C-i>
-cnoremap		<C-i>		<Esc><C-i>
 
 " view jump list
 noremap<silent>	<C-m>		:jumps<CR>
@@ -146,6 +152,22 @@ noremap<silent>	<C-m>		:jumps<CR>
 " follow previous/next links
 noremap			<			[[
 noremap			>			]]
+
+" macros {{{2
+" paste-n-go from selection or clipboard
+noremap			p			<C-v><C-c>p
+noremap			P			<C-v><C-c>gP
+
+" quick search in background tab
+" google/wikipedia/special/dictionary
+noremap<silent>	s			<C-v><C-c>:set act!=tabopen<CR>tg<Space><S-Insert><CR>:set act!=tabopen<CR>
+noremap<silent>	w			<C-v><C-c>:set act!=tabopen<CR>tw<Space><S-Insert><CR>:set act!=tabopen<CR>
+noremap<silent>	S			<C-v><C-c>:set act!=tabopen<CR>ts<Space><S-Insert><CR>:set act!=tabopen<CR>
+noremap<silent>	W			<C-v><C-c>:set act!=tabopen<CR>td<Space><S-Insert><CR>:set act!=tabopen<CR>
+
+" search with selection or clipboard contents
+noremap			a			<C-v><C-c>o<S-Insert><Home><C-Right><Space>
+noremap			A			<C-v><C-c>t<S-Insert><Home><C-Right><Space>
 
 " tabs {{{2
 " previous/next tab
@@ -164,23 +186,27 @@ noremap			e			b
 noremap			<C-e>		B:buffer!<Space>
 
 " move the current tab
+noremap<silent>	<leader>H	:tabmove 0<CR>
+noremap<silent>	<leader>L	:tabmove<CR>
 noremap<silent>	<leader>h	:tabmove! -1<CR>
 noremap<silent>	<leader>l	:tabmove! +1<CR>
 
 " duplicate, detach, attach
-noremap<silent>	<leader>d	:tabduplicate<CR>
+noremap<silent>	<leader>d	ygP
 noremap<silent>	<leader>w	:tabdetach<CR>
 noremap<silent>	<leader>W	:tabattach 1<CR>
 
 " interface {{{2
-" bookmarks sidebar
-noremap			<C-b>		<C-v><C-b>
-
 " toggle toolbars
 " Menu Bar, Navigation Toolbar
 noremap<silent>	c			:js toggle_bars(["toolbar-menubar","nav-bar"])<CR>
 " Bookmarks Toolbar (PersonalToolbar)
 noremap<silent>	C			:toolbartoggle Bookmarks Toolbar<CR>
+
+" vimperator help
+noremap			H			:help<Space>
+" run command
+noremap			!			:!
 
 " function keys {{{2
 noremap<silent>	<F4>		:emenu Bookmarks.Organize Bookmarks…<CR>
@@ -188,35 +214,47 @@ noremap<silent>	<F5>		:nohlsearch<CR>
 noremap			<F13>		<C-o>
 noremap			<F14>		<C-i>
 
-" macros {{{2
-" paste-n-go from selection or clipboard
-noremap			p			<C-v><C-c>p
-noremap			P			<C-v><C-c>gP
+" bookmarks {{{2
+" search bookmarks
+noremap			B			:bmarks<Space>
 
-" quick search in background tab
-" google/wikipedia/special/dictionary
-noremap<silent>	s			<C-v><C-c>:set act!=tabopen<CR>tg<Space><S-Insert><CR>:set act!=tabopen<CR>
-noremap<silent>	w			<C-v><C-c>:set act!=tabopen<CR>tw<Space><S-Insert><CR>:set act!=tabopen<CR>
-noremap<silent>	S			<C-v><C-c>:set act!=tabopen<CR>ts<Space><S-Insert><CR>:set act!=tabopen<CR>
-noremap<silent>	W			<C-v><C-c>:set act!=tabopen<CR>td<Space><S-Insert><CR>:set act!=tabopen<CR>
+" toggle bookmark
+noremap			<leader>b	A
 
-" search with selection or clipboard contents
-noremap			a			<C-v><C-c>o<S-Insert><Home><C-Right><Space><Left>
-noremap			<leader>a	<C-v><C-c>t<S-Insert><Home><C-Right><Space><Left>
-noremap			<leader>t	<C-v><C-c>t<S-Insert><Home><C-Right><Space><Left>
-
-" bookmarklets {{{2
 " readability
 noremap<silent>	<leader>r	:emenu Bookmarks.Bookmarks Toolbar.Read<CR>
-
 " invert colors
 noremap<silent>	<leader>i	:emenu Bookmarks.Bookmarks Toolbar.Macros.Invert colors<CR>
+
+" plugins {{{2
+" firebug
+noremap<silent>	<leader>f	:firebug toggle<CR>
+noremap<silent>	<leader>F	:firebug console-clear<CR>:firebug console-focus<CR>
+
+" minion
+noremap<silent>	<C-S-p>		:mpd pause!<CR>
+noremap<silent>	<C-S-j>		:mpd next<CR>
+noremap<silent>	<C-S-k>		:mpd prev<CR>
+noremap<silent>	<C-S-h>		:mpd seek -5<CR>
+noremap<silent>	<C-S-l>		:mpd seek +5<CR>
+noremap<silent>	<C-S-m>		:mpd<CR>
+noremap<silent>	<C-S-f>		:mpd vol +5<CR>
+noremap<silent>	<C-S-v>		:mpd vol -5<CR>
+noremap<silent>	<C-S-g>		:mpd info<CR>
+
+" external {{{2
+" detach to chrome
+noremap<silent>	<leader>c	yd:!chrome <S-Insert> &<CR>
+
+" play flash videos with vlc
+noremap<silent>	<leader>v	:!vlc /tmp/Flash* &<CR>
 
 " }}}
 
 " options {{{1
 " vimperator {{{2
-set complete=lS
+set complete=l
+set defsearch=gl
 set editor='scim-run gvim -f'
 set followhints=0
 set guioptions+=B

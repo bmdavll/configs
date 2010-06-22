@@ -1,18 +1,37 @@
 <?xml encoding="UTF-8" version="1.0"?>
 <actions>
 		<!-- <directories/> -->
-		<!-- <audio-files/> -->
-		<!-- <image-files/> -->
-		<!-- <other-files/> -->
 		<!-- <text-files/>  -->
+		<!-- <image-files/> -->
+		<!-- <audio-files/> -->
 		<!-- <video-files/> -->
+		<!-- <other-files/> -->
 	<action>
 		<icon>Terminal</icon>
 		<name>Open Terminal Here</name>
 		<command>exo-open --working-directory %f --launch TerminalEmulator</command>
-		<description>Example for a custom action</description>
+		<description>Open Terminal in a working directory</description>
 		<patterns>*</patterns>
 		<directories/>
+	</action>
+	<action>
+		<icon>text-x-patch</icon>
+		<name>Compare Text Files</name>
+		<command>gvimdiff %F</command>
+		<description>Compare text files with GVim</description>
+		<patterns>*</patterns>
+		<text-files/>
+	</action>
+	<action>
+		<icon>application-x-reject</icon>
+		<name>Compare Binary Files</name>
+		<command>zenity-cmp %F</command>
+		<description>Compare two files bit for bit</description>
+		<patterns>*</patterns>
+		<image-files/>
+		<audio-files/>
+		<video-files/>
+		<other-files/>
 	</action>
 	<action>
 		<icon>audio-x-mp3</icon>

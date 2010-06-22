@@ -22,7 +22,4 @@ cnoremap	<A-v>		<C-v><C-v>
 
 inoremap	<C-v>		<C-v><C-v>
 cnoremap	<C-v>		<C-v><C-v>
-" use <C-b> to substitute as <C-v>
-inoremap	<C-b>		<C-v>
-cnoremap	<C-b>		<C-v>
 
