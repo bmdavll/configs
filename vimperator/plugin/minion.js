@@ -1,7 +1,7 @@
 /**
  * minion.js
  *
- * Minion is an mpd client which runs as a Firefox extension.
+ * Minion is an MPD client which runs as a Firefox extension.
  *
  * @author David Liang (bmdavll@gmail.com)
  * @author Yoann Lamouroux (spamonsophia@gmail.com)
@@ -11,26 +11,141 @@
 var INFO =
 <plugin name="minion" version="0.2"
 		href="https://addons.mozilla.org/en-US/firefox/addon/6324/"
-		summary="MPD client"
+		summary="Minion MPD client"
 		xmlns="http://vimperator.org/namespaces/liberator">
 	<author email="bmdavll@gmail.com">David Liang</author>
 	<author email="spamonsophia@gmail.com">Yoann Lamouroux</author>
 	<license href="http://www.opensource.org/licenses/mit-license.html">MIT</license>
 	<project name="Vimperator" minVersion="2.0" />
 	<p>
-		This plugin allows you to control the Minion mpd client from the
-		Vimperator interface.
+		This plugin allows you to control the Minion MPD client from the
+		command line.
 	</p>
 	<item>
-		<tags>:mp :mpd mpd-action</tags>
-		<spec>:mp[d] <oa>action</oa></spec>
+		<tags>:mp :mpd</tags>
+		<spec>:mp[d]</spec>
 		<description><p>
-			Issue a command to mpd. Actions can be one of: prev, next, play, pause, stop.
 			Open the Minion interface in a new tab.
 		</p></description>
 	</item>
+	<item>
+		<tags>mpd-action</tags>
+		<spec>:mp[d] <a>action</a></spec>
+		<description><p>
+			Issue one of the following simple commands:<code>
+prev
+next
+stop
+update
+info
+			</code>
+			The actions taken are mostly self-descriptive.
+			Issuing the 'info' command will simply display the current song
+			information on the command line.
+		</p></description>
+	</item>
+	<item>
+		<tags>mpd-play</tags>
+		<spec>:mp[d] play</spec>
+		<spec>:mp[d] play <a>N</a></spec>
+		<description><p>
+			Start playing the current song.
+			If <em>N</em> is provided, start playing song number N from the
+			current playlist.
+		</p></description>
+	</item>
+	<item>
+		<tags>mpd-pause</tags>
+		<spec>:mp[d] pause[!]</spec>
+		<description><p>
+			Pause or unpause the current song.
+			A <em>!</em> means play/pause (i.e. start playing if stopped, and
+			pause otherwise).
+		</p></description>
+	</item>
+	<item>
+		<tags>mpd-seek</tags>
+		<spec>:mp[d] seek <a>[+|-]S</a></spec>
+		<spec>:mp[d] seek <a>[+|-]M:SS</a></spec>
+		<description><p>
+			Seek to a point in the current song, given by <em>S</em> seconds or
+			<em>M:SS</em> minutes.
+			If <em>+</em> or <em>-</em> is prepended to the time, seek
+			forward or backward from the current point.
+		</p></description>
+	</item>
+	<item>
+		<tags>mpd-shuffle mpd-repeat</tags>
+		<spec>:mp[d] shuffle[!]</spec>
+		<spec>:mp[d] shuffle <a>1|0|on|off</a></spec>
+		<spec>:mp[d] repeat[!]</spec>
+		<spec>:mp[d] repeat <a>1|0|on|off</a></spec>
+		<description><p>
+			Without any arguments, displays whether shuffle/repeat is on.
+			If <em>!</em> is specified, toggles shuffle/repeat.
+			You can also provide an argument to explicitly turn it on or off.
+		</p></description>
+	</item>
+	<item>
+		<tags>mpd-vol</tags>
+		<spec>:mp[d] vol</spec>
+		<spec>:mp[d] vol <a>N</a></spec>
+		<spec>:mp[d] vol <a>[+|-]N</a></spec>
+		<description><p>
+			Without any arguments, displays the current volume.
+			If <em>N</em> is specified, sets the volume to N%.
+			If <em>+N</em> or <em>-N</em> is given instead, increment or
+			decrement the current volume by N%.
+		</p></description>
+	</item>
+	<item>
+		<tags>mpd-notify</tags>
+		<spec>:mp[d] notify <oa>on|off|M</oa></spec>
+		<spec>:mp[d] notify[!]</spec>
+		<description><p>
+			Specifies whether to automatically display song information on the
+			command line when a new song begins playing.
+			The argument can also specify how often the plugin checks for song
+			changes (every <em>M</em> milliseconds).
+			</p><p>
+			Without any arguments, displays whether auto-notify is on.
+			If <em>!</em> is specified, toggles auto-notify.
+		</p></description>
+	</item>
+	<note>
+		<tags>mpd-abbreviate</tags><p>
+		All the commands can be abbreviated down to one or two letters, or to
+		any uniquely identifying "prefix" of the command.
+		For example, the following are equivalent:<code>
+:mpd info
+:mp inf
+:mp in
+:mp i
+		</code>
+		As are:<code>
+:mpd pause!
+:mp pa!
+:mp p!
+		</code>
+		The shortest ways to specify the available commands are:<code>
+pr    prev
+n     next
+pl    play
+p     pause
+st    stop
+se    seek
+sh    shuffle
+re    repeat
+v     vol
+i     info
+no    notify
+u     update
+		</code></p>
+	</note>
 </plugin>;
 
+
+if (typeof(nsMPM) != 'undefined') {
 
 var notify = true;
 
@@ -44,7 +159,7 @@ function MPVimperator() {
 		_relative_cmds.limit = 7;
 
 	var _notify_timeout = 2000;
-	var _last_notify = null;
+	var _last_notify_file = null;
 
 	function mpdCmd(command, callback) {
 		mpd.doCmd(command);
@@ -65,9 +180,11 @@ function MPVimperator() {
 			var cmd = _relative_cmds.shift();
 			var command = cmd['command'];
 			var arg = parseInt(mpd[cmd['base']]) + cmd['offset'];
-			mpd.doCmd(command+' '+arg);
-			_callbacks[_ticket] = cmd['callback'] || null;
-			checkResponse(_ticket++);
+			if (!isNaN(arg)) {
+				mpd.doCmd(command+' '+arg);
+				_callbacks[_ticket] = cmd['callback'] || null;
+				checkResponse(_ticket++);
+			}
 		}
 	}
 	function checkResponse(ticket) {
@@ -84,16 +201,16 @@ function MPVimperator() {
 
 	function autoNotify(init) {
 		if (!notify) {
-			_last_notify = null;
+			_last_notify_file = null;
 			return;
 		}
 		if (mpd.song) {
-			if (mpd.file != _last_notify) {
-				_last_notify = mpd.file;
+			if (mpd.file != _last_notify_file) {
+				_last_notify_file = mpd.file;
 				if (!init)
 					echoInfo();
 			}
-		} else _last_notify = null;
+		} else _last_notify_file = null;
 		setTimeout(autoNotify, _notify_timeout, false);
 	}
 
@@ -118,10 +235,9 @@ function MPVimperator() {
 			artist = '';
 
 		var album = song.Album;
-		if (album) {
-			var track = song.Track;
-			album = (track ? sep+track : '')+sep+'from '+album;
-		} else
+		if (album)
+			album = sep+(song.Track ? '#'+song.Track+' ' : '')+'from '+album;
+		else
 			album = '';
 
 		var date = song.Date;
@@ -226,6 +342,12 @@ function MPVimperator() {
 		next: function() {
 			mpdCmd('next', echoInfo)
 		},
+		play: function(args) {
+			if (args.length == 0)
+				mpdCmd('play', echoInfo)
+			else
+				mpdCmd('play '+(args[0]-1), echoInfo)
+		},
 		pause: function(args, bang) {
 			if (mpd.state == 'stop' && bang)
 				mpdCmd('play', echoInfo)
@@ -239,13 +361,6 @@ function MPVimperator() {
 			mpdCmd('update', function() {
 				echo("Update OK")
 			})
-		},
-
-		play: function(args) {
-			if (args.length == 0)
-				mpdCmd('play', echoInfo)
-			else
-				mpdCmd('play '+(args[0]-1), echoInfo)
 		},
 
 		shuffle: function(args, bang) {
@@ -351,6 +466,13 @@ function MPVimperator() {
 			})
 		},
 
+		_rm: function(args) {
+			if (mpd.file) {
+				liberator.echomsg("Removing "+mpd.file);
+				liberator.execute('! trash-put ~/music/"'+mpd.file+'"', null, true);
+			}
+		},
+
 		_execute: function(args) {
 			if (args.length == 0)
 				return openUILinkIn('chrome://minion/content/minion.xul', 'tab');
@@ -372,7 +494,7 @@ function MPVimperator() {
 		_completer: function(context) {
 			var commands = [];
 			for (var name in mpv) {
-				if (name.indexOf('_') !== 0 && mpv.hasOwnProperty(name))
+				if (name[0] != '_' && mpv.hasOwnProperty(name))
 					commands.push(name);
 			}
 			commands.sort(function(a, b) {return a.length - b.length});
@@ -420,11 +542,6 @@ var abbreviations = {
 	rep		: 'repeat',
 	repe	: 'repeat',
 	repea	: 'repeat',
-	u		: 'update',
-	up		: 'update',
-	upd		: 'update',
-	upda	: 'update',
-	updat	: 'update',
 	v		: 'vol',
 	vo		: 'vol',
 	i		: 'info',
@@ -434,6 +551,11 @@ var abbreviations = {
 	not		: 'notify',
 	noti	: 'notify',
 	notif	: 'notify',
+	u		: 'update',
+	up		: 'update',
+	upd		: 'update',
+	upda	: 'update',
+	updat	: 'update',
 };
 for (var ab in abbreviations) {
 	mpv[ab] = mpv[abbreviations[ab]];
@@ -455,4 +577,5 @@ commands.addUserCommand(
 	{ argCount: '*', completer: mpv._completer }
 );
 
+}
 // vim:set ts=4 sw=4 noet:

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ ! -d "$LOGDIR" ] && LOGDIR="$HOME/documents/txt"
+[ ! -d "$LOGDIR" ] && LOGDIR="$HOME/doc/txt"
 
 LOCK="$HOME/.$(basename -- "$0").lock"
 TODO="$LOGDIR/todo"

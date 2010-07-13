@@ -1,5 +1,5 @@
 " smartword - Smart motions on words
-" Version: 0.0.0
+" Version: 0.0.2
 " Copyright (C) 2008 kana <http://whileimautomaton.net/>
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -26,16 +26,26 @@ if exists('g:loaded_smartword')
   finish
 endif
 
-noremap <silent> <Plug>(smartword-w)  :<C-u>call smartword#move('w')<Return>
-noremap <silent> <Plug>(smartword-b)  :<C-u>call smartword#move('b')<Return>
-noremap <silent> <Plug>(smartword-e)  :<C-u>call smartword#move('e')<Return>
-noremap <silent> <Plug>(smartword-ge) :<C-u>call smartword#move('ge')<Return>
+nnoremap <silent> <Plug>(smartword-w)  :<C-u>call smartword#move('w','n')<CR>
+nnoremap <silent> <Plug>(smartword-b)  :<C-u>call smartword#move('b','n')<CR>
+nnoremap <silent> <Plug>(smartword-e)  :<C-u>call smartword#move('e','n')<CR>
+nnoremap <silent> <Plug>(smartword-ge)  :<C-u>call smartword#move('ge','n')<CR>
+
+vnoremap <silent> <Plug>(smartword-w)  :<C-u>call smartword#move('w','v')<CR>
+vnoremap <silent> <Plug>(smartword-b)  :<C-u>call smartword#move('b','v')<CR>
+vnoremap <silent> <Plug>(smartword-e)  :<C-u>call smartword#move('e','v')<CR>
+vnoremap <silent> <Plug>(smartword-ge)  :<C-u>call smartword#move('ge','v')<CR>
+
+onoremap <silent> <Plug>(smartword-w)  :<C-u>call smartword#move('w','o')<CR>
+onoremap <silent> <Plug>(smartword-b)  :<C-u>call smartword#move('b','o')<CR>
+onoremap <silent> <Plug>(smartword-e)  :<C-u>call smartword#move('e','o')<CR>
+onoremap <silent> <Plug>(smartword-ge)  :<C-u>call smartword#move('ge','o')<CR>
 
 "+
-nmap w  <Plug>(smartword-w)
-nmap b  <Plug>(smartword-b)
-nmap e  <Plug>(smartword-e)
-nmap ge <Plug>(smartword-ge)
+map w  <Plug>(smartword-w)
+map b  <Plug>(smartword-b)
+map e  <Plug>(smartword-e)
+map ge <Plug>(smartword-ge)
 
 let g:loaded_smartword = 1
 

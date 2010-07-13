@@ -7,7 +7,7 @@
 " Version:     1.1
 " $Revision$
 "
-" This file contains some simple functions that attempt to emulate some of the
+" This file contains some simple functions that attempt to emulate some of the 
 " behaviour of 'Snippets' from the OS X editor TextMate, in particular the
 " variable bouncing and replacement behaviour.
 "
@@ -25,10 +25,10 @@
 " Snippet fori for <{datum}> in <{data}>:<CR><{datum}>.<{}>
 "
 " The above will expand to the following (indenting may differ):
-"
+" 
 " for <{datum}> in <{data}>:
 "   <{datum}>.<{}>
-"
+" 
 " The cursor will be placed after the first '<{' in insert mode.
 " Pressing <Tab> will 'tab' to the next place marker (<{data}>) in
 " insert mode.  Adding text between <{ and }> and then hitting <{Tab}> will
@@ -43,7 +43,7 @@
 "
 " for MyVariableName in <{data}>:
 "   MyVariableName.<{}>
-"
+" 
 " Enjoy.
 "
 " For more information please see the documentation accompanying this plugin.
@@ -246,7 +246,7 @@ function! <SID>SetCom(text, scope)
       echohl Error | echo "Undefined snippet: ".snip | echohl None
     endif
   else
-    let [lhs, rhs] = [s:Hash(tokens[0]), join(tokens[1:])]
+    let [lhs, rhs] = [s:Hash(tokens[0]), join(tokens[1:])] 
     call s:SetSearchStrings()
     let g:search_str = b:search_str
     exe "let ".a:scope."trigger_".lhs.' = "'.rhs.'"'
@@ -266,7 +266,7 @@ function! s:RestoreSearch()
   endif
 endfunction
 "}}}
-" {{{ DeleteEmptyTag
+" {{{ DeleteEmptyTag 
 function! s:DeleteEmptyTag()
   let [snip_start_tag, snip_elem_delim, snip_end_tag] = s:SetLocalTagVars()
   exec "normal zv".(s:StrLen(snip_start_tag) + s:StrLen(snip_end_tag))."x"
@@ -510,7 +510,7 @@ function! s:CheckForInTag()
     " whether we're in a tag.
     let s:count = 0
     let s:curSkip = s:curCurs
-    while match(strpart(s:line,s:curSkip),snip_start_tag) != -1
+    while match(strpart(s:line,s:curSkip),snip_start_tag) != -1 
       if match(strpart(s:line,s:curSkip),snip_start_tag) == 0
         let s:curSkip = s:curSkip + 1
       else
@@ -637,14 +637,14 @@ endfunction
 " 2. Tag with variable name.  Save the variable name for the next jump.
 " 3. Tag with command. Tags no longer have default values. Everything after the
 " centre delimiter until the end tag is assumed to be a command.
-"
+" 
 " Jumper is performed when we want to perform a jump.  If we've landed in a
 " 1. style tag then we'll be in free form text and just want to jump to the
 " next tag.  If we're in a 2. or 3. style tag then we need to look for whether
 " the value has changed and make all the replacements.   If we're in a 3.
 " style tag then we need to replace all the occurrences with their command
 " modified values.
-"
+" 
 function! <SID>Jumper()
   if s:Disable == 1
     return substitute(g:snippetsEmu_key, '^<', "\\<",'')
@@ -660,7 +660,7 @@ function! <SID>Jumper()
   if !exists('b:search_str') && exists('g:search_str')
       let b:search_str = g:search_str
   endif
-
+   
   if !exists('b:search_str')
     return s:ReturnKey()
   endif
@@ -669,7 +669,7 @@ function! <SID>Jumper()
   let s:curLine = line(".")
   let s:line = getline(".")
   let s:replaceVal = ""
-
+   
   " First we'll check that the user hasn't just typed a snippet to expand
   let origword = matchstr(strpart(getline("."), 0, s:curCurs), '\(^\|\s\)\S\{-}$')
   let origword = substitute(origword, '\s', "", "")
@@ -745,7 +745,7 @@ function! <SID>Jumper()
       let delEndTag = substitute(snip_end_tag, '.', "\<Del>", "g")
       "call s:Debug("Jumper", "Deleting ".s:StrLen(delEndTag)." characters")
     endif
-
+    
     " We've found a mapping so we'll substitute special variables
     let rhs = s:SubSpecialVars(rhs)
     let rhs = s:SubCommandOutput(rhs)
@@ -970,5 +970,4 @@ function! s:StrLen(str)
 endfunction
 
 " }}}
-
 " vim: set tw=80 sw=2 sts=2 et foldmethod=marker :

@@ -100,14 +100,12 @@ function mancache
 
 #{{1 pacman
 alias pac='pacman'
-alias y='yaourt'
 complete -F _pacman pac
-complete -F _yaourt y
 
 function pacinstall
 {
-	[ $# -eq 0 ] && return 1
-	yaourt -S "$@"
+	! pat_in '^[^-]' "$@" && return 1
+	yaourt -S --needed "$@"
 	local code=$?
 	if [ $code -eq 0 ]; then
 		echo Done
@@ -127,7 +125,7 @@ complete -F _pacremove pacremove
 
 function pacupdate
 {
-	yaourt -Syu "$@" && sudo clean-pacman-cache.py 2
+	yaourt -Syu --noconfirm "$@" && sudo clean-pacman-cache.py 2
 }
 _pacsearch() {
 	local results=$(pacman -"$1"s "${@:2}")
@@ -138,8 +136,8 @@ _pacsearch() {
 		-e          's#^local/.*#\\033[1;32m&\\033[0;37m#g' \
 		-e 's#^.*/.* [0-9]\+\..*#\\033[1;31m&\\033[0;37m#g' ) \e[0m"
 }
-alias pacgrep='pacman -Slq | grep'
-alias paclgrep='pacman -Qq | grep'
+alias pacgrep='pacman -Sl | sed "s/^[^ ]* //" | grep'
+alias paclgrep='pacman -Q | grep'
 alias pacsearch='_pacsearch S'
 alias paclsearch='_pacsearch Q'
 alias paclist='pacman -Ql'

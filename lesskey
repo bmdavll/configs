@@ -81,9 +81,9 @@ q		quit
 :q		quit
 
 # search macros
-\\t		forw-search \^\\s*(\\w|\\s|$)\eh\eh\eh\eh\eh\eh\eh\eh\eh
-\\a		forw-search \^\\s+((-\\w+|--(\\w|[=-])+)[,|]\\s*)*--?
-\\w		forw-search \\<\\>\eh\eh
+,t		forw-search \^\\s*(\\w|\\s|$)\eh\eh\eh\eh\eh\eh\eh\eh\eh
+,a		forw-search \^\\s+((-\\w+|--(\\w|[=-])+)[,|]\\s*)*--?
+,w		forw-search \\<\\>\eh\eh
 #stop
 
 
@@ -119,6 +119,6 @@ q		quit
 \kd		down
 
 # search macros
-;w		literal \\<\\>\eh\eh
-;\40	literal \\s+
+,w		literal \\<\\>\eh\eh
+,\40	literal \\s+
 #stop

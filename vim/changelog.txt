@@ -1,39 +1,73 @@
-[changes marked "+]
-+ customization # bugfix
+LEGEND
+	additions marked "+
+	deletions marked "-
+	* bugfix
+	+ customization
 
-pydoc.vim
-+ remove highlighting
+MINE
+	random.vim
+	session_dialog.vim
+
+2010-07-11
+a.vim
+genutils.vim
+repeat.vim
 
 clipbrd.vim
-# normal with !
-+ remove defaut mapping \cb
-+ noconfirm for UpdateRegister
-
-taglist.vim
-+ toggling folds: nnoremap <buffer> <silent> <C-Space> za
-
-yankring.vim
-# use input() for YRGetSearch
-+ no "YR:" messages
-+ remove inoremaps for YRGetSearch and YRGetChar
+	* normal with !
+	+ changed buffer name to [Clipboard]
+	+ removed defaut mapping <leader>cb
+	+ no confirmation for UpdateRegister
 
 echofunc.vim
-+ remove sections: if has("balloon_eval")
-
-NERD_commenter.vim
-# remember to convert leading whitespace when uncommenting
-# one line sexy comment case defaults to CommentLines
-# remove extra whitespace after uncommenting aligned comments
-+ g:NERDDefaultAlign
-+ g:NERDSexy and toggle
-+ YankRing compatibility (normal with no !)
-+ remove some maps; full list now ,cc ,c<space> ,cm ,ci ,cy ,cu ,c$ ,cA ,a ,s
-
-NERD_tree.vim
-+ add <space> to g:NERDTreeMapActivateNode
+	+ removed BalloonDeclaration start/stop functions
+	+ removed sections: if has("balloon_eval")
 
 matchit.vim
-# vmaps to xmaps
+	* changed vmaps to xmaps
+
+NERD_commenter.vim
+	* one line sexy comment defaults to CommentLines
+	* remember to convert leading whitespace when uncommenting
+	* remove extra whitespace after uncommenting aligned comments
+	* added space to echo messages
+	* made <plug>NERDCommenterAltDelims mapping silent
+	* changed vmap to xmap
+	+ g:NERDDefaultAlign
+	+ g:NERDSexyComs
+	+ YankRing compatibility (normal with no !)
+	+ changed mapping ,c<space> to ,<space>
+	+ removed mappings ,cl ,cb
+	+ changed mapping ,ca to ,a
+	+ added mapping ,s (g:NERDSexyComs toggle)
+
+NERD_tree.vim
+	+ added mapping  <space> to g:NERDTreeMapActivateNode
+	+ added mapping g<space> to g:NERDTreeMapPreview
+
+pydoc.vim
+	+ changed mapping <leader>pw to <leader>pd
+	+ changed mapping <leader>pW to <leader>pD
+
+smartword.vim
+	+ added standard mappings
 
 surround.vim
-+ reversed whether ({[< and )}]> insert spaces
+	+ reversed whether ({[< and )}]> insert spaces
+
+taglist.vim
+	* catch error if no fold
+	+ removed no ctags found error message
+	+ added mapping <C-Space> (toggle fold)
+
+yankring.vim
+	+ use .yankring_history as history file name
+	+ on windows, yank to clipboard
+	+ no warning messages
+	+ simplified prompt message
+	+ removed inoremap for YRGetChar
+
+2010-07-12
+ragtag.vim
+speeddating.vim
+

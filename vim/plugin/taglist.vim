@@ -94,8 +94,8 @@ if !exists('loaded_taglist')
         elseif executable('tags')
             let Tlist_Ctags_Cmd = 'tags'
         else
-            "+ echomsg 'Taglist: Exuberant ctags (http://ctags.sf.net) ' .
-            "            \ 'not found in PATH. Plugin is not loaded.'
+         "- echomsg 'Taglist: Exuberant ctags (http://ctags.sf.net) ' .
+         "-             \ 'not found in PATH. Plugin is not loaded.'
             " Skip loading the plugin
             let loaded_taglist = 'no'
             let &cpo = s:cpo_save
@@ -1414,22 +1414,22 @@ function! s:Tlist_Window_Exit_Only_Window()
     " Before quitting Vim, delete the taglist buffer so that
     " the '0 mark is correctly set to the previous buffer.
     if v:version < 700
-	if winbufnr(2) == -1
-	    bdelete
-	    quit
-	endif
+    if winbufnr(2) == -1
+        bdelete
+        quit
+    endif
     else
-	if winbufnr(2) == -1
-	    if tabpagenr('$') == 1
-		" Only one tag page is present
-		bdelete
-		quit
-	    else
-		" More than one tab page is present. Close only the current
-		" tab page
-		close
-	    endif
-	endif
+    if winbufnr(2) == -1
+        if tabpagenr('$') == 1
+        " Only one tag page is present
+        bdelete
+        quit
+        else
+        " More than one tab page is present. Close only the current
+        " tab page
+        close
+        endif
+    endif
     endif
 endfunction
 
@@ -1548,6 +1548,7 @@ function! s:Tlist_Window_Init()
     set cpoptions&vim
 
     " Create buffer local mappings for jumping to the tags and sorting the list
+    "+
     nnoremap <buffer> <silent> <C-Space> za
     nnoremap <buffer> <silent> <CR>
                 \ :call <SID>Tlist_Window_Jump_To_Tag('useopen')<CR>
@@ -1669,8 +1670,8 @@ function! s:Tlist_Window_Init()
         endif
         " Exit Vim itself if only the taglist window is present (optional)
         if g:Tlist_Exit_OnlyWindow
-	    autocmd BufEnter __Tag_List__ nested
-			\ call s:Tlist_Window_Exit_Only_Window()
+        autocmd BufEnter __Tag_List__ nested
+            \ call s:Tlist_Window_Exit_Only_Window()
         endif
         if s:tlist_app_name != "winmanager" &&
                     \ !g:Tlist_Process_File_Always &&
@@ -4121,10 +4122,10 @@ function! s:Tlist_Refresh_Folds()
             if s:tlist_{fidx}_{ttype}_count
                 let s = s:tlist_{fidx}_start + s:tlist_{fidx}_{ttype}_offset
                 let e = s + s:tlist_{fidx}_{ttype}_count
-				try "+
-					exe s . ',' . e . 'fold'
-				catch
-				endtry
+                try "+
+                    exe s . ',' . e . 'fold'
+                catch
+                endtry
             endif
             let j = j + 1
         endwhile
@@ -4548,3 +4549,4 @@ endfunction
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
+" vim:set ts=4 sw=4 et:

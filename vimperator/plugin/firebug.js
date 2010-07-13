@@ -37,6 +37,8 @@
  *   - add ability to simulate a right click, and then j,k scroll items.
  */
 
+if (document.getElementById('fbContentBox')) {
+
 function FirebugVimperator() {
   var fbContentBox = document.getElementById('fbContentBox');
   var panelFocused = null;
@@ -359,4 +361,5 @@ commands.add(['fire[bug]'],
   { count: true, argCount: '*', completer: fbv._completer }
 );
 
+}
 /* vim:set ts=2 sw=2 et: */

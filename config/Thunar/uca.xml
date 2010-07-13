@@ -9,10 +9,16 @@
 	<action>
 		<icon>Terminal</icon>
 		<name>Open Terminal Here</name>
-		<command>exo-open --working-directory %f --launch TerminalEmulator</command>
+		<command>t %f</command>
+		<!-- <command>exo-open --working-directory %f --launch TerminalEmulator</command> -->
 		<description>Open Terminal in a working directory</description>
 		<patterns>*</patterns>
 		<directories/>
+		<text-files/>
+		<image-files/>
+		<audio-files/>
+		<video-files/>
+		<other-files/>
 	</action>
 	<action>
 		<icon>text-x-patch</icon>

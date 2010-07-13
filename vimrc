@@ -455,6 +455,9 @@ command! -nargs=0 CD exec 'cd' expand('%:h')
 " delete current file from disk
 command! -nargs=0 RmFile echo "rm" @% "(".delete(@%).")"
 
+" delete all buffers
+command! -nargs=0 BD bufdo bdelete
+
 " settings and views {{{2
 " highlight with RightMargin beyond a column number
 command! -nargs=? ColumnMarker	if "<args>" != '' | try |
@@ -678,120 +681,117 @@ endfunction
 " externally map CapsLock to Control
 " basic {{{3
 " no-ops
-noremap		K			<Nop>
-
-" convenience remappings
-noremap		-			=
+noremap			K			<Nop>
 
 " make <Enter> more useful: enter command line or cancel pending operation
-noremap		<CR>		:
-onoremap	<CR>		<C-C>
+noremap			<CR>		:
+onoremap		<CR>		<C-C>
 
 " set <Space> to toggle a fold
-noremap<silent><Space>	:<C-U>exec 'silent! normal! za'.(foldlevel('.')?'':'')<CR>
+noremap<silent><Space>		:<C-U>exec 'silent! normal! za'.(foldlevel('.')?'':'')<CR>
 
 " use <C-Space> as <Esc>
-noremap		<C-Space>	<Esc>
-inoremap	<C-Space>	<Esc>
-cnoremap	<C-Space>	<C-\><C-N>
+noremap			<C-Space>	<Esc>
+inoremap		<C-Space>	<Esc>
+cnoremap		<C-Space>	<C-\><C-N>
 
 " use <BackSpace> for deleting visual selections
-xnoremap	<BS>		d
-snoremap	<BS>		<BS>i
+xnoremap		<BS>		d
+snoremap		<BS>		<BS>i
 
 " make Y consistent with D and C
-nnoremap	Y			y$
+nnoremap		Y			y$
 
 " don't clobber registers when doing character deletes
-nnoremap	x			"_x
-nnoremap	X			"_X
-nnoremap	s			"_s
+nnoremap		x			"_x
+nnoremap		X			"_X
+nnoremap		s			"_s
 
 " <C-[HLJK]> {{{3
 " first remap <C-K> (digraphs) to <C-B>
-noremap!	<C-B>		<C-K>
+noremap!		<C-B>		<C-K>
 " and <C-L> (redraw) to <C-Y>
-noremap		<C-Y>		<C-L>
-noremap		<C-E>		<Nop>
+noremap			<C-Y>		<C-L>
+noremap			<C-E>		<Nop>
 " anchor the cursor and scroll
-noremap		<C-H>		zh
-noremap		<C-L>		zl
-noremap		<C-J>		<C-E>
-noremap		<C-K>		<C-Y>
-inoremap	<C-J>		<C-X><C-E>
-inoremap	<C-K>		<C-X><C-Y>
+noremap			<C-H>		zh
+noremap			<C-L>		zl
+noremap			<C-J>		<C-E>
+noremap			<C-K>		<C-Y>
+inoremap		<C-J>		<C-X><C-E>
+inoremap		<C-K>		<C-X><C-Y>
 " kill line
-cnoremap	<C-K>		<C-F>D<C-C><End>
+cnoremap		<C-K>		<C-F>D<C-C><End>
 " <C-H> remains <BS> by default; use <C-L> to go right
-noremap!	<C-L>		<Right>
+noremap!		<C-L>		<Right>
 " in command-line mode, use <C-T> for partial completion and listing matches
-cnoremap	<C-T>		<C-L><C-D>
+cnoremap		<C-T>		<C-L><C-D>
 
 " <M-[hljk]> {{{3
 " use as movement keys
-noremap!	<M-h>		<Left>
-noremap!	<M-l>		<Right>
-inoremap	<M-j>		<C-O>gj
-inoremap	<M-k>		<C-O>gk
+noremap!		<M-h>		<Left>
+noremap!		<M-l>		<Right>
+inoremap		<M-j>		<C-O>gj
+inoremap		<M-k>		<C-O>gk
 " recall command history, matching current command line
-cnoremap	<M-j>		<Down>
-cnoremap	<M-k>		<Up>
+cnoremap		<M-j>		<Down>
+cnoremap		<M-k>		<Up>
 " switch between windows in normal mode
-nnoremap	<M-h>		<C-W>h
-nnoremap	<M-l>		<C-W>l
-nnoremap	<M-j>		<C-W>j
-nnoremap	<M-k>		<C-W>k
+nnoremap		<M-h>		<C-W>h
+nnoremap		<M-l>		<C-W>l
+nnoremap		<M-j>		<C-W>j
+nnoremap		<M-k>		<C-W>k
 " go from select mode to insert mode
-snoremap	<M-h>		<C-\><C-N>`<i
-snoremap	<M-l>		<C-\><C-N>`>a
+snoremap		<M-h>		<C-\><C-N>`<i
+snoremap		<M-l>		<C-\><C-N>`>a
 
 " move in virtual lines {{{3
-nnoremap	j			gj
-vnoremap	j			gj
-nnoremap	k			gk
-vnoremap	k			gk
-noremap		<Up>		gk
-inoremap	<Up>		<C-O>gk
-noremap		<Down>		gj
-inoremap	<Down>		<C-O>gj
+nnoremap		j			gj
+xnoremap		j			gj
+nnoremap		k			gk
+xnoremap		k			gk
+noremap			<Up>		gk
+inoremap		<Up>		<C-O>gk
+noremap			<Down>		gj
+inoremap		<Down>		<C-O>gj
 
 " emacs-style bindings for word movement and deletion {{{3
-noremap		<M-b>		b
-noremap		<M-f>		w
-noremap!	<M-b>		<S-Left>
-noremap!	<M-f>		<S-Right>
+noremap			<M-b>		b
+noremap			<M-f>		w
+noremap!		<M-b>		<S-Left>
+noremap!		<M-f>		<S-Right>
 
 function! <SID>KillWord()
 	return (col('.')==col('$') ? "\<Del>" : "\<C-O>de")
 endfunction
-inoremap<silent><M-d>	<C-R>=<SID>KillWord()<CR>
-noremap!	<M-BS>		<C-W>
+inoremap<silent><M-d>		<C-R>=<SID>KillWord()<CR>
+noremap!		<M-BS>		<C-W>
 
 " use <C-O>D for <C-K>
-inoremap	<C-A>		<C-O>^
-cnoremap	<C-A>		<Home>
-noremap!	<C-E>		<End>
-cnoremap	<C-D>		<Del>
+inoremap		<C-A>		<C-O>^
+cnoremap		<C-A>		<Home>
+noremap!		<C-E>		<End>
+cnoremap		<C-D>		<Del>
 " in insert mode:
 " use <C-F> as the default <C-A> (insert previously inserted text),
 " and <C-G> as the default <C-E> (insert the char below cursor)
-inoremap	<C-F>		<C-A>
-inoremap	<C-G>		<C-E>
+inoremap		<C-F>		<C-A>
+inoremap		<C-G>		<C-E>
 
 " register yank, delete, and paste with Meta {{{3
-vnoremap<silent><M-y>	:<C-U>exec 'normal gv"'.nr2char(getchar()).'y'<CR>
-vnoremap<silent><M-d>	:<C-U>exec 'normal gv"'.nr2char(getchar()).'d'<CR>
+vnoremap<silent><M-y>		:<C-U>exec 'normal gv"'.nr2char(getchar()).'y'<CR>
+vnoremap<silent><M-d>		:<C-U>exec 'normal gv"'.nr2char(getchar()).'d'<CR>
 
 function! <SID>PasteRegister(visual)
 	exec 'normal '.(a:visual ? 'gv' : '').'"'.nr2char(getchar()).'p'
 endfunction
-noremap	<silent><M-r>	:<C-U>call <SID>PasteRegister(0)<CR>
-vnoremap<silent><M-r>	:<C-U>call <SID>PasteRegister(1)<CR>
+noremap	<silent><M-r>		:<C-U>call <SID>PasteRegister(0)<CR>
+vnoremap<silent><M-r>		:<C-U>call <SID>PasteRegister(1)<CR>
 
 " paste most recently used register
-nnoremap	<M-p>		o<C-R>"<C-C>
-nnoremap	<M-S-p>		O<C-R>"<C-C>
-inoremap	<M-p>		<C-R>"
+nnoremap		<M-p>		o<C-R>"<C-C>
+nnoremap		<M-S-p>		O<C-R>"<C-C>
+inoremap		<M-p>		<C-R>"
 
 " increment/decrement all characters with <C-A> and <C-X> {{{3
 function! <SID>OffsetCharacter(offset)
@@ -803,54 +803,43 @@ function! <SID>OffsetCharacter(offset)
 		normal! v"zp
 	endif
 endfunction
-nnoremap<silent><C-A>	:call <SID>OffsetCharacter(1)<CR>
-nnoremap<silent><C-X>	:call <SID>OffsetCharacter(-1)<CR>
-" (works only if incrementing alphabetic chars is allowed)
-" toggle:
-function! <SID>ToggleNRFormats()
-	if &nrformats =~# '\<alpha\>'
-		set nrformats-=alpha
-	else
-		set nrformats+=alpha
-	endif
-	set nf?
-endfunction
-map	<silent><leader><C-A>	:<C-U>call <SID>ToggleNRFormats()<CR>
-map	<silent><leader><C-X>	:<C-U>call <SID>ToggleNRFormats()<CR>
+nnoremap<silent><C-A>		:call <SID>OffsetCharacter(1)<CR>
+nnoremap<silent><C-X>		:call <SID>OffsetCharacter(-1)<CR>
+" works only if incrementing alphabetic chars is allowed
 
 " windows-style clipboard shortcuts emulated with Meta {{{3
 " select all
-noremap		<M-a>		<C-\><C-N>ggVG
+noremap			<M-a>		<C-\><C-N>ggVG
 " cut
-vnoremap	<M-x>		"+x
+vnoremap		<M-x>		"+x
 " copy
-vnoremap	<M-c>		"+y
+vnoremap		<M-c>		"+y
 " paste
-noremap		<M-v>		<C-\><C-N>"+gP
+noremap			<M-v>		<C-\><C-N>"+gP
 exec 'vnoremap <script> <M-v>' paste#paste_cmd['v']
 exec 'inoremap <script> <M-v>' paste#paste_cmd['i']
-cnoremap	<M-v>		<C-R>+
+cnoremap		<M-v>		<C-R>+
 
 " misc {{{3
 " re-enable 'hlsearch' with each search
-nnoremap<silent>n		:set hlsearch<CR>n
-nnoremap<silent>N		:set hlsearch<CR>N
+nnoremap<silent>n			:set hlsearch<CR>n
+nnoremap<silent>N			:set hlsearch<CR>N
 
 " tab switching
-noremap		<C-Tab>		:<C-U>tabnext<CR>
-noremap		<C-S-Tab>	:<C-U>tabprevious<CR>
+noremap			<C-Tab>		:<C-U>tabnext<CR>
+noremap			<C-S-Tab>	:<C-U>tabprevious<CR>
 
 " visual mode indenting
-xnoremap	<Tab>		>gv
-xnoremap	<S-Tab>		<gv
+xnoremap		<Tab>		>gv
+xnoremap		<S-Tab>		<gv
 
 " save shortcut
-nnoremap	<C-S>		:w<CR>
-xnoremap	<C-S>		:<C-U>w<CR>gv
-inoremap	<C-S>		<C-O>:w<CR>
+nnoremap		<C-S>		:w<CR>
+xnoremap		<C-S>		:<C-U>w<CR>gv
+inoremap		<C-S>		<C-O>:w<CR>
 
 " paste X selection register
-noremap!	<S-Insert>	<C-R>*
+noremap!		<S-Insert>	<C-R>*
 
 " nothing to see here; move along {{{3
 if !has('gui_running') && &term =~ 'xterm' && &t_Co == 256
@@ -892,9 +881,9 @@ fun! Raveon(auto)
 	endwhile
 endfun
 silent! unlet g:wtf
-map	<silent><M-F14>		:call Rave(1)<CR>
-map	<silent><M-F13>		:call Rave(64)<CR>
-map	<silent><M-F12>		:call Raveon(1)<CR>
+map	<silent>	<M-F14>		:call Rave(1)<CR>
+map	<silent>	<M-F13>		:call Rave(64)<CR>
+map	<silent>	<M-F12>		:call Raveon(1)<CR>
 endif " }}}3
 
 " function keys {{{2
@@ -902,7 +891,7 @@ endif " }}}3
 function! <SID>ClearMapsF(key1, key2)
 	for fkey in range(a:key1, a:key2)
 		for modifier in [ '', 'C-', 'S-', 'C-S-' ]
-			exec 'map <silent> <'.modifier.'F'.fkey.'> '.
+			exec 'noremap <silent> <'.modifier.'F'.fkey.'> '.
 				\':<C-U>call <SID>WarningMsg("Unmapped")<CR>'
 			exec 'silent! unmap! <'.modifier.'F'.fkey.'>'
 			exec 'inoremap <'.modifier.'F'.fkey.'> <Nop>'
@@ -913,12 +902,12 @@ call <SID>ClearMapsF(1,14)
 
 " plugins <F1> to <F3> {{{3
 " toggle taglist
-map			<F1>		:<C-U>TlistToggle<CR>
-vmap		<F1>		:<C-U>TlistToggle<CR>gv
+map				<F1>		:<C-U>TlistToggle<CR>
+vmap			<F1>		:<C-U>TlistToggle<CR>gv
 " toggle NERD Tree
-map			<F2>		:<C-U>NERDTreeToggle<CR>
+map				<F2>		:<C-U>NERDTreeToggle<CR>
 " toggle yank ring
-map			<F3>		:<C-U>YRShow<CR>
+map				<F3>		:<C-U>YRShow<CR>
 " toggle clipboard <C-F3> {{{4
 function! <SID>ToggleClipBrd()
 	let clipnr = bufnr('*\[Clip Board\]$')
@@ -933,7 +922,7 @@ function! <SID>ToggleClipBrd()
 		catch | endtry
 	endif
 endfunction
-map	<silent><C-F3>		:<C-U>call <SID>ToggleClipBrd()<CR>
+map	<silent>	<C-F3>		:<C-U>call <SID>ToggleClipBrd()<CR>
 " }}}
 
 " trim trailing whitespace <F4> {{{3
@@ -947,33 +936,33 @@ function! <SID>Trim()
 	catch | endtry
 	%s/\s\+$//e
 endfunction
-map	<silent><F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`a
-vmap<silent><F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agv
-imap<silent><F4>		<C-C>:let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agi
+map	<silent>	<F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`a
+vmap<silent>	<F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agv
+imap<silent>	<F4>		<C-C>:let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agi
 
 " autoindent entire file <C-F4> {{{3
-map			<C-F4>		<C-\><C-N>maHmzgg=G`zzt`a
-vmap		<C-F4>		<C-\><C-N>maHmzgg=G`zzt`agv
+map				<C-F4>		<C-\><C-N>maHmzgg=G`zzt`a
+vmap			<C-F4>		<C-\><C-N>maHmzgg=G`zzt`agv
 
 " remove search highlighting <F5> {{{3
 " let @/=@_
-map	<silent><F5>		:<C-U>nohlsearch<CR>
-vmap<silent><F5>		:<C-U>nohlsearch<CR>gv
-imap<silent><F5>		<C-O>:nohlsearch<CR>
+map	<silent>	<F5>		:<C-U>nohlsearch<CR>
+vmap<silent>	<F5>		:<C-U>nohlsearch<CR>gv
+imap<silent>	<F5>		<C-O>:nohlsearch<CR>
 
 " toggle scrollbind <C-F5> {{{3
-map	<silent><C-F5>		:<C-U>setlocal scrollbind! scb?<CR>
-vmap<silent><C-F5>		:<C-U>setlocal scrollbind! scb?<CR>gv
-imap<silent><C-F5>		<C-O>:setlocal scrollbind! scb?<CR>
+map	<silent>	<C-F5>		:<C-U>setlocal scrollbind! scb?<CR>
+vmap<silent>	<C-F5>		:<C-U>setlocal scrollbind! scb?<CR>gv
+imap<silent>	<C-F5>		<C-O>:setlocal scrollbind! scb?<CR>
 
 " toggle list mode (show tabs) <F6> {{{3
-map	<silent><F6>		:<C-U>setlocal list! list?<CR>
-vmap<silent><F6>		:<C-U>setlocal list! list?<CR>gv
-imap<silent><F6>		<C-O>:setlocal list! list?<CR>
+map	<silent>	<F6>		:<C-U>setlocal list! list?<CR>
+vmap<silent>	<F6>		:<C-U>setlocal list! list?<CR>gv
+imap<silent>	<F6>		<C-O>:setlocal list! list?<CR>
 
 " highlight characters beyond column … <C-F6> {{{3
-map			<C-F6>		:<C-U>ColumnMarker<Space>
-imap		<C-F6>		<C-O>:ColumnMarker<Space>
+map				<C-F6>		:<C-U>ColumnMarker<Space>
+imap			<C-F6>		<C-O>:ColumnMarker<Space>
 
 " toggle tabstop <F7> {{{3
 function! <SID>ToggleTabstop()
@@ -984,24 +973,24 @@ function! <SID>ToggleTabstop()
 	endif
 	set ts?
 endfunction
-map	<silent><F7>		:<C-U>call <SID>ToggleTabstop()<CR>
-vmap<silent><F7>		:<C-U>call <SID>ToggleTabstop()<CR>gv
-imap<silent><F7>		<C-O>:call <SID>ToggleTabstop()<CR>
+map	<silent>	<F7>		:<C-U>call <SID>ToggleTabstop()<CR>
+vmap<silent>	<F7>		:<C-U>call <SID>ToggleTabstop()<CR>gv
+imap<silent>	<F7>		<C-O>:call <SID>ToggleTabstop()<CR>
 
 " toggle expandtab <C-F7> {{{3
-map	<silent><C-F7>		:<C-U>setlocal expandtab! et?<CR>
-vmap<silent><C-F7>		:<C-U>setlocal expandtab! et?<CR>gv
-imap<silent><C-F7>		<C-O>:setlocal expandtab! et?<CR>
+map	<silent>	<C-F7>		:<C-U>setlocal expandtab! et?<CR>
+vmap<silent>	<C-F7>		:<C-U>setlocal expandtab! et?<CR>gv
+imap<silent>	<C-F7>		<C-O>:setlocal expandtab! et?<CR>
 
 " toggle line wrapping <F8> {{{3
-map	<silent><F8>		:<C-U>setlocal wrap! wrap?<CR>
-vmap<silent><F8>		:<C-U>setlocal wrap! wrap?<CR>gv
-imap<silent><F8>		<C-O>:setlocal wrap! wrap?<CR>
+map	<silent>	<F8>		:<C-U>setlocal wrap! wrap?<CR>
+vmap<silent>	<F8>		:<C-U>setlocal wrap! wrap?<CR>gv
+imap<silent>	<F8>		<C-O>:setlocal wrap! wrap?<CR>
 
 " view/set maximum line length to … <C-F8> {{{3
 " (set to 0 to disable auto-truncation)
-map			<C-F8>		:<C-U>TextWidth<Space>
-imap		<C-F8>		<C-O>:TextWidth<Space>
+map				<C-F8>		:<C-U>TextWidth<Space>
+imap			<C-F8>		<C-O>:TextWidth<Space>
 
 " cycle color schemes <F9> {{{3
 function! <SID>NextColorScheme()
@@ -1019,9 +1008,9 @@ function! <SID>NextColorScheme()
 	let next = (idx+1) % len(g:colors_select)
 	call <SID>SetColorScheme(g:colors_select[next])
 endfunction
-map	<silent><F9>		:<C-U>call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>
-vmap<silent><F9>		:<C-U>call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>gv
-imap<silent><F9>		<C-C>:call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>gi
+map	<silent>	<F9>		:<C-U>call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>
+vmap<silent>	<F9>		:<C-U>call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>gv
+imap<silent>	<F9>		<C-C>:call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>gi
 
 " cycle fonts <C-F9> {{{3
 function! <SID>NextFont()
@@ -1031,14 +1020,14 @@ function! <SID>NextFont()
 	let g:font_index = (g:font_index+1) % len(g:font_select)
 	call <SID>SetGUIFont(g:font_select[g:font_index])
 endfunction
-map	<silent><C-F9>		:<C-U>call <SID>NextFont()<CR>:echo &guifont<CR>
-vmap<silent><C-F9>		:<C-U>call <SID>NextFont()<CR>:echo &guifont<CR>gv
-imap<silent><C-F9>		<C-C>:call <SID>NextFont()<CR>:echo &guifont<CR>gi
+map	<silent>	<C-F9>		:<C-U>call <SID>NextFont()<CR>:echo &guifont<CR>
+vmap<silent>	<C-F9>		:<C-U>call <SID>NextFont()<CR>:echo &guifont<CR>gv
+imap<silent>	<C-F9>		<C-C>:call <SID>NextFont()<CR>:echo &guifont<CR>gi
 
 " toggle line numbers <S-F9> {{{3
-map	<silent><S-F9>		:<C-U>setlocal number! nu?<CR>
-vmap<silent><S-F9>		:<C-U>setlocal number! nu?<CR>gv
-imap<silent><S-F9>		<C-O>:setlocal number! nu?<CR>
+map	<silent>	<S-F9>		:<C-U>setlocal number! nu?<CR>
+vmap<silent>	<S-F9>		:<C-U>setlocal number! nu?<CR>gv
+imap<silent>	<S-F9>		<C-O>:setlocal number! nu?<CR>
 
 " toggle menu bar and toolbar <F10> {{{3
 function! <SID>ToggleBars()
@@ -1051,22 +1040,22 @@ function! <SID>ToggleBars()
 	endif
 	set go?
 endfunction
-map	<silent><F10>		:<C-U>call <SID>ToggleBars()<CR>
-vmap<silent><F10>		:<C-U>call <SID>ToggleBars()<CR>gv
+map	<silent>	<F10>		:<C-U>call <SID>ToggleBars()<CR>
+vmap<silent>	<F10>		:<C-U>call <SID>ToggleBars()<CR>gv
 
 " maximize current window <F11> {{{3
-map			<F11>		<C-\><C-N><C-W>_<C-W>\|
-vmap		<F11>		<C-\><C-N><C-W>_<C-W>\|gv
+map				<F11>		<C-\><C-N><C-W>_<C-W>\|
+vmap			<F11>		<C-\><C-N><C-W>_<C-W>\|gv
 
 " change window width <C-F(10|11)>, height <S-F(10|11)> {{{3
-map			<C-F10>		<C-\><C-N>3<C-W><
-vmap		<C-F10>		<C-\><C-N>3<C-W><gv
-map			<C-F11>		<C-\><C-N>3<C-W>>
-vmap		<C-F11>		<C-\><C-N>3<C-W>>gv
-map			<S-F10>		<C-\><C-N>3<C-W>-
-vmap		<S-F10>		<C-\><C-N>3<C-W>-gv
-map			<S-F11>		<C-\><C-N>3<C-W>+
-vmap		<S-F11>		<C-\><C-N>3<C-W>+gv
+map				<C-F10>		<C-\><C-N>3<C-W><
+vmap			<C-F10>		<C-\><C-N>3<C-W><gv
+map				<C-F11>		<C-\><C-N>3<C-W>>
+vmap			<C-F11>		<C-\><C-N>3<C-W>>gv
+map				<S-F10>		<C-\><C-N>3<C-W>-
+vmap			<S-F10>		<C-\><C-N>3<C-W>-gv
+map				<S-F11>		<C-\><C-N>3<C-W>+
+vmap			<S-F11>		<C-\><C-N>3<C-W>+gv
 
 " toggle spellcheck and autocorrect <F12> {{{3
 function! <SID>ToggleSpellCorrect()
@@ -1077,51 +1066,54 @@ function! <SID>ToggleSpellCorrect()
 	endif
 	setlocal spell! spell?
 endfunction
-map	<silent><F12>		:<C-U>call <SID>ToggleSpellCorrect()<CR>
-vmap<silent><F12>		:<C-U>call <SID>ToggleSpellCorrect()<CR>gv
-imap<silent><F12>		<C-O>:call <SID>ToggleSpellCorrect()<CR>
+map	<silent>	<F12>		:<C-U>call <SID>ToggleSpellCorrect()<CR>
+vmap<silent>	<F12>		:<C-U>call <SID>ToggleSpellCorrect()<CR>gv
+imap<silent>	<F12>		<C-O>:call <SID>ToggleSpellCorrect()<CR>
 
 " toggle cursorline <C-F12> {{{3
-map	<silent><C-F12>		:<C-U>setlocal cursorline! cul?<CR>
-vmap<silent><C-F12>		:<C-U>setlocal cursorline! cul?<CR>gv
-imap<silent><C-F12>		<C-O>:setlocal cursorline! cul?<CR>
+map	<silent>	<C-F12>		:<C-U>setlocal cursorline! cul?<CR>
+vmap<silent>	<C-F12>		:<C-U>setlocal cursorline! cul?<CR>gv
+imap<silent>	<C-F12>		<C-O>:setlocal cursorline! cul?<CR>
 
 " switch buffers <F13> <F14> {{{3
-map			<F13>		:<C-U>bprevious<CR>
-map			<F14>		:<C-U>bnext<CR>
+map				<F13>		:<C-U>bprevious<CR>
+map				<F14>		:<C-U>bnext<CR>
 
 " choose buffer <C-F13>; split all buffers <C-F14> {{{3
-map			<C-F13>		:<C-U>ls<CR>:buffer<Space>
-map			<C-F14>		:<C-U>tab ball<CR>
+map				<C-F13>		:<C-U>ls<CR>:buffer<Space>
+map				<C-F14>		:<C-U>tab ball<CR>
 
 " redirect command-line output to @z <S-F13>; end redirect <S-F14> {{{3
-map			<S-F13>		:<C-U>let @z=@_<CR>:redir @z><CR>
-vmap		<S-F13>		:<C-U>let @z=@_<CR>:redir @z><CR>gv
-nmap		<S-F14>		:<C-U>redir END<CR>
-vmap		<S-F14>		:<C-U>redir END<CR>gv
+map				<S-F13>		:<C-U>let @z=@_<CR>:redir @z><CR>
+vmap			<S-F13>		:<C-U>let @z=@_<CR>:redir @z><CR>gv
+nmap			<S-F14>		:<C-U>redir END<CR>
+vmap			<S-F14>		:<C-U>redir END<CR>gv
 " }}}
 
 " macros {{{2
 " misc {{{3
 " surround selected area (obsoleted by surround.vim)
-xnoremap	'			<C-C>`>a'<C-C>`<i'<C-C>
-xnoremap	(			<C-C>`>a)<C-C>`<i(<C-C>
+xnoremap		'			<C-C>`>a'<C-C>`<i'<C-C>
+xnoremap		(			<C-C>`>a)<C-C>`<i(<C-C>
+
+" close all folds except this
+nnoremap<silent>zT			:exec 'normal zM'.foldlevel('.').'zo'<CR>
 
 " display current file in two columns
-noremap<silent>ZC		:<C-U>let @z=&so<CR>:set so=0<CR>maHmz:set noscb<CR>
-						\:vs<CR><C-W>wLzt:set scb<CR><C-W>p:set scb<CR>
-						\`zzt`a:let &so=@z<CR>
+noremap	<silent>ZC			:<C-U>let @z=&so<CR>:set so=0<CR>maHmz:set noscb<CR>
+							\:vs<CR><C-W>wLzt:set scb<CR><C-W>p:set scb<CR>
+							\`zzt`a:let &so=@z<CR>
 
 " diff mode
-noremap		du			:<C-U>diffupdate<CR>
+noremap			du			:<C-U>diffupdate<CR>
 " jump between diffs
-noremap		dN			<C-\><C-N>[czz
-noremap		dn			<C-\><C-N>]czz
+noremap			dN			<C-\><C-N>[czz
+noremap			dn			<C-\><C-N>]czz
 
 " <M-0> to <M-9> {{{3
 function! <SID>ClearMapsM(key1, key2)
 	for mkey in range(a:key1, a:key2)
-		exec 'map <silent> <M-'.mkey.'> '.
+		exec 'noremap <silent> <M-'.mkey.'> '.
 			\':<C-U>call <SID>WarningMsg("Unmapped")<CR>'
 		exec 'silent! unmap! <M-'.mkey.'>'
 	endfor
@@ -1129,77 +1121,72 @@ endfunction
 call <SID>ClearMapsM(0,9)
 
 " quickfix {{{4
-map			<M-1>		<C-\><C-N>:cprevious<CR>
-map			<M-2>		<C-\><C-N>:cnext<CR>
-map			<M-3>		<C-\><C-N>:clist<CR>
-map			<M-4>		<C-\><C-N>:make<Space><Up><CR>
-cmap<silent><M-4>		<C-R>=expand('%:t:r')<CR>
+map				<M-1>		<C-\><C-N>:cprevious<CR>
+map				<M-2>		<C-\><C-N>:cnext<CR>
+map				<M-3>		<C-\><C-N>:clist<CR>
+map				<M-4>		<C-\><C-N>:make<Space><Up><CR>
+cmap<silent>	<M-4>		<C-R>=expand('%:t:r')<CR>
 " fold one level
-map			<M-5>		<C-\><C-N>:%foldclose<CR>
+map				<M-5>		<C-\><C-N>:%foldclose<CR>
 " highlight without jumping
-xmap<silent><M-8>		:<C-U>let @/="\\V<C-R>=escape(<SID>FidgetWhitespace(escape(<SID>GetSelection(),'\')),'\"')<CR>"<CR>
-" exec "let @/='\\<".expand("<cword>")."\\>'"
-nmap<silent><M-8>		:<C-U>normal! #*<CR>
-imap<silent><M-8>		<C-O>:normal! #*<CR>
+xmap<silent>	<M-8>		:<C-U>let @/="\\V<C-R>=escape(<SID>FidgetWhitespace(escape(<SID>GetSelection(),'\')),'\"')<CR>"<CR>
+"							exec "let @/='\\<".expand("<cword>")."\\>'"
+nmap<silent>	<M-8>		:<C-U>normal! #*<CR>
+imap<silent>	<M-8>		<C-O>:normal! #*<CR>
 
 " change font size {{{4
-map	<silent><M-0>		:<C-U>call <SID>NextFont(0)<CR>
-vmap<silent><M-0>		:<C-U>call <SID>NextFont(0)<CR>
-map	<silent><M-->		:<C-U>FontSize -<CR>:set guifont?<CR>
-vmap<silent><M-->		:<C-U>FontSize -<CR>:set guifont?<CR>gv
-map	<silent><M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>
-vmap<silent><M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>gv
+map	<silent>	<M-0>		:<C-U>call <SID>NextFont(0)<CR>
+vmap<silent>	<M-0>		:<C-U>call <SID>NextFont(0)<CR>
+map	<silent>	<M-->		:<C-U>FontSize -<CR>:set guifont?<CR>
+vmap<silent>	<M-->		:<C-U>FontSize -<CR>:set guifont?<CR>gv
+map	<silent>	<M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>
+vmap<silent>	<M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>gv
 
 " <leader> {{{3
 let mapleader = '\'
 
 " replace last search pattern
-map			<leader>s		:%s///gc<Left><Left><Left>
-xmap		<leader>s		:s///gc<Left><Left><Left>
+map				<leader>s		:%s///gc<Left><Left><Left>
+xmap			<leader>s		:s///gc<Left><Left><Left>
 " execute command on lines matching last search pattern
-map			<leader>g		:g//
+map				<leader>g		:g//
 
 " files {{{4
 " load this file for editing and re-source
-map			<leader>v		:<C-U>TabOpen $MYVIMRC<CR>
-map			<leader>u		:<C-U>source $MYVIMRC<CR>
+map				<leader>v		:<C-U>TabOpen $MYVIMRC<CR>
+map				<leader>u		:<C-U>source $MYVIMRC<CR>
 " load config files for editing
-map	<silent><leader>b		:<C-U>TabOpen ~/.bash{rc,_aliases,_hacks}<CR>:tabnext 2<CR>
-map	<silent><leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{Content,Chrome}.css
+map	<silent>	<leader>b		:<C-U>TabOpen ~/.bash{rc,_aliases,_hacks}<CR>:tabnext 2<CR>
+map	<silent>	<leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{Content,Chrome}.css
 										\ ~/Application\ Data/Mozilla/Firefox/Profiles/*.default/chrome/userChrome.css<CR>
 
 " tabs {{{4
 " expand tabs in selected lines to spaces
-xmap<silent><leader>e		:<C-U>let @z=&et<CR>:set et<CR>gv:retab<CR>:let &et=@z<CR>
+xmap<silent>	<leader>e		:<C-U>let @z=&et<CR>:set et<CR>gv:retab<CR>:let &et=@z<CR>
 " convert spaces to tabs
-xmap<silent><leader>t		:retab!<CR>
+xmap<silent>	<leader>t		:retab!<CR>
 
 " insert expanded tabs (tabs as spaces)
-imap<silent><leader><TAB>	<C-R>=repeat(' ', &tabstop - (virtcol('.')-1) % &tabstop)<CR>
+imap<silent>	<leader><TAB>	<C-R>=repeat(' ', &tabstop - (virtcol('.')-1) % &tabstop)<CR>
 
 " deletion {{{4
 " delete into the null register
-map			<leader>d		"_d
-map			<leader>D		"_D
-map			<leader>c		"_c
-map			<leader>C		"_C
+map				<leader>d		"_d
+map				<leader>D		"_D
+map				<leader>c		"_c
+map				<leader>C		"_C
 " delete the stretch of whitespace at or before the cursor
-nmap<silent><leader><BS>	:normal! gE<CR>
-							\:exec(getline('.')[col('.')-1]=~'\S' ? "normal! \<lt>Right>":"")<CR>
-							\:exec(getline('.')[col('.')-1]=~'\s' ? 'normal! dw':'')<CR>
+nmap<silent>	<leader><BS>	:normal! gE<CR>
+								\:exec(getline('.')[col('.')-1]=~'\S' ? "normal! \<lt>Right>":"")<CR>
+								\:exec(getline('.')[col('.')-1]=~'\s' ? 'normal! dw':'')<CR>
 
 " text insertion {{{4
 " append modeline
-nmap<silent><leader>m		ovim:set ts=4 sw=4 noet:<C-C>^
+nmap<silent>	<leader>m		ovim:set ts=4 sw=4 noet:<C-C>^
 
 " date
-imap<silent><leader>dd		<C-R>=strftime('%Y-%m-%d')<CR>
-for s:i in range(1,5)
-	exec "imap <leader>d".s:i." <C-R>=strftime('%Y-%m-%d', localtime() - ".s:i."*86400)<CR>"
-endfor
-
-" log date
-imap<silent><leader>l		 <C-v>u25d81 <C-R>=strftime('%m/%d %a \| [] ')<CR><Left><Left>
+imap<silent>	<leader>d		<C-R>=strftime('%Y-%m-%d')<CR>
+imap<silent>	<leader>l		<C-v>u25d81 <C-R>=strftime('%m/%d %a \| [] ')<CR><Left><Left>
 
 " encryption {{{4
 function! <SID>R()
@@ -1225,23 +1212,17 @@ function! <SID>R()
 	let @z = tr(<SID>GetSelection(), alpha1, alpha2)
 	exec 'normal! gv"zp'
 endfunction
-xmap<silent><leader>r		:<C-U>call <SID>R()<CR>
+xmap<silent>	<leader>r		:<C-U>call <SID>R()<CR>
 
 " spellchecking {{{4
-nmap		<leader>[		[s
-nmap		<leader>]		]s
-nmap		<leader>=		z=
-
-" custom operations {{{4
-" switch .XCompose key bindings
-xmap<silent><leader>X		:<C-U>let @z=&hls.@/<CR>:set nohls<CR>
-							\:'<,'>s/\v^(\<\w+\>)(%(\s*\<\w+\>)*)(\s*\<\w+\>)/\1\3\2/e<CR>
-							\:let @/=@z[1:]<CR>:let &hls=@z[0]<CR>
+nmap			<leader>[		[s
+nmap			<leader>]		]s
+nmap			<leader>=		z=
 
 " search {{{3
 " search for a word
-map			<leader>w		<C-\><C-N>/\<\><Left><Left>
-cmap		<leader>W		\<\><Left><Left>
+map				<leader>w		<C-\><C-N>/\<\><Left><Left>
+cmap			<leader>W		\<\><Left><Left>
 
 " search for visually selected text {{{4
 function! <SID>FidgetWhitespace(pat)
@@ -1250,16 +1231,16 @@ function! <SID>FidgetWhitespace(pat)
 	return    substitute(pat,  '\_s\+', '\\_s\\+','g')
 endfunction
 " fuzzy whitespace
-xmap<silent>		*		<C-C>/\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'/\'))<CR><CR>
-xmap<silent>		#		<C-C>?\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'?\'))<CR><CR>
+xmap<silent>	*				<C-C>/\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'/\'))<CR><CR>
+xmap<silent>	#				<C-C>?\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'?\'))<CR><CR>
 " exact match
-xmap<silent><leader>*		<C-C>/\V<C-R>=substitute(escape(<SID>GetSelection(),'/\'),'\n','\\n','g')<CR><CR>
-xmap<silent><leader>#		<C-C>?\V<C-R>=substitute(escape(<SID>GetSelection(),'?\'),'\n','\\n','g')<CR><CR>
+xmap<silent>	<leader>*		<C-C>/\V<C-R>=substitute(escape(<SID>GetSelection(),'/\'),'\n','\\n','g')<CR><CR>
+xmap<silent>	<leader>#		<C-C>?\V<C-R>=substitute(escape(<SID>GetSelection(),'?\'),'\n','\\n','g')<CR><CR>
 
 " regex shortcuts {{{4
 " brace multi, non-greedy multi
-cnoremap	<leader>{		\{}<Left>
-cnoremap	<leader>-		\{-}
+cnoremap		<leader>{		\{}<Left>
+cnoremap		<leader>-		\{-}
 
 " }}}1 mappings
 " Section: plugins {{{1
@@ -1271,42 +1252,15 @@ function! <SID>PlugBalloonEval()
 	else | return '' | endif
 endfunction
 
-" genutils
-" matchit
+" ClipBrd {{{2
+let g:clipbrdDefaultReg = '+'
 
-" taglist " {{{2
-"""""""""""
-let g:Tlist_Show_One_File = 1
-
-" echofunc " {{{2
-""""""""""""
+" echofunc {{{2
 let g:EchoFuncKeyPrev = '<M-p>'
 let g:EchoFuncKeyNext = '<M-n>'
 let g:EchoFuncMaxBalloonDeclarations = 6
 
-" YankRing " {{{2
-""""""""""""
-if !has('gui_win32')
-	let g:yankring_history_file = ".yankring_history"
-else
-	let g:yankring_history_file = "_yankring_history"
-endif
-" custom maps: extend to or bar from YankRing
-function! YRRunAfterMaps()
-	noremap			-		=
-	nnoremap<silent>Y		:<C-U>YRYankCount 'y$'<CR>
-	nnoremap		x		"_x
-	nnoremap		X		"_X
-	nnoremap		s		"_s
-endfunction
-if exists("loaded_yankring") | call YRRunAfterMaps() | endif
-
-" ClipBrd " {{{2
-"""""""""""
-let g:clipbrdDefaultReg = '+'
-
-" NERD Commenter " {{{2
-""""""""""""""""""
+" NERD Commenter {{{2
 let g:NERDBlockComIgnoreEmpty = 1
 let g:NERDCommentWholeLinesInVMode = 2
 let g:NERDDefaultNesting = 0
@@ -1316,12 +1270,20 @@ let g:NERDSexyComs = 0
 let g:NERDCompactSexyComs = 0
 let g:NERDShutUp = 1
 
-" NERD Tree " {{{2
-"""""""""""""
+" NERD Tree {{{2
 let g:NERDTreeWinPos = "right"
 
-" snippetsEmu " {{{2
-"""""""""""""""
+" session_dialog {{{2
+let g:SessionSaveDirectory = "~"
+let g:SessionPath = ".,~"
+" let g:SessionFilePrefix = ""
+" let g:SessionFileSuffix = ""
+let g:SessionDefault = ""
+let g:SessionConfirmOverwrite = 0
+let g:SessionQuitAfterSave = 0
+let g:SessionCreateDefaultMaps = 1
+
+" snippetsEmu {{{2
 let g:snip_start_tag = "\u2039"
 let g:snip_end_tag = "\u203a"
 
@@ -1332,7 +1294,7 @@ function! s:EditSnippets(...)
 	let args = (a:0==0 ? [&filetype] : a:000)
 	for type in args
 		if type == '' | continue | endif
-		let snips = reverse(split(globpath(&rtp, "after/*/".type."_".(type=='*'? 'my' : '*')."snip*s.vim")))
+		let snips = split(globpath(&rtp, "after/*/".type."_snippets".(type=='*'? '_*' : '*').".vim"))
 		if len(snips) == 0
 			call <SID>ErrorMsg("No snippets found for filetype ".type)
 			continue
@@ -1341,23 +1303,66 @@ function! s:EditSnippets(...)
 	endfor
 endfunction
 function! EditSnippetsComplete(a,l,p)
-	let types = split(globpath(&rtp, "after/*/*_*snip*s.vim"))
+	let types = split(globpath(&rtp, "after/*/*_snippets*.vim"))
 	for i in range(len(types))
-		let types[i] = StripFrom(fnamemodify(types[i], ':t'), '_.*snip.*s\.vim$')
+		let types[i] = StripFrom(fnamemodify(types[i], ':t'), '_snippets.*\.vim$')
 	endfor
 	return join(RemoveDuplicates(types), "\n")
 endfunction
 
-" session_dialog " {{{2
-""""""""""""""""""
-let g:SessionSaveDirectory = "~"
-let g:SessionPath = ".,~"
-" let g:SessionFilePrefix = ""
-" let g:SessionFileSuffix = ""
-let g:SessionDefault = ""
-let g:SessionConfirmOverwrite = 0
-let g:SessionQuitAfterSave = 0
-let g:SessionCreateDefaultMaps = 1
+" highlight snippets
+command! -nargs=0 HighlightSnippets exec 'silent! normal! /\<Snippet\s\+\zs\S\+<CR>'
+
+" speeddating {{{2
+let g:speeddating_no_mappings = 0
+
+function! <SID>ToggleNrFormats() " {{{3
+	if &nrformats =~# '\<alpha\>'
+		set nrformats-=alpha
+	else
+		set nrformats+=alpha
+	endif
+	set nf?
+endfunction
+function! <SID>ToggleCtrlAX() " {{{3
+if hasmapto('<Plug>SpeedDatingUp')
+	unmap		<C-A>
+	unmap		<C-X>
+	unmap		d<C-A>
+	unmap		d<C-X>
+	nmap<silent><C-A>		:call <SID>OffsetCharacter(1)<CR>
+	nmap<silent><C-X>		:call <SID>OffsetCharacter(-1)<CR>
+	echo "  normal"
+else
+	nmap		<C-A>		<Plug>SpeedDatingUp
+	nmap		<C-X>		<Plug>SpeedDatingDown
+	xmap		<C-A>		<Plug>SpeedDatingUp
+	xmap		<C-X>		<Plug>SpeedDatingDown
+	nmap		d<C-A>		<Plug>SpeedDatingNowUTC
+	nmap		d<C-X>		<Plug>SpeedDatingNowLocal
+	echo "  speeddating"
+endif
+endfunction " }}}3
+map	<silent>	<leader><C-A>	:<C-U>call <SID>ToggleNrFormats()<CR>
+map	<silent>	<leader><C-X>	:<C-U>call <SID>ToggleCtrlAX()<CR>
+
+" taglist {{{2
+let g:Tlist_Show_One_File = 1
+
+" YankRing {{{2
+if !has('gui_win32')
+	let g:yankring_history_file = ".yankring_history"
+else
+	let g:yankring_history_file = "_yankring_history"
+endif
+" custom maps: extend to or exclude from YankRing
+function! YRRunAfterMaps()
+nnoremap<silent>Y			:<C-U>YRYankCount 'y$'<CR>
+nnoremap		x			"_x
+nnoremap		X			"_X
+nnoremap		s			"_s
+endfunction
+if exists("loaded_yankring") | call YRRunAfterMaps() | endif
 
 " }}}1 plugins
 " Section: development {{{1

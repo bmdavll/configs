@@ -2,28 +2,27 @@ if !exists('loaded_snippet') || &cp
 	finish
 endif
 
-" global snippets
+" global snippets {{{1
 let st = g:snip_start_tag
 let et = g:snip_end_tag
 let se = st.et
 
-exec "Iabbr '' \"".se."\"".se
-exec "Iabbr ' '".se."'".se
-exec "Iabbr jk (".se.")".se
+exec "Iabbr '' \"".se."\""
+exec "Iabbr '  '".se."'"
+exec "Iabbr jk (".se.")"
 
 let g:snip_foo = "Goo"
 let g:snip_args = st."\"...\":CleanupArgs(@z)".et
-let g:snip_post_args = st."\"...\":PostProcess(CleanupArgs(@z), ', ', '')".et
+let g:snip_post_args = st."\"...\":Decorate(CleanupArgs(@z), ', ', '')".et
 
-" common functions "
-""""""""""""""""""""
+" common functions {{{1
 " returns text with all instances of 'pat' removed
-function! StripFrom(text, pat)
+function! StripFrom(text, pat) "{{{2
 	return substitute(a:text, a:pat, '', 'g')
-endfunction
+endfunction "}}}2
 
 " returns the number of occurrences of needle in haystack
-function! Count(haystack, needle)
+function! Count(haystack, needle) "{{{2
 	let counter = 0
 	let index = match(a:haystack, a:needle)
 	while index > -1
@@ -32,12 +31,13 @@ function! Count(haystack, needle)
 		let index = match(a:haystack, a:needle, end)
 	endwhile
 	return counter
-endfunction
+endfunction "}}}2
 
-" returns the number of contiguous needles in haystack, skipping intermittent poop
-" returns 0 unless all of haystack is matched (from start of string to end, by
-" either needles or poop)
-function! CountSkipping(haystack, needle, poop)
+" returns the number of contiguous needles in haystack, skipping only
+" intermittent poop
+" returns 0 unless all of haystack is matched, from start to end, by either
+" needles or poop
+function! CountSkipping(haystack, needle, poop) "{{{2
 	let counter = 0
 	let end = 0
 	while 1
@@ -53,10 +53,10 @@ function! CountSkipping(haystack, needle, poop)
 	else
 		return counter
 	endif
-endfunction
+endfunction "}}}2
 
 " returns a list of pat occurrences in str
-function! MatchList(str, pat)
+function! MatchList(str, pat) "{{{2
 	let matches = []
 	let end = 0
 	while 1
@@ -66,60 +66,60 @@ function! MatchList(str, pat)
 		let end = matchend(a:str, a:pat, end)
 	endwhile
 	return matches
-endfunction
+endfunction "}}}2
 
-" returns replacement if text equals match, otherwise returns text
-function! ReplaceIfEqual(text, match, replacement)
+" returns replacement if text equals match, otherwise returns text unchanged
+function! ReplaceIfEqual(text, match, replacement) "{{{2
 	if a:text ==# a:match
 		return a:replacement
 	endif
 	return a:text
-endfunction
+endfunction "}}}2
 
 " returns string with all words capitalized
 " uses the first argument, or register z if given no arguments
-function! CapWords(...)
+function! CapWords(...) "{{{2
 	if a:0 == 0
 		return substitute(@z,  '\w\+', '\u&', 'g')
 	else
 		return substitute(a:1, '\w\+', '\u&', 'g')
 	endif
-endfunction
+endfunction "}}}2
 
-" returns text surrounded by prefix and suffix if it's not empty
-function! PostProcess(text, prefix, suffix)
+" returns text bookended by prefix and suffix, but only if it's non-null
+function! Decorate(text, prefix, suffix) "{{{2
 	if a:text != ''
 		return a:prefix.a:text.a:suffix
 	endif
 	return a:text
-endfunction
+endfunction "}}}2
 
 " construct a comma-separated tag list
-function! ArgList(count)
+function! ArgList(count) "{{{2
 	if a:count == 0
 		return ''
 	endif
 	return repeat(', '.g:snip_start_tag.g:snip_end_tag, a:count)
-endfunction
+endfunction "}}}2
 
 " format argument list
-function! CleanupArgs(text)
+function! CleanupArgs(text) "{{{2
 	if a:text == '...'
 		return ''
 	endif
-	let text = substitute(a:text, '\s*,\s*', ', ', 'g')
+	let text = substitute(a:text, '\s*,\+\s*', ', ', 'g')
 	let text = substitute(text, '^,*\s*', '', '')
-	return     substitute(text, ',*\s\+$', '', '')
-endfunction
+	return     substitute(text, ',*\s*$', '', '')
+endfunction "}}}2
 
 " get the indent level of a line
-function! GetIndentLevel(lnum)
+function! IndentLevel(lnum) "{{{2
     return indent(a:lnum) / &shiftwidth
-endfunction
+endfunction "}}}2
 
-" given an indent level, return an indent string, taking into account
-" 'expandtab', 'shiftwidth', and 'tabstop'
-function! ConstructIndent(level)
+" given an indent level, return an indent string, taking into account current
+" &expandtab, &shiftwidth, and &tabstop
+function! ConstructIndent(level) "{{{2
 	if &expandtab
 		let tabs   = 0
 		let spaces = a:level * &shiftwidth
@@ -128,5 +128,6 @@ function! ConstructIndent(level)
 		let spaces = a:level * &shiftwidth % &tabstop
 	endif
 	return repeat('\t', tabs).repeat(' ', spaces)
-endfunction
+endfunction "}}}2
 
+" vim:set ts=4 sw=4 noet fdm=marker:

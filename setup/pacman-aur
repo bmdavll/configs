@@ -12,7 +12,7 @@ add ()
 [ $(whoami) = root ] && exit 1
 
 # yaourt
-if ! which yaourt &>/dev/null; then
+if false; then
 	echo -n "Install yaourt? [Y/n] "
 	read reply
 	if [[ "$reply" == [Nn]* ]]; then
@@ -57,9 +57,11 @@ add foremost # file recovery tool
 add libsvg
 add mbrola # text-to-speech
 add mit-scheme
+add pdftk
 add stardict-i2e-es-en
-add stardict-oald stardict-wordnet
+add stardict-oald
 add svg2png
+add trash-cli
 add uzbl-git
 add vifm
 # add winff

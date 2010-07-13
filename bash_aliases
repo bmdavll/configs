@@ -198,7 +198,8 @@ then :
 fi
 
 #{{2 ls
-function l #{{
+#{{ fuzzy ls
+function l
 { :
 	local IFS=$'\n' arg
 	split_opts 'IkpTw' -- "$@" || return $?
@@ -222,6 +223,30 @@ alias ll='l -lh'
 alias lla='l -lhA'
 alias lt='l -lhtr'
 alias lS='l -lhSr'
+alias lR='l -R'
+
+#{{ pipe to less with colors
+function _lsl
+{ :
+	local code=0 output cmd="$1" && shift
+	if [ "$(type -t "$cmd")" = "alias" ]; then
+		cmd=($(alias "$cmd" | sed 's/^alias [^=]\+=.\(.*\).$/\1/'))
+	else
+		cmd=($cmd)
+	fi
+	output=$([ "$cmd" ] && "${cmd[@]}" --color=always "$@") || code=$?
+	if [ "$output" ]; then
+		printf "%s" "$output" | less -R
+	fi
+	return $code
+} #}}
+alias lsl='_lsl l'
+alias lal='_lsl la'
+alias lll='_lsl ll'
+alias llal='_lsl lla'
+alias ltl='_lsl lt'
+alias lSl='_lsl lS'
+alias lRl='_lsl lR'
 
 #{{ ls links
 function lh
@@ -264,26 +289,9 @@ function lh
 	}'
 	return ${PIPESTATUS[0]}
 } #}}
+alias lhl='_lsl lh'
 
-#{{ pipe to less with colors
-function _lsl
-{ :
-	local code=0 output ls=($1) && shift
-	output=$([ "$ls" ] && "${ls[@]}" --color=always "$@") || code=$?
-	if [ "$output" ]; then
-		printf "%s" "$output" | less -R
-	fi
-	return $code
-} #}}
-alias lsl='_lsl "l"'
-alias lal='_lsl "l -A"'
-alias lll='_lsl "l -lh"'
-alias ltl='_lsl "l -lhtr"'
-alias lSl='_lsl "l -lhSr"'
-alias lhl='_lsl "lh"'
-
-#{{ selective ls
-# modes are code, other, hidden
+#{{ selective ls: code, other, hidden
 # option -R will be ignored
 _lsmode() { :
 	local mode=$1 && shift
@@ -329,10 +337,10 @@ _ls_special() { :
 	split_opts -c
 	return $code
 }
+#}}
 alias lsc='_ls_special c'
 alias lso='_ls_special o'
 alias lsh='_ls_special h'
-#}}
 
 alias cls='clear && ls'
 
@@ -764,8 +772,8 @@ function ahelp
 alias ?='echo $?'
 alias p='pwd'
 alias x='xargs -r'
-alias g='egrep'
-alias gv='egrep -v'
+alias g='egrep -i'
+alias gv='egrep -iv'
 alias ch='chmod'
 alias hist='history | sort -nr | less'
 alias histop='history | awk "{print \$2}" | sort | uniq -c | sort -nr | head -n'
@@ -876,7 +884,7 @@ alias what='_search "http://what.cd/torrents.php?action=advanced&artistname=%s&g
 
 #{{2 vim
 function vd { ($GUI gvimdiff "$@") }
-function vp { ($GUI gvim -p  "$@") }
+function v  { ($GUI gvim -p  "$@") }
 
 #{{3 open in a new tab in existing gvim server
 function vs

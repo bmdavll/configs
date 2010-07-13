@@ -1051,6 +1051,8 @@
 <Multi_key> <asterisk> <at> <o>			: "ϸ"	U03F8 # GREEK SMALL LETTER SHO
 
 ##1 Macros
+# Basic
+<Multi_key> <backslash> <s> <c> <r> <i> <p>	: "⁰¹²³⁴⁵⁶⁷⁸⁹⁽⁻⁾₀₁₂₃₄₅₆₇₈₉₍₋₎"
 # Phrases
 <Multi_key> <backslash> <d> <e> <l> <e>		: "བཀྲ་ཤིས་བདེ་ལེགས།"
 <Multi_key> <backslash> <a> <l> <l> <a> <h>	: "الله أكبر"

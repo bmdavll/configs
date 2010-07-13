@@ -1,12 +1,12 @@
-72	gvim 
-57	t 
+130	gvim 
+59	t 
 22	t timer 
 12	f 
 8	t cpuset 
-3	firefox 
+4	firefox 
+3	chromium
 2	scim-run gvim 
 2	pokerth
-2	chromium
 1	scim-run stardict 
 1	clipboard 
 1	galculator 

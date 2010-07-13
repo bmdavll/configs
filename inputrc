@@ -29,10 +29,11 @@ set bind-tty-special-chars off
 # C-\ C-^ M-a M-e M-g M-h M-i M-j M-k M-m M-o M-q M-s M-v M-w M-x M-z
 # unused: M-t M-u M-w M-y M-z
 # terminal sends Esc prefix for Meta, so use \e in place of \M-
-$if Bash
 #{{{2 basics
 # use space to perform history expansion
+$if Bash
 space:	magic-space
+$endif
 
 # delete words separated by both whitespace and slashes
 "\C-w":	unix-filename-rubout
@@ -60,10 +61,10 @@ space:	magic-space
 
 #{{{2 previous command
 # command substitute (output from last command here)
-"\e`":	"$(!!) \C-h"
+"\e`":	" $(!!) \C-h"
 
 # make fifo from last command
-"\e,":	"<(!!) \C-h"
+"\e,":	" <(!!) \C-h"
 
 # repeat last command with sudo
 "\es":	"\C-p\C-asudo \ef\C-f"
@@ -111,6 +112,5 @@ space:	magic-space
 "\ec":	'\C-acalc "\C-e"\C-b'
 
 #}}}
-$endif
 #}}}1
 # vim:set ts=4 sw=4 noet fdm=marker:

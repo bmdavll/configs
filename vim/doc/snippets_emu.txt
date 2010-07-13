@@ -103,7 +103,7 @@ second <{name}> tag in the @z register (any value already in @z will be
 preserved and restored). The substitute command will change the entered value
 to be in upper case. I.e. Entering 'trigger<Tab>' and typing 'Tycho<Tab>'
 will result in the following text: >
-
+    
     My name is Tycho. I SAID: MY NAME IS TYCHO!
 ~
                                                            *snip-special-vars*
@@ -117,7 +117,7 @@ list of available variables is detailed below:
                                                        *snip-snippet-commands*
 In addition to tag commands it is also possible to define commands which will
 be executed before the snippet is inserted into the buffer. These are defined
-within double backticks.
+within double backticks. 
 
 E.g.
 >
@@ -132,19 +132,19 @@ Buffer Specific Snippets ~
 The Snippet command defines buffer specific snippets. This is the recommended
 option when using filetype specific snippets. It is possible to define
 'global' snippets which will act across all buffers. These can be defined
-using the legacy 'Iabbr' command (note the capital 'I').
+using the legacy 'Iabbr' command (note the capital 'I'). 
 
 E.g. >
     Iabbr for for <{var}> in <{list}>:<CR><{}>
 ~
                                                                *snip-ftplugin*
-The preferred practice for defining filetype specific snippets is to include
+The preferred practice for defining filetype specific snippets is to include 
 them in files named <filetype>_snippets.vim and for these files to be placed in the
 ~/.vim/after/ftplugin directory (or vimfiles\after\ftplugin under Windows).
 When a file of a specific type is loaded so will all of the defined snippets.
 The 'after' directory is used to ensure that the plugin has been loaded. It is
 also recommended that the following is included at the top of the file: >
-
+    
     if !exists('loaded_snippet') || &cp
         finish
     endif
@@ -205,7 +205,7 @@ Element Delimiter ~
 The value of snip_elem_delim is used to separate a tag's name and its command.
 By default it is set to ':' but can be set as above either globally or for a
 specific buffer using the following variables: >
-
+    
     g:snip_elem_delim
     b:snip_elem_delim
 ~
@@ -254,7 +254,7 @@ functionality in a user function.
 
 Example:
 >
-
+    
     function! Count(haystack, needle)
         let counter = 0
         let index = match(a:haystack, a:needle)

@@ -16,7 +16,7 @@
 "   - The register name is remembered (until you change it again by explicitly
 "     specifying it) so that you don't have to specify it everytime you run
 "     :ClipBrd command.
-"   - The "[Clip Board]" buffer is like a regular Vim file buffer, as you can
+"   - The "[Clipboard]" buffer is like a regular Vim file buffer, as you can
 "     write (:w, :w!, :wq, :wq!), reload (:e, :e!) and quit (:q, :q!) the
 "     buffer using the built-in Vim commands. Writing without the bang will
 "     make the plugin prompt you for confirmation and where available, you can
@@ -24,7 +24,7 @@
 "   - To refresh contents from the register, use :e or :e! command, or just
 "     close and reopen the buffer. To quit without saving, just use the :q!
 "     command.
-"   - <C-G> while in the [Clip Board] buffer shows the register name.
+"   - <C-G> while in the [Clipboard] buffer shows the register name.
 "   - Even other buffer commands and settings work as expected, e.g., you can
 "     :hide the buffer if you can't decide to save or quit, and the contents
 "     should remain the same when you come back, unless a different register
@@ -77,7 +77,8 @@ if !exists('s:myBufNum')
   else
     let s:curReg = '*'
   endif
-  let s:title = '[Clip Board]'
+"-let s:title = '[Clip Board]'
+  let s:title = '[Clipboard]'
 endif
 
 command! -nargs=? ClipBrd :call <SID>ViewRegister(<f-args>)
@@ -87,7 +88,7 @@ if (! exists("no_plugin_maps") || ! no_plugin_maps) &&
   nnoremap <script> <Plug>ClipBrdOpen :ClipBrd<CR>
 
   if !hasmapto('<Plug>ClipBrdOpen')
-    "nmap <unique> <silent> <Leader>cb <Plug>ClipBrdOpen
+ "- nmap <unique> <silent> <Leader>cb <Plug>ClipBrdOpen
   endi
 endif
 
@@ -109,7 +110,7 @@ function! s:ViewRegister(...)
       else
         exec "sp \\". escape(s:title, ' ')
       endif
-      exec "normal! i\<C-G>u\<Esc>"
+      exec "normal! i\<C-G>u\<Esc>" | "+
       let s:myBufNum = bufnr('%')
       let s:myDir = getcwd()
     finally
@@ -196,8 +197,9 @@ function! s:SetupBuf(regName)
   let auTitle = escape(s:title, '\[*^$. ')
   aug ClipBrd
     au!
-    exec 'au BufWriteCmd '.auTitle.' :call <SID>UpdateRegister(1, 1)'
-    exec 'au BufReadCmd '.auTitle.' :call <SID>ViewRegister()'
+ "- exec 'au BufWriteCmd ' . auTitle .' :call <SID>UpdateRegister(0, 1)'
+    exec 'au BufWriteCmd ' . auTitle .' :call <SID>UpdateRegister(1, 1)'
+    exec 'au BufReadCmd ' . auTitle .' :call <SID>ViewRegister()'
   aug END
 endfunction
 
