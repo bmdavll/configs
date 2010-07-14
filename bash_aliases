@@ -513,6 +513,7 @@ _rm_special() { :
 		[ "$line" = "." ] && line="$PWD"
 		rm -r "$line" || code+=$?
 	done
+	[ ! -e "$PWD" ] && cd ..
 	return $code
 }
 alias rmbk='_rm_special bk'
@@ -804,11 +805,10 @@ complete -c typef
 alias cat4='expand -t4'
 alias db='diff -bB'
 alias df='df -h'
-alias dr='diff -qr'
 alias free='free -m'
 alias pl='perl -de 47'
-alias py3='python3'
 alias py='python'
+alias py3='python3'
 alias wcL='wc -L'
 alias wcl='wc -l'
 

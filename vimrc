@@ -1377,6 +1377,16 @@ augroup cpp
 	au FileType c,cpp setl foldmethod=syntax
 augroup END
 
+" java {{{2
+augroup java
+	au!
+	" use syntax folding
+	au FileType java setl foldmethod=syntax
+	" make
+	au FileType java setl mp=javac\ -g\ $*\ %
+	au FileType java setl efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#,%-G%.%#
+augroup END
+
 " python {{{2
 if has('python')
 python << EOF
@@ -1428,8 +1438,6 @@ def RemoveBreakpoints():
 EOF
 endif
 
-let g:python_highlight_all = 1
-
 augroup python
 	au!
 	au FileType python setl expandtab
@@ -1440,16 +1448,6 @@ augroup python
 	" breakpoints
 	au FileType python map <buffer> <M-9> <C-\><C-N>:python ToggleBreakpoint()<CR>
 	au FileType python map <buffer> <M-0> <C-\><C-N>:python RemoveBreakpoints()<CR>
-augroup END
-
-" java {{{2
-augroup java
-	au!
-	" use syntax folding
-	au FileType java setl foldmethod=syntax
-	" make
-	au FileType java setl mp=javac\ -g\ $*\ %
-	au FileType java setl efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#,%-G%.%#
 augroup END
 
 " git {{{2
