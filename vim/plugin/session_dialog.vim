@@ -30,11 +30,12 @@
 "
 " :SessionDelete [SESSION|GLOB_PATTERN]...
 "   Displays the delete session dialog if no arguments were given, otherwise
-"   deletes all sessions that match the arguments. Spaces need to be escaped
-"   since they would otherwise separate the arguments.
+"   deletes all the sessions that match the arguments. Spaces need to be
+"   escaped since they would otherwise separate the arguments.
 "   e.g. :SessionDelete foo will delete the session named "foo". If more
-"   than one session is named "foo", you will be prompted to select one. To
-"   delete all such sessions, use a pattern. (i.e. :SessionDelete [f]oo)
+"   than one session is named "foo", you will be prompted to select one. You
+"   can also use a pattern (e.g. :SessionDelete foo*). This will delete all
+"   sessions beginning with "foo".
 "
 " :SessionList [GLOB_PATTERN]...
 "   Prints a list of all the sessions and their locations in g:SessionPath
@@ -54,7 +55,7 @@
 "   Default is "$HOME"
 "   Where to save new sessions. This can be set in your vimrc or while Vim
 "   is running. For example, to get the default behavior of :mksession,
-"        let g:SessionSaveDirectory = "."
+"        let SessionSaveDirectory = "."
 "
 " g:SessionPath
 "   Default is set to the initial value of g:SessionSaveDirectory

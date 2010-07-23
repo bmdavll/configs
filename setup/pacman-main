@@ -12,7 +12,7 @@ add ()
 list=()
 
 ##1 UI
-# add dmenu
+add dmenu
 add expect
 add gksu
 # add launchy
@@ -20,11 +20,7 @@ add screen
 add xbindkeys
 add zenity
 
-##1 shells
-# add rxvt-unicode-256color
-add zsh
-
-##2 command-line utils
+##1 command-line
 add bc
 add colordiff
 add lesspipe # input filter for less
@@ -34,6 +30,10 @@ add pv
 # add scrot
 add units
 add xclip
+
+##2 shells
+# add rxvt-unicode-256color
+add zsh
 
 ##1 languages
 add clisp
@@ -64,6 +64,8 @@ add perlxml
 
 ##2 python
 add python-fuse
+add python-numpy
+add python-scipy
 add python-simplejson
 add python-webpy
 
@@ -80,6 +82,7 @@ add xorg-utils
 add ctags
 add gdb
 add git
+add giggle
 add mercurial
 add subversion
 
@@ -130,6 +133,7 @@ add truecrypt
 
 ##1 web
 add lynx
+add uzbl-tabbed
 add w3m
 
 ##2 email
@@ -167,7 +171,7 @@ add mpg123
 add mpd ncmpcpp # ncmpc mpc
 add gmpc # sonata
 # add cmus
-add xfmedia # banshee
+# add xfmedia
 add timidity++ # MIDI player
 
 ##3 editors
@@ -202,7 +206,7 @@ add cdrdao # for writing cue/bin files
 # add cdemu-client # for cue-bin emulation
 add xfburn
 
-##1 special
+##1 misc
 add anki # supermemo alternative
 # add gourmet
 # add pokerth

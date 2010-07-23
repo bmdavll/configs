@@ -1,13 +1,22 @@
 #!/bin/bash
 
-FILEMAN=Thunar
+FILEMAN=(Thunar 'nautilus --no-desktop')
 
-if [ -d "$1" ]; then
-	dir="$1" && shift
+if [[ -d "$1" || "$1" =~ (:|/)$ ]]; then
+	dir="$1"
+	shift
 elif [ -e "$1" ]; then
-	dir="$(dirname -- "$1")" && shift
+	dir=$(dirname -- "$1")
+	shift
 else
 	dir="$HOME"
 fi
 
-$FILEMAN "$dir"
+for fileman in "${FILEMAN[@]}"; do
+	if type "${fileman%% *}" &>/dev/null; then
+		$fileman "$dir" "$@"
+		exit
+	fi
+done
+
+exit 1

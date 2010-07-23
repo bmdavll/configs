@@ -352,10 +352,10 @@ alias bd='cd - >/dev/null'
 alias CD='cd "$(readlink -m "$PWD")"'
 
 function c
-{ :
+{ : :
 	local IFS=$'\n'
 	if [ $# -gt 0 -a ! -d "$1" ]; then
-		local try=$(ls -d $1* 2>/dev/null)
+		local try=$(ls -d $1* 2>/dev/null | perl -lne 'print if -d')
 		[ ! -d "$try" ] && try=$(dirname -- "$1")
 		if [ -d "$try" -a ! "$try" -ef "$PWD" ]; then
 			shift
@@ -377,11 +377,10 @@ function cl
 # macro for inputrc binding
 function cll
 { : :
-	if pat_in "$HELP_PAT" "$@"; then
-		echo "Usage: cll [ls_option]..." && return
+	local args=() arg
+	if [ $# -eq 0 ]; then
+		eval "set -- $(tail -n1 "$HISTFILE" 2>/dev/null | sed 's/[&|!<>$();]//g')"
 	fi
-	local opts=("$@") args=() arg
-	eval "set -- $(tail -n1 "$HISTFILE" 2>/dev/null | sed 's/[&|!<>$();]//g')"
 	while [ $# -gt 0 ]; do
 		args[$#]="$1" && shift
 	done
@@ -390,7 +389,7 @@ function cll
 			arg=$(dirname -- "$arg")
 		fi
 		if [ -d "$arg" -a ! "$arg" -ef "$PWD" -a "$arg" != '/' ]; then
-			cl "${opts[@]}" -- "$arg"
+			cl -- "$arg"
 			return
 		else
 			continue
@@ -699,18 +698,17 @@ complete -F _psgrep psgrep ok
 
 #{{2 file browser/terminal
 function f
-{ :
+{ : :
 	local fileman
 	for fileman in Thunar "nautilus --no-desktop"; do
 		if type "${fileman%% *}" &>/dev/null; then
 			[ $# -eq 0 ] && set "$PWD"
-			($GUI $fileman "$@")
+			$fileman "$@"
 			return
 		fi
 	done
 	return 1
 }
-complete -A directory t
 
 #{{2 help
 #{{3 combined help
@@ -862,25 +860,25 @@ function var
 complete -A variable var
 
 #{{2 web
-_search() { :
+_search() { : :
 	local SEP='/' URL="$1" && shift
-	URL=$(echo "$@" | perl -e '
+	URL=$(echo "$@" | perl -mURI::Escape=uri_escape_utf8 -e '
 		$URL = q['"$URL"'];
 		$/ = "";
 		@Q = split(q['"$SEP"'], <>);
 		foreach (@Q) {
-			$_   =~ s/^\s+|\s+$//g;
-			$_   =~ s/\s+/+/g;
-			$URL =~ s/%s/$_/;
+			$_ =~ s/^\s+|\s+$//g;
+			$_ = uri_escape_utf8($_);
+			$URL =~ s/%s\b/$_/;
 		}
-		$URL =~ s/%s//g;
+		$URL =~ s/%s\b//g;
 		print $URL;
 	')
-	$BROWSER "$URL"
-} && BROWSER="$GUI firefox"
+	$WEB_BROWSER "$URL"
+} && WEB_BROWSER="$GUI firefox"
 alias goog='_search "http://google.com/search?q=%s"'
 alias wiki='_search "http://en.wikipedia.org/wiki/Special:Search?search=%s"'
-alias what='_search "http://what.cd/torrents.php?action=advanced&artistname=%s&groupname=&filelist=%s&freetorrent=&taglist=&tags_type=1&order_by=time&order_way=desc"'
+alias what='_search "http://what.cd/torrents.php?action=advanced&artistname=%s&groupname=%s&year=&filelist=%s&freetorrent=%s&order_by=snatched&order_way=desc"'
 
 #{{2 vim
 function vd { ($GUI gvimdiff "$@") }
@@ -919,7 +917,7 @@ _vs() { :
 }
 complete -F _vs -o filenames -o default vs
 
-alias dev='vs DEV'
+alias dev='vs CODE'
 alias lib='vs LIB -R'
 _devlib() { :
 	local cur="$2"

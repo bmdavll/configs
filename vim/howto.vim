@@ -16,8 +16,3 @@ fun! s:Foo(scope, bang)
 	echo {var}
 endfun
 
-" switch key order of .XCompose key binding
-xmap<silent><leader>X		:<C-U>let @z=&hls.@/<CR>:set nohls<CR>
-							\:'<,'>s/\v^(\<\w+\>)(%(\s*\<\w+\>)*)(\s*\<\w+\>)/\1\3\2/e<CR>
-							\:let @/=@z[1:]<CR>:let &hls=@z[0]<CR>
-

@@ -33,7 +33,8 @@ while (<>) {
 } continue {
     push(@lines, "$_$/");
 }
-if (! $found && $choice =~ m/^\w+$/) {
+if (! $found && $choice =~ m/^[\w-]+$/
+	&& system("which " . $choice . " &>/dev/null") == 0) {
 	push(@lines, "1\t" . $choice . "$/");
 }
 @sorted = map  { $_->[0] }

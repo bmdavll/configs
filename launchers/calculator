@@ -1,0 +1,12 @@
+#!/bin/bash
+
+CALCULATORS=(galculator gcalctool)
+
+for calc in "${CALCULATORS[@]}"; do
+	if type "$calc" &>/dev/null; then
+		$calc
+		exit
+	fi
+done
+
+exit 1

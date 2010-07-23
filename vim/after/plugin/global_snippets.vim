@@ -16,7 +16,7 @@ let g:snip_args = st."\"...\":CleanupArgs(@z)".et
 let g:snip_post_args = st."\"...\":Decorate(CleanupArgs(@z), ', ', '')".et
 
 " common functions {{{1
-" returns text with all instances of 'pat' removed
+" returns text with all instances of pat removed
 function! StripFrom(text, pat) "{{{2
 	return substitute(a:text, a:pat, '', 'g')
 endfunction "}}}2

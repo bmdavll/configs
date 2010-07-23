@@ -55,6 +55,7 @@ set timeoutlen=666		" milliseconds before mapped key sequences time out
 set formatoptions+=r	" auto insert comment leader
 set formatoptions+=n	" recognize numbered lists when formatting
 set backspace=2			" allow backspacing over everything in insert mode
+set delcombine			" delete combining characters separately
 " vim {{{2
 set updatetime=1000		" interval for CursorHold updates and swap file writes
 set nobackup			" do not keep a backup file
@@ -121,35 +122,6 @@ if has('gui_running')
 	endif
 	let g:font_index = 0
 	call <SID>SetGUIFont(g:font_select[g:font_index])
-
-	" pop-up balloon evaluation {{{2
-	function! MyBalloonEval()
-		let beval = <SID>PlugBalloonEval()
-		if beval != '' | return beval | endif
-		" tooltips for spelling suggestions and folds
-		let size = 6
-		let lines = []
-		let foldStart = foldclosed(v:beval_lnum)
-		let foldEnd = foldclosedend(v:beval_lnum)
-		if foldStart < 0
-			" try to find misspelling
-			let lines = spellsuggest(spellbadword(v:beval_text)[0], size, 0)
-		else
-			let numLines = foldEnd - foldStart + 1
-			" if too many lines in fold, show only first and last 'size' lines
-			if numLines > size*2
-				let lines = getline(foldStart, foldStart + (size-1))
-				let lines += [ "+----- " . (numLines - size*2) . " lines -----" ]
-				let lines += getline(foldEnd - (size-1), foldEnd)
-			else
-				let lines = getline(foldStart, foldEnd)
-			endif
-		endif
-		return join(lines, has('balloon_multiline') ? "\n" : " ")
-	endfunction
-	set balloonexpr=MyBalloonEval()
-	set balloondelay=250
-	set ballooneval
 	" }}}
 endif
 
@@ -212,7 +184,13 @@ if has('gui_running') || &t_Co > 2
 	" enable syntax highlighting
 	syntax on
 
-	function! <SID>SetColorScheme(color) " {{{
+	" hack: assume xterm has 256 colors
+	if &term =~ 'xterm' && &t_Co > 2
+		set t_Co=256
+	endif
+
+	" set the color scheme
+	function! <SID>SetColorScheme(color)
 		set background=dark
 		try
 			exec "colorscheme" a:color
@@ -221,38 +199,36 @@ if has('gui_running') || &t_Co > 2
 		endtry
 		" custom highlighting for color schemes {{{
 		if g:colors_name == 'desert256'
-			hi Normal ctermbg=234 guibg=#1c1c1c
-			hi Cursor guifg=#222222
-			hi LineNr ctermbg=233 guibg=#121212
+			hi Normal					ctermbg=234					guibg=#1c1c1c
+			hi LineNr					ctermbg=233					guibg=#121212
+			hi CursorLine	cterm=NONE	ctermbg=236					guibg=#303030
+			hi Search		ctermfg=6	ctermbg=18	guifg=#87ceeb	guibg=#000087
+			hi SpecialKey	ctermfg=240	ctermbg=235	guifg=#585858	guibg=#262626
+			hi Cursor								guifg=#222222
 			hi! link NonText LineNr
-			hi SpecialKey ctermfg=240 ctermbg=235 guifg=#585858 guibg=#262626
-			hi CursorLine cterm=NONE ctermbg=236 guibg=#303030
 			hi! link CursorColumn CursorLine
-			hi Search ctermfg=darkcyan ctermbg=18 guifg=#87ceeb guibg=#000087
-		elseif g:colors_name == 'zenburn'
-			hi Normal ctermbg=237 guibg=#3a3a38
-			hi Cursor guifg=#081220 guibg=#ecee90 gui=NONE
-			hi MatchParen guifg=#ecee90 guibg=#081220 gui=bold
-			hi Statement gui=bold
-			hi Todo ctermfg=240 ctermbg=Yellow guifg=#585858 guibg=Yellow
-			hi! link NonText LineNr
-			hi SpecialKey ctermfg=241 ctermbg=237 guifg=#626262 guibg=#363634
-			hi CursorLine cterm=NONE gui=NONE
-			hi! link CursorColumn CursorLine
-			hi Search ctermbg=22 guifg=#ecee90 guibg=#105f00
 		endif " }}}
 		" highlighting for ColumnMarker
 		hi RightMargin ctermbg=239 guibg=#4e4e4e
-	endfunction " }}}
+	endfunction
 
-	" hack: assume xterm has 256 colors
-	if &term =~ 'xterm' && &t_Co > 2 | set t_Co=256 | endif
+	" color schemes to use from ~/.vim/colors
+	let g:colors_select = [ 'wombat256mod', 'zenburn', 'desert256' ]
 
-	" color schemes from ~/.vim/colors
-	let g:colors_select = [ 'wombat256', 'zenburn', 'desert256' ]
-
-	" set the default color scheme
-	call <SID>SetColorScheme(g:colors_select[0])
+	function! <SID>NextColorScheme()
+		if !exists("g:colors_select")
+			let g:colors_select = split(globpath(&rtp, 'colors/*.vim'))
+			call map(g:colors_select, 'fnamemodify(v:val, ":t:r")')
+			let g:colors_select = <SID>RemoveDuplicates(g:colors_select)
+			let s:colors_next = 0
+		elseif !exists("s:colors_next")
+			let s:colors_next = 0
+		endif
+		call <SID>SetColorScheme(g:colors_select[s:colors_next])
+		let s:colors_next = (s:colors_next+1) % len(g:colors_select)
+	endfunction
+	unlet! s:colors_next
+	call <SID>NextColorScheme()
 endif
 
 " Section: autocommands {{{1
@@ -294,34 +270,39 @@ else
 		au BufReadPre  *.bin,*.hex setlocal binary
 		au BufReadPost * if &binary | Hexmode | endif
 		au BufWritePre *
-			\	if exists("b:edit_hex") && b:edit_hex && &binary |
-			\		let ro_save = &ro | set noreadonly |
-			\		let ma_save = &ma | set modifiable |
-			\		exec '%!xxd -r' |
-			\		let &ro = ro_save | let &ma = ma_save |
-			\		unlet ro_save | unlet ma_save |
-			\	endif
+			\	if exists("b:edit_hex") && b:edit_hex && &binary
+			\|		let ro_save = &ro | set noreadonly
+			\|		let ma_save = &ma | set modifiable
+			\|		exec '%!xxd -r'
+			\|		let &ro = ro_save | let &ma = ma_save
+			\|		unlet ro_save | unlet ma_save
+			\|	endif
 		au BufWritePost *
-			\	if exists("b:edit_hex") && b:edit_hex && &binary |
-			\		let ro_save = &ro | set noreadonly |
-			\		let ma_save = &ma | set modifiable |
-			\		exec '%!xxd' |
-			\		exe "set nomod" |
-			\		let &ro = ro_save | let &ma = ma_save |
-			\		unlet ro_save | unlet ma_save |
-			\	endif
+			\	if exists("b:edit_hex") && b:edit_hex && &binary
+			\|		let ro_save = &ro | set noreadonly
+			\|		let ma_save = &ma | set modifiable
+			\|		exec '%!xxd'
+			\|		exe "set nomod"
+			\|		let &ro = ro_save | let &ma = ma_save
+			\|		unlet ro_save | unlet ma_save
+			\|	endif
 	augroup END
 	" }}}
 endif
 
 " Section: utility functions {{{1
-" returns text with all instances of 'pat' removed
+" returns text with all instances of pat removed
 function! StripFrom(text, pat)
 	return substitute(a:text, a:pat, '', 'g')
 endfunction
 
+" returns the length of str, counting each multi-byte character as 1
+function! CharLen(str)
+	return strlen(substitute(a:str, '.', 'x', 'g'))
+endfunction
+
 " returns a new list with duplicate items removed
-function! RemoveDuplicates(list)
+function! <SID>RemoveDuplicates(list)
 	let uniq = []
 	for i in range(len(a:list))
 		if index(uniq, a:list[i]) == -1
@@ -329,18 +310,6 @@ function! RemoveDuplicates(list)
 		endif
 	endfor
 	return uniq
-endfunction
-
-" returns the number of occurrences of needle in haystack
-function! Count(haystack, needle)
-	let counter = 0
-	let index = match(a:haystack, a:needle)
-	while index > -1
-		let counter += 1
-		let end = matchend(a:haystack, a:needle, index)
-		let index = match(a:haystack, a:needle, end)
-	endwhile
-	return counter
 endfunction
 
 " returns most recently selected text
@@ -366,8 +335,14 @@ endfunction
 " Section: commands {{{1
 " diff {{{2
 " compare the current buffer and the saved file
-command! -nargs=0 DiffOrig	vertical new | set buftype=nofile |
-							\ read # | 0 delete _ | diffthis | wincmd p | diffthis
+command! -nargs=0 DiffOrig
+	\	vertical new
+	\|	set buftype=nofile
+	\|	read #
+	\|	0 delete _
+	\|	diffthis
+	\|	wincmd p
+	\|	diffthis
 
 " DiffRegs: diff contents of two registers {{{3
 " usage: DiffRegs a z | DiffRegs az
@@ -416,12 +391,12 @@ endfunction
 
 " ClearRegister: clear a register (@" and @z by default)
 command! -nargs=0 -register ClearRegister
-	\	if "<reg>" != ''     |
-	\		let @<reg> = @_  |
-	\	else                 |
-	\		let @" = @_      |
-	\		let @z = @_      |
-	\	endif                |
+	\	if '<reg>' != ''
+	\|		let @<reg> = @_
+	\|	else
+	\|		let @" = @_
+	\|		let @z = @_
+	\|	endif
 
 " files {{{2
 " TabOpen: open files in new tabs {{{3
@@ -460,46 +435,85 @@ command! -nargs=0 BD bufdo bdelete
 
 " settings and views {{{2
 " highlight with RightMargin beyond a column number
-command! -nargs=? ColumnMarker	if "<args>" != '' | try |
-								\	match RightMargin /\%><args>v.\+/ |
-								\	catch | endtry |
-								\else | match |
-								\endif
+command! -nargs=? ColumnMarker
+	\	if <q-args> != ''
+	\|		try
+	\|			match RightMargin /\%><args>v.\+/
+	\|		catch | endtry
+	\|	else
+	\|			match
+	\|	endif
 
-" view/set the number of text columns
-command! -nargs=? Columns	if "<args>" != '' | try |
-							\	if &number | exec 'set columns='.(len(line('$'))+1+<args>) |
-							\	else | set columns=<args> |
-							\	endif | endtry |
-							\else |
-							\	if &number | echo &columns-len(line('$'))-1 |
-							\	else | echo &columns |
-							\	endif |
-							\endif
-
-" view/set textwidth
-command! -nargs=? TextWidth	if "<args>" != '' | setlocal textwidth=<args> |
-							\ else | set tw? | endif
+" check/set textwidth
+command! -nargs=? TextWidth
+	\	if <q-args> != ''
+	\|		setlocal textwidth=<args>
+	\|	else
+	\|		set tw?
+	\|	endif
 
 " FontSize: change the current font size {{{3
-command! -nargs=1 FontSize call s:FontSize(<q-args>)
+command! -nargs=? FontSize call s:FontSize(<q-args>)
 function! s:FontSize(op)
-	if !exists("g:font_increment")
-		let g:font_increment = 0.5
-	endif
-	let curfont =   escape(StripFrom(&guifont, '\d\+\(\.\d\)\?$'), ' ')
-	let cursize = str2float(matchstr(&guifont, '\d\+\(\.\d\)\?$'))
-	if cursize == 0
-		let newsize = ''
-	elseif a:op == '+'
-		let newsize = string(cursize + g:font_increment)
-	elseif a:op == '-'
-		let newsize = string(cursize - g:font_increment)
+	if !has('gui_running')
+		call <SID>WarningMsg("Not available in terminal")
+	elseif a:op == ''
+		echo &guifont
 	else
-		let newsize = a:op
+		if !exists("g:font_increment")
+			let g:font_increment = 0.5
+		endif
+		let curfont =   escape(StripFrom(&guifont, '\d\+\(\.\d\)\?$'), ' ')
+		let cursize = str2float(matchstr(&guifont, '\d\+\(\.\d\)\?$'))
+		if cursize == 0
+			let newsize = ''
+		elseif a:op == '+'
+			let newsize = string(cursize + g:font_increment)
+		elseif a:op == '-'
+			let newsize = string(cursize - g:font_increment)
+		else
+			let newsize = a:op
+		endif
+		exec 'set guifont='.curfont.StripFrom(newsize, '\.0$')
 	endif
-	exec 'set guifont='.curfont.StripFrom(newsize, '\.0$')
-endfunction " }}}3
+endfunction
+
+" embiggen font
+command! -nargs=? BigFont
+	\	if <q-args> != ''
+	\|		call s:FontSize(<args>)
+	\|	else
+	\|		call s:FontSize(24)
+	\|	endif
+	\|	set lines=13 columns=47
+
+" Lines, Columns: check/set the number of usable lines/columns {{{3
+command! -nargs=? Lines call s:Lines(<q-args>)
+function! s:Lines(arg)
+	let extra = &cmdheight
+	if &showtabline
+		if &showtabline == 2 || tabpagenr('$') > 1
+			let extra += 1
+		endif
+	endif
+	if a:arg != ''
+		exec 'set lines='.(a:arg+extra)
+	else
+		echo &lines-extra
+	endif
+endfunction
+command! -nargs=? Columns
+	\	if <q-args> != ''
+	\|		try
+	\|			if &number	| exec 'set columns='.(len(line('$'))+1+<args>)
+	\|			else		| set columns=<args>
+	\|			endif
+	\|		catch | endtry
+	\|	else
+	\|			if &number	| echo &columns-len(line('$'))-1
+	\|			else		| echo &columns
+	\|			endif
+	\|	endif
 
 " editing {{{2
 " CopyMatches: copy matches of the last search to a register (default is ") {{{3
@@ -507,7 +521,7 @@ endfunction " }}}3
 " accepts a range (default is the whole file)
 " matches are appended to the register and each match is terminated by \n
 command! -range=% -nargs=0 -register CopyMatches
-	\	call s:CopyMatches(<line1>, <line2>, "<reg>")
+	\ call s:CopyMatches(<line1>, <line2>, "<reg>")
 function! s:CopyMatches(line1, line2, reg)
 	let ic_save = &ignorecase
 	set noignorecase
@@ -527,8 +541,7 @@ endfunction
 
 " CutMatches: cut matches of the last search to a register (default is ") {{{3
 " matches are appended to the register and each match is terminated by \n
-command! -nargs=0 -register CutMatches
-	\	call s:CutMatches("<reg>")
+command! -nargs=0 -register CutMatches call s:CutMatches("<reg>")
 function! s:CutMatches(reg)
 	let ic_save = &ignorecase
 	set noignorecase
@@ -544,51 +557,87 @@ endfunction
 
 " Reverse: reverse lines in range {{{3
 command! -range -nargs=0 Reverse
-	\	let @z = @/<bar>
-	\	<line2>mark a<bar>
-	\	<line1>,<line2>g/^/m'a<bar>
-	\	let @/ = @z
+	\	let @z = @/
+	\|	<line2>mark a
+	\|	<line1>,<line2>g/^/m'a
+	\|	let @/ = @z
 
 " LeadingSpacesToTabs: convert as many leading spaces to tabs as possible {{{3
-command! -range=% -nargs=0 LeadingSpacesToTabs
-	\	call s:LeadingSpacesToTabs(<line1>, <line2>)
-function! s:LeadingSpacesToTabs(line1, line2)
+command! -range=% -nargs=? LeadingSpacesToTabs
+	\ call s:LeadingSpacesToTabs(<line1>, <line2>, <q-args>)
+function! s:LeadingSpacesToTabs(line1, line2, arg)
+	let ts = str2nr(a:arg)
+	if ts <= 0
+		let ts = &tabstop
+	endif
 	for line in range(a:line1, a:line2)
-		while len(matchstr(getline(line), '^\t*\zs \+')) >= &tabstop
-			exec line.'s/^\(\t*\) \{'.&tabstop.'}/\1\t/'
+		while len(matchstr(getline(line), '^\t*\zs \+')) >= ts
+			exec line.'s/^\(\t*\) \{'.ts.'}/\1\t/'
 		endwhile
 	endfor
 endfunction
 
-" InternalTabsToSpaces: convert tabs inside lines (used for alignment) to spaces {{{3
-command! -range=% -nargs=0 InternalTabsToSpaces
-	\	call s:InternalTabsToSpaces(<line1>, <line2>)
-function! s:InternalTabsToSpaces(line1, line2)
-	let tabpat = '^\t*\([^\t]\+\)\(\t\+\)'
+" ExpandTabs: expand all tabs to spaces, or to the argument given {{{3
+command! -range=% -nargs=? ExpandTabs call s:ExpandTabs(<line1>, <line2>, <q-args>)
+function! s:ExpandTabs(line1, line2, arg)
+	if a:arg == ''
+		let fill = ' '
+	else
+		let fill = a:arg
+	endif
+	let fill_len = CharLen(fill)
+	let last = matchstr(fill, '.$')
+	let tabpat = '\v^([^\t]*)(\t+)'
 	for line in range(a:line1, a:line2)
-		while Count(getline(line), tabpat)
+		while match(getline(line), tabpat) != -1
 			let list = matchlist(getline(line), tabpat)
-			exec line.'s/^\t*[^\t]\+\zs\t\+/'.
-				\ repeat(' ', len(list[2]) * &tabstop - len(list[1]) % &tabstop).'/'
+			let len = len(list[2])*&tabstop - CharLen(list[1])%&tabstop
+			exec line.'s/^[^\t]*\zs\t\+/'.
+				\repeat(fill, len/fill_len).repeat(last, len%fill_len).'/'
 		endwhile
 	endfor
+endfunction
+
+" InternalTabsToSpaces: expand tabs within lines (used for alignment) to spaces {{{3
+command! -range=% -nargs=0 InternalTabsToSpaces
+	\ call s:InternalTabsToSpaces(<line1>, <line2>)
+function! s:InternalTabsToSpaces(line1, line2)
+	let tabpat = '\v^\t*([^\t]+)(\t+)'
+	for line in range(a:line1, a:line2)
+		while match(getline(line), tabpat) != -1
+			let list = matchlist(getline(line), tabpat)
+			exec line.'s/^\t*[^\t]\+\zs\t\+/'.
+				\repeat(' ', len(list[2])*&tabstop - CharLen(list[1])%&tabstop).'/'
+		endwhile
+	endfor
+endfunction
+
+" Overline, Underline, DoubleUnderline, Strikethrough {{{3
+" modify selected text using combining diacritics
+command! -range -nargs=0 Overline        call s:CombineSelection(<line1>, <line2>, '0305')
+command! -range -nargs=0 Underline       call s:CombineSelection(<line1>, <line2>, '0332')
+command! -range -nargs=0 DoubleUnderline call s:CombineSelection(<line1>, <line2>, '0333')
+command! -range -nargs=0 Strikethrough   call s:CombineSelection(<line1>, <line2>, '0336')
+function! s:CombineSelection(line1, line2, cp)
+	exec 'let char = "\u'.a:cp.'"'
+	exec a:line1.','.a:line2.'s/\%V[^[:cntrl:]]\%V/&'.char.'/ge'
 endfunction
 
 " CodeReadability: insert whitespace in code for readability {{{3
 command! -range=% -nargs=0 CodeReadability call s:CodeReadability(<line1>, <line2>)
 function! s:CodeReadability(line1, line2)
-	try | for line in range(a:line1, a:line2)
-		exec line.'s/\([^-+*/%&^|=!<>[:space:]]\)\(\%([-+*/%&^|=!<>]\|<<\|>>\)\?=\)\([^=[:space:]]\)/\1 \2 \3/ge'
-		exec line.'s/\(\w\|)\)\([<>]\)\(\w\|(\)/\1 \2 \3/ge'
-		exec line.'s/\(\%(el\|els\|else\)if\|for\|while\|until\)(/\1 (/ge'
-		exec line.'s/){/) {/ge'
-		exec line.'s/}\(else\|\%(el\|els\|else\)if\)/} \1/ge'
-		exec line.'s/\(else\|\%(el\|els\|else\)if\){/\1 {/ge'
-		exec line.'s/\<return\>\([^;[:space:]]\)/return \1/ge'
-		" user confirm:
-		exec line.'s/\(\w\|[]})"'."'".']\)\zs,\ze\(\w\|[[{("'."'".']\)/, /gec'
-	endfor
-	catch /^Interrupted$/ | endtry
+try
+	let range = a:line1.','.a:line2
+	exec range.'s/\([^-+*/%&^|=!<>[:space:]]\)\(\%([-+*/%&^|=!<>]\|<<\|>>\)\?=\)\([^=[:space:]]\)/\1 \2 \3/ge'
+	exec range.'s/\(\w\|)\)\([<>]\)\(\w\|(\)/\1 \2 \3/ge'
+	exec range.'s/\(\%(el\|els\|else\)if\|for\|while\|until\)(/\1 (/ge'
+	exec range.'s/){/) {/ge'
+	exec range.'s/}\(else\|\%(el\|els\|else\)if\)/} \1/ge'
+	exec range.'s/\(else\|\%(el\|els\|else\)if\){/\1 {/ge'
+	exec range.'s/\<return\>\([^;[:space:]]\)/return \1/ge'
+	" user confirm:
+	exec range.'s/\(\w\|[]})"'."'".']\)\zs,\ze\(\w\|[[{("'."'".']\)/, /gec'
+catch /^Interrupted$/ | endtry
 endfunction
 
 " Hexmode: toggle for hex mode {{{3
@@ -624,52 +673,27 @@ function! s:WordProcess(line1, line2)
 	let w = '[0-9A-Za-z]'
 	let W = '[^0-9A-Za-z]'
 	let punct = '[.,!?]'
-	for line in range(a:line1, a:line2)
-		exec line.'s/\('.w.'\|\s\|"\|^\)\zs--\ze\('.w.'\|\s\|'.punct.'\|"\|$\)/—/ge'
-		exec line.'s/'.punct.'\zs"\ze\('.W.'\|$\)/”/ge'
-		exec line.'s/\('.W.'\|^\)\zs"\ze\S/“/ge'
-		exec line.'s/\S\zs"\ze\('.W.'\|$\)/”/ge'
-		exec line.'s/\('.W.'\|^\)\zs'."'".'\ze\S/‘/ge'
-		exec line.'s/\S\zs'."'".'\ze\('.W.'\|$\)/’/ge'
-		exec line.'s/'.w.'\zs'."'".'\ze\a/’/ge'
-	endfor
+	let range = a:line1.','.a:line2
+	exec range.'s/\('.w.'\|\s\|"\|^\)\zs--\ze\('.w.'\|\s\|'.punct.'\|"\|$\)/—/ge'
+	exec range.'s/'.punct.'\zs"\ze\('.W.'\|$\)/”/ge'
+	exec range.'s/\('.W.'\|^\)\zs"\ze\S/“/ge'
+	exec range.'s/\S\zs"\ze\('.W.'\|$\)/”/ge'
+	exec range.'s/\('.W.'\|^\)\zs'."'".'\ze\S/‘/ge'
+	exec range.'s/\S\zs'."'".'\ze\('.W.'\|$\)/’/ge'
+	exec range.'s/'.w.'\zs'."'".'\ze\a/’/ge'
 endfunction
 
 " enforce ASCII-ness
 command! -range=% -nargs=0 Ascii call s:Ascii(<line1>, <line2>)
 function! s:Ascii(line1, line2)
-	for line in range(a:line1, a:line2)
-		exec line.'s/“/"/ge'
-		exec line.'s/”/"/ge'
-		exec line.'s/‘‘/"/ge'
-		exec line.'s/’’/"/ge'
-		exec line."s/‘/'/ge"
-		exec line."s/’/'/ge"
-		exec line.'s/—/--/ge'
-	endfor
-endfunction
-
-" XCompose {{{3
-" convert a line such as "ə U+0259 LATIN SMALL LETTER SCHWA"
-" use bang for canonical bind (<ampersand> <x> <x> <x> <x>)
-command! -range -bang -nargs=0 XCompose call s:XCompose(<line1>, <line2>, <bang>0)
-function! s:XCompose(line1, line2, bang)
-	for line in range(a:line1, a:line2)
-		let txt = getline(line)
-		let m = matchlist(txt, '\v^(.)\s*(U\+?\x\x\x\x)?\s*#?\s*(.*)')
-		if empty(m) | continue | endif
-		let m[2] = substitute(m[2], '\vU\+?(\x\x\x\x)', 'U\U\1', '')
-		if a:bang && m[2] =~ 'U\x\x\x\x'
-			let bind = '<ampersand>'
-			for x in split(m[2][1:], '\ze.')
-				let bind .= ' <'.tolower(x).'>'
-			endfor
-		else
-			let bind = '<> <>'
-		endif
-		let txt = "<Multi_key> ".bind."\t\t\t: \"".m[1].'"'.(len(m[2]) ? "\t".m[2] : "").(len(m[3]) ? " # ".m[3] : "")
-		call setline(line, txt)
-	endfor
+	let range = a:line1.','.a:line2
+	exec range.'s/“/"/ge'
+	exec range.'s/”/"/ge'
+	exec range.'s/‘‘/"/ge'
+	exec range.'s/’’/"/ge'
+	exec range."s/‘/'/ge"
+	exec range."s/’/'/ge"
+	exec range.'s/—/--/ge'
 endfunction
 
 " }}}1 commands
@@ -714,8 +738,8 @@ noremap!		<C-B>		<C-K>
 noremap			<C-Y>		<C-L>
 noremap			<C-E>		<Nop>
 " anchor the cursor and scroll
-noremap			<C-H>		zh
-noremap			<C-L>		zl
+noremap			<C-H>		2zh
+noremap			<C-L>		2zl
 noremap			<C-J>		<C-E>
 noremap			<C-K>		<C-Y>
 inoremap		<C-J>		<C-X><C-E>
@@ -900,7 +924,7 @@ function! <SID>ClearMapsF(key1, key2)
 endfunction
 call <SID>ClearMapsF(1,14)
 
-" plugins <F1> to <F3> {{{3
+" <F1> to <F3>      plugins {{{3
 " toggle taglist
 map				<F1>		:<C-U>TlistToggle<CR>
 vmap			<F1>		:<C-U>TlistToggle<CR>gv
@@ -925,46 +949,39 @@ endfunction
 map	<silent>	<C-F3>		:<C-U>call <SID>ToggleClipBrd()<CR>
 " }}}
 
-" trim trailing whitespace <F4> {{{3
+" <F4>              trim trailing whitespace {{{3
 function! <SID>Trim()
-	try " snippetsEmu housekeeping
-		if expand('%:t') !~ '\.XCompose' && exists("*CleanupArgs") &&
-			\ g:snip_start_tag != '' && g:snip_end_tag != ''
-			exec '%s/('.g:snip_start_tag.'\(.*\))/\="(".CleanupArgs(submatch(1)).")"/e'
-			exec '%s/'.g:snip_start_tag.g:snip_end_tag.'//eg'
-		endif
-	catch | endtry
 	%s/\s\+$//e
 endfunction
 map	<silent>	<F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`a
 vmap<silent>	<F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agv
 imap<silent>	<F4>		<C-C>:let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agi
 
-" autoindent entire file <C-F4> {{{3
+" <C-F4>            autoindent entire file {{{3
 map				<C-F4>		<C-\><C-N>maHmzgg=G`zzt`a
 vmap			<C-F4>		<C-\><C-N>maHmzgg=G`zzt`agv
 
-" remove search highlighting <F5> {{{3
+" <F5>              remove search highlighting {{{3
 " let @/=@_
 map	<silent>	<F5>		:<C-U>nohlsearch<CR>
 vmap<silent>	<F5>		:<C-U>nohlsearch<CR>gv
 imap<silent>	<F5>		<C-O>:nohlsearch<CR>
 
-" toggle scrollbind <C-F5> {{{3
+" <C-F5>            toggle scrollbind {{{3
 map	<silent>	<C-F5>		:<C-U>setlocal scrollbind! scb?<CR>
 vmap<silent>	<C-F5>		:<C-U>setlocal scrollbind! scb?<CR>gv
 imap<silent>	<C-F5>		<C-O>:setlocal scrollbind! scb?<CR>
 
-" toggle list mode (show tabs) <F6> {{{3
+" <F6>              toggle list mode (show tabs) {{{3
 map	<silent>	<F6>		:<C-U>setlocal list! list?<CR>
 vmap<silent>	<F6>		:<C-U>setlocal list! list?<CR>gv
 imap<silent>	<F6>		<C-O>:setlocal list! list?<CR>
 
-" highlight characters beyond column … <C-F6> {{{3
+" <C-F6>            highlight characters beyond column … {{{3
 map				<C-F6>		:<C-U>ColumnMarker<Space>
 imap			<C-F6>		<C-O>:ColumnMarker<Space>
 
-" toggle tabstop <F7> {{{3
+" <F7>              toggle tabstop {{{3
 function! <SID>ToggleTabstop()
 	if &tabstop == 4
 		setlocal tabstop=8
@@ -977,42 +994,27 @@ map	<silent>	<F7>		:<C-U>call <SID>ToggleTabstop()<CR>
 vmap<silent>	<F7>		:<C-U>call <SID>ToggleTabstop()<CR>gv
 imap<silent>	<F7>		<C-O>:call <SID>ToggleTabstop()<CR>
 
-" toggle expandtab <C-F7> {{{3
+" <C-F7>            toggle expandtab {{{3
 map	<silent>	<C-F7>		:<C-U>setlocal expandtab! et?<CR>
 vmap<silent>	<C-F7>		:<C-U>setlocal expandtab! et?<CR>gv
 imap<silent>	<C-F7>		<C-O>:setlocal expandtab! et?<CR>
 
-" toggle line wrapping <F8> {{{3
+" <F8>              toggle line wrapping {{{3
 map	<silent>	<F8>		:<C-U>setlocal wrap! wrap?<CR>
 vmap<silent>	<F8>		:<C-U>setlocal wrap! wrap?<CR>gv
 imap<silent>	<F8>		<C-O>:setlocal wrap! wrap?<CR>
 
-" view/set maximum line length to … <C-F8> {{{3
+" <C-F8>            view/set maximum line length to … {{{3
 " (set to 0 to disable auto-truncation)
 map				<C-F8>		:<C-U>TextWidth<Space>
 imap			<C-F8>		<C-O>:TextWidth<Space>
 
-" cycle color schemes <F9> {{{3
-function! <SID>NextColorScheme()
-	if !exists("g:colors_select")
-		let g:colors_name = "nocolors"
-		return
-	endif
-	let idx = 0
-	if exists("g:colors_name")
-		for name in g:colors_select
-			if g:colors_name == name | break | endif
-			let idx += 1
-		endfor
-	endif
-	let next = (idx+1) % len(g:colors_select)
-	call <SID>SetColorScheme(g:colors_select[next])
-endfunction
+" <F9>              cycle color schemes {{{3
 map	<silent>	<F9>		:<C-U>call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>
 vmap<silent>	<F9>		:<C-U>call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>gv
 imap<silent>	<F9>		<C-C>:call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>gi
 
-" cycle fonts <C-F9> {{{3
+" <C-F9>            cycle fonts {{{3
 function! <SID>NextFont()
 	if !exists("g:font_select") || !exists("g:font_index")
 		return
@@ -1024,12 +1026,12 @@ map	<silent>	<C-F9>		:<C-U>call <SID>NextFont()<CR>:echo &guifont<CR>
 vmap<silent>	<C-F9>		:<C-U>call <SID>NextFont()<CR>:echo &guifont<CR>gv
 imap<silent>	<C-F9>		<C-C>:call <SID>NextFont()<CR>:echo &guifont<CR>gi
 
-" toggle line numbers <S-F9> {{{3
+" <S-F9>            toggle line numbers {{{3
 map	<silent>	<S-F9>		:<C-U>setlocal number! nu?<CR>
 vmap<silent>	<S-F9>		:<C-U>setlocal number! nu?<CR>gv
 imap<silent>	<S-F9>		<C-O>:setlocal number! nu?<CR>
 
-" toggle menu bar and toolbar <F10> {{{3
+" <F10>             toggle menu bar and toolbar {{{3
 function! <SID>ToggleBars()
 	if &guioptions =~# 'm'
 		set guioptions-=m
@@ -1043,11 +1045,11 @@ endfunction
 map	<silent>	<F10>		:<C-U>call <SID>ToggleBars()<CR>
 vmap<silent>	<F10>		:<C-U>call <SID>ToggleBars()<CR>gv
 
-" maximize current window <F11> {{{3
+" <F11>             maximize current window {{{3
 map				<F11>		<C-\><C-N><C-W>_<C-W>\|
 vmap			<F11>		<C-\><C-N><C-W>_<C-W>\|gv
 
-" change window width <C-F(10|11)>, height <S-F(10|11)> {{{3
+" <C-F10> <S-F10>   change window width, height {{{3
 map				<C-F10>		<C-\><C-N>3<C-W><
 vmap			<C-F10>		<C-\><C-N>3<C-W><gv
 map				<C-F11>		<C-\><C-N>3<C-W>>
@@ -1057,7 +1059,7 @@ vmap			<S-F10>		<C-\><C-N>3<C-W>-gv
 map				<S-F11>		<C-\><C-N>3<C-W>+
 vmap			<S-F11>		<C-\><C-N>3<C-W>+gv
 
-" toggle spellcheck and autocorrect <F12> {{{3
+" <F12>             toggle spellcheck and autocorrect {{{3
 function! <SID>ToggleSpellCorrect()
 	if &spell
 		iabclear
@@ -1070,20 +1072,20 @@ map	<silent>	<F12>		:<C-U>call <SID>ToggleSpellCorrect()<CR>
 vmap<silent>	<F12>		:<C-U>call <SID>ToggleSpellCorrect()<CR>gv
 imap<silent>	<F12>		<C-O>:call <SID>ToggleSpellCorrect()<CR>
 
-" toggle cursorline <C-F12> {{{3
+" <C-F12>           toggle cursorline {{{3
 map	<silent>	<C-F12>		:<C-U>setlocal cursorline! cul?<CR>
 vmap<silent>	<C-F12>		:<C-U>setlocal cursorline! cul?<CR>gv
 imap<silent>	<C-F12>		<C-O>:setlocal cursorline! cul?<CR>
 
-" switch buffers <F13> <F14> {{{3
+" <F13> <F14>       switch buffers {{{3
 map				<F13>		:<C-U>bprevious<CR>
 map				<F14>		:<C-U>bnext<CR>
 
-" choose buffer <C-F13>; split all buffers <C-F14> {{{3
+" <C-F13> <C-F14>   choose buffer; split all buffers {{{3
 map				<C-F13>		:<C-U>ls<CR>:buffer<Space>
 map				<C-F14>		:<C-U>tab ball<CR>
 
-" redirect command-line output to @z <S-F13>; end redirect <S-F14> {{{3
+" <S-F13> <S-F14>   redirect command-line output to @z; end redirect {{{3
 map				<S-F13>		:<C-U>let @z=@_<CR>:redir @z><CR>
 vmap			<S-F13>		:<C-U>let @z=@_<CR>:redir @z><CR>gv
 nmap			<S-F14>		:<C-U>redir END<CR>
@@ -1158,7 +1160,7 @@ map				<leader>u		:<C-U>source $MYVIMRC<CR>
 " load config files for editing
 map	<silent>	<leader>b		:<C-U>TabOpen ~/.bash{rc,_aliases,_hacks}<CR>:tabnext 2<CR>
 map	<silent>	<leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{Content,Chrome}.css
-										\ ~/Application\ Data/Mozilla/Firefox/Profiles/*.default/chrome/userChrome.css<CR>
+											\ ~/Application\ Data/Mozilla/Firefox/Profiles/*.default/chrome/userChrome.css<CR>
 
 " tabs {{{4
 " expand tabs in selected lines to spaces
@@ -1185,7 +1187,7 @@ nmap<silent>	<leader><BS>	:normal! gE<CR>
 nmap<silent>	<leader>m		ovim:set ts=4 sw=4 noet:<C-C>^
 
 " date
-imap<silent>	<leader>d		<C-R>=strftime('%Y-%m-%d')<CR>
+imap<silent>	<leader>dd		<C-R>=strftime('%Y-%m-%d')<CR>
 imap<silent>	<leader>l		<C-v>u25d81 <C-R>=strftime('%m/%d %a \| [] ')<CR><Left><Left>
 
 " encryption {{{4
@@ -1241,17 +1243,10 @@ xmap<silent>	<leader>#		<C-C>?\V<C-R>=substitute(escape(<SID>GetSelection(),'?\'
 " brace multi, non-greedy multi
 cnoremap		<leader>{		\{}<Left>
 cnoremap		<leader>-		\{-}
+" }}}3
 
 " }}}1 mappings
 " Section: plugins {{{1
-" external balloon evaluation
-function! <SID>PlugBalloonEval()
-	if exists("*BalloonDeclaration")
-		" echofunc
-		return BalloonDeclaration()
-	else | return '' | endif
-endfunction
-
 " ClipBrd {{{2
 let g:clipbrdDefaultReg = '+'
 
@@ -1289,7 +1284,7 @@ let g:snip_end_tag = "\u203a"
 
 " edit snippets for the current or given filetype
 command! -nargs=* -complete=custom,EditSnippetsComplete EditSnippets
-	\	call s:EditSnippets(<f-args>)
+	\ call s:EditSnippets(<f-args>)
 function! s:EditSnippets(...)
 	let args = (a:0==0 ? [&filetype] : a:000)
 	for type in args
@@ -1307,7 +1302,7 @@ function! EditSnippetsComplete(a,l,p)
 	for i in range(len(types))
 		let types[i] = StripFrom(fnamemodify(types[i], ':t'), '_snippets.*\.vim$')
 	endfor
-	return join(RemoveDuplicates(types), "\n")
+	return join(<SID>RemoveDuplicates(types), "\n")
 endfunction
 
 " highlight snippets
@@ -1316,14 +1311,6 @@ command! -nargs=0 HighlightSnippets exec 'silent! normal! /\<Snippet\s\+\zs\S\+<
 " speeddating {{{2
 let g:speeddating_no_mappings = 0
 
-function! <SID>ToggleNrFormats() " {{{3
-	if &nrformats =~# '\<alpha\>'
-		set nrformats-=alpha
-	else
-		set nrformats+=alpha
-	endif
-	set nf?
-endfunction
 function! <SID>ToggleCtrlAX() " {{{3
 if hasmapto('<Plug>SpeedDatingUp')
 	unmap		<C-A>
@@ -1332,7 +1319,8 @@ if hasmapto('<Plug>SpeedDatingUp')
 	unmap		d<C-X>
 	nmap<silent><C-A>		:call <SID>OffsetCharacter(1)<CR>
 	nmap<silent><C-X>		:call <SID>OffsetCharacter(-1)<CR>
-	echo "  normal"
+	set nrformats+=alpha
+	echo "charwise"
 else
 	nmap		<C-A>		<Plug>SpeedDatingUp
 	nmap		<C-X>		<Plug>SpeedDatingDown
@@ -1340,10 +1328,11 @@ else
 	xmap		<C-X>		<Plug>SpeedDatingDown
 	nmap		d<C-A>		<Plug>SpeedDatingNowUTC
 	nmap		d<C-X>		<Plug>SpeedDatingNowLocal
-	echo "  speeddating"
+	set nrformats-=alpha
+	echo "speeddating"
 endif
 endfunction " }}}3
-map	<silent>	<leader><C-A>	:<C-U>call <SID>ToggleNrFormats()<CR>
+map	<silent>	<leader><C-A>	:<C-U>call <SID>ToggleCtrlAX()<CR>
 map	<silent>	<leader><C-X>	:<C-U>call <SID>ToggleCtrlAX()<CR>
 
 " taglist {{{2
@@ -1355,9 +1344,9 @@ if !has('gui_win32')
 else
 	let g:yankring_history_file = "_yankring_history"
 endif
-" custom maps: extend to or exclude from YankRing
+" rebind custom maps
 function! YRRunAfterMaps()
-nnoremap<silent>Y			:<C-U>YRYankCount 'y$'<CR>
+nmap			Y			y$
 nnoremap		x			"_x
 nnoremap		X			"_X
 nnoremap		s			"_s

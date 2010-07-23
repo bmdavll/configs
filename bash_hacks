@@ -61,13 +61,19 @@ function b
 	local TIMEFORMAT=$'\n%2Rs'
 	time BACKUP_LOG=~/tmp/backup.log backup "$@"
 	local code=$? disks=$(ls -d /media/disk* 2>/dev/null)
-	if [ $code -eq 0 -a "$disks" ]; then
-		sudo umount /media/disk* && echo -e "Unmounted:\n$disks"
+	if [ $code -eq 0 ]; then
+		$GUI dropboxd
+		if [ -n "$disks" ]; then
+			sudo umount /media/disk*
+			echo -e "Unmounted:\n$disks"
+		fi
 	fi
 	return $code
 }
 
 #{{1 completion
+complete -A directory t
+
 # man
 type _man &>/dev/null &&
 _mancached() {
@@ -99,8 +105,7 @@ function mancache
 }
 
 #{{1 pacman
-alias pac='pacman'
-complete -F _pacman pac
+[ -x /usr/bin/pac ] && complete -F _pacman pac
 
 function pacinstall
 {
@@ -125,7 +130,7 @@ complete -F _pacremove pacremove
 
 function pacupdate
 {
-	yaourt -Syu --noconfirm "$@" && sudo clean-pacman-cache.py 2
+	yaourt -Syu --noconfirm "$@" && sudo pacman-cache-cleanup.py 2
 }
 _pacsearch() {
 	local results=$(pacman -"$1"s "${@:2}")
@@ -228,17 +233,6 @@ function caps
 	fi
 }
 
-function uzbl
-{
-	local UZBL=uzbl
-	split_opts -- "$@" || return $?
-	str_in '-f' "${OPTS[@]}" && set -- "file://$@"
-	str_in '-t' "${OPTS[@]}" && UZBL=uzbl_tabbed.py
-	XDG_DATA_HOME="$HOME/.uzbl" XDG_CONFIG_HOME="$HOME/.uzbl" \
-	$GUI $UZBL "${ARGV[@]}"
-	split_opts -c
-}
-
 function comptest
 {
 	[ -z "$COMP_POINT" ] && return
@@ -290,60 +284,4 @@ function mp3collect
 	return $code
 }
 
-#{{1 class
-# cs162
-# export ARCHDIR=~/class/cs162/mips-x86.linux-xgcc
-
-# cs164
-CS164=~/class/cs164/proj/proj2
-addpath "$CS164"
-TESTSET=correct
-TESTFILE=output.ast
-function crun
-{
-	[ "$1" ] &&
-	apyc --phase=1 -dp -o $CS164/$TESTFILE $CS164/tests/$TESTSET/$1 &&
-	cat $CS164/$TESTFILE
-}
-function cin
-{
-	[ "$1" ] && cat $CS164/tests/$TESTSET/$1
-}
-function clex
-{
-	[ "$1" ] &&
-	${CS164}-lex/apyc --phase=1 -o $CS164/$TESTFILE $CS164/tests/$TESTSET/$1 &&
-	cat $CS164/$TESTFILE
-}
-_crun() {
-	local IFS=$'\n'
-	COMPREPLY=$( (cd "$CS164/tests/$TESTSET" && ls -d $2*) 2>/dev/null)
-	COMPREPLY=($COMPREPLY)
-}
-complete -F _crun crun cin clex
-function ccheck
-{
-	local file
-	for file in $CS164/tests/$TESTSET/*.py; do
-		echo "======== $(basename $file) ========"
-		python "$file"
-		echo
-	done
-}
-function cswap
-{
-	if [ "$TESTSET" = "correct" ]; then
-		TESTSET=error
-		echo error
-	elif [ "$TESTSET" = "error" ]; then
-		TESTSET=correct
-		echo correct
-	fi
-}
-function cup
-{
-	$CS164/pyunparse $CS164/$TESTFILE
-}
-
-#}}1
 # vim:set ts=4 sw=4 noet fmr={{,}} fdm=marker:

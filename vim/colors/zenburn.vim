@@ -1,18 +1,27 @@
 " Vim color file
 " Maintainer:   Jani Nurminen <slinky@iki.fi>
-" Last Change:  $Id: zenburn.vim,v 2.3 2008/07/30 17:34:37 slinky Exp $
+" Last Change:  $Id: zenburn.vim,v 2.13 2009/10/24 10:16:01 slinky Exp $
 " URL:      	http://slinky.imukuppi.org/zenburnpage/
 " License:      GPL
 "
 " Nothing too fancy, just some alien fruit salad to keep you in the zone.
-" This syntax file was designed to be used with dark environments and
+" This syntax file was designed to be used with dark environments and 
 " low light situations. Of course, if it works during a daybright office, go
 " ahead :)
 "
 " Owes heavily to other Vim color files! With special mentions
 " to "BlackDust", "Camo" and "Desert".
 "
-" To install, copy to ~/.vim/colors directory. Then :colorscheme zenburn.
+" To install, copy to ~/.vim/colors directory.
+"
+" Alternatively, you can use Vimball installation:
+"     vim zenburn.vba
+"     :so %
+"     :q
+"
+" For details, see :help vimball
+"
+" After installation, use it with :colorscheme zenburn.
 " See also :help syntax
 "
 " Credits:
@@ -22,16 +31,33 @@
 "                 bug fixing
 "  - Charlie - spotted too bright StatusLine in non-high contrast mode
 "  - Pablo Castellazzi - CursorLine fix for 256 color mode
+"  - Tim Smith - force dark background
+"  - John Gabriele - spotted bad Ignore-group handling
+"  - Zac Thompson - spotted invisible NonText in low contrast mode
+"  - Christophe-Marie Duquesne - suggested making a Vimball
 "
 " CONFIGURABLE PARAMETERS:
 "
 " You can use the default (don't set any parameters), or you can
 " set some parameters to tweak the Zenburn colours.
 "
+" To use them, put them into your .vimrc file before loading the color scheme,
+" example:
+"    let g:zenburn_high_Contrast=1
+"    colors zenburn
+"
 " * You can now set a darker background for bright environments. To activate, use:
 "   contrast Zenburn, use:
 "
 "      let g:zenburn_high_Contrast = 1
+"
+" * For example, Vim help files uses the Ignore-group for the pipes in tags 
+"   like "|somelink.txt|". By default, the pipes are not visible, as they
+"   map to Ignore group. If you wish to enable coloring of the Ignore group,
+"   set the following parameter to 1. Warning, it might make some syntax files
+"   look strange.
+"
+"      let g:zenburn_color_also_Ignore = 1
 "
 " * To get more contrast to the Visual selection, use
 "
@@ -45,6 +71,14 @@
 "   colouring for Include, use
 "
 "      let g:zenburn_alternate_Include = 1
+"
+" * Work-around to a Vim bug, it seems to misinterpret ctermfg and 234 and 237
+"   as light values, and sets background to light for some people. If you have
+"   this problem, use:
+"
+"      let g:zenburn_force_dark_Background = 1
+"
+" NOTE:
 "
 " * To turn the parameter(s) back to defaults, use UNLET:
 "
@@ -93,7 +127,6 @@ hi LineNr          guifg=#9fafaf guibg=#262626
 hi Macro           guifg=#ffcfaf gui=bold
 hi ModeMsg         guifg=#ffcfaf gui=none
 hi MoreMsg         guifg=#ffffff gui=bold
-hi NonText         guifg=#404040
 hi Number          guifg=#8cd0d3
 hi Operator        guifg=#f0efd0
 hi PreCondit       guifg=#dfaf8f gui=bold
@@ -157,7 +190,6 @@ if &t_Co > 255
     hi Macro           ctermfg=223   cterm=bold
     hi ModeMsg         ctermfg=223   cterm=none
     hi MoreMsg         ctermfg=15    cterm=bold
-    hi NonText         ctermfg=238
     hi Number          ctermfg=116
     hi Operator        ctermfg=230
     hi PreCondit       ctermfg=180   cterm=bold
@@ -187,8 +219,23 @@ if &t_Co > 255
     hi WildMenu        ctermbg=236   ctermfg=194     cterm=bold
     hi CursorLine      ctermbg=236   cterm=none
 
+    " spellchecking, always "bright" background
+    hi SpellLocal ctermfg=14  ctermbg=237
+    hi SpellBad   ctermfg=9   ctermbg=237
+    hi SpellCap   ctermfg=12  ctermbg=237
+    hi SpellRare  ctermfg=13  ctermbg=237
+
+    " pmenu
+    hi PMenu      ctermfg=248  ctermbg=0
+    hi PMenuSel   ctermfg=223 ctermbg=235
+
     if exists("g:zenburn_high_Contrast")
         hi Normal ctermfg=188 ctermbg=234
+        hi NonText         ctermfg=238
+
+        if exists("g:zenburn_color_also_Ignore")
+            hi Ignore          ctermfg=238
+        endif
     else
         hi Normal ctermfg=188 ctermbg=237
         hi Cursor          ctermbg=109
@@ -211,7 +258,28 @@ if &t_Co > 255
         hi visualnos       ctermbg=210
         hi warningmsg      ctermbg=236
         hi wildmenu        ctermbg=236
+        hi NonText         ctermfg=240
+        
+        if exists("g:zenburn_color_also_Ignore")
+            hi Ignore          ctermfg=240
+        endif
     endif
+
+    if exists("g:zenburn_alternate_Error")
+        " use more jumpy Error
+        hi Error ctermfg=210 ctermbg=52 gui=bold
+    else
+        " default is something more zenburn-compatible
+        hi Error ctermfg=228 ctermbg=95 gui=bold
+    endif
+endif
+
+if exists("g:zenburn_force_dark_Background")
+    " Force dark background, because of a bug in VIM:  VIM sets background
+    " automatically during "hi Normal ctermfg=X"; it misinterprets the high
+    " value (234 or 237 above) as a light color, and wrongly sets background to
+    " light.  See ":help highlight" for details.
+    set background=dark
 endif
 
 if exists("g:zenburn_high_Contrast")
@@ -228,6 +296,7 @@ if exists("g:zenburn_high_Contrast")
     hi TabLineSel      guifg=#efefef guibg=#1c1c1b gui=bold
     hi TabLine         guifg=#b6bf98 guibg=#181818 gui=bold
     hi CursorColumn    guifg=#dcdccc guibg=#2b2b2b
+    hi NonText         guifg=#404040 gui=bold
 else
     " Original, lighter background
     hi Normal          guifg=#dcdccc guibg=#3f3f3f
@@ -242,6 +311,7 @@ else
     hi TabLineSel      guifg=#efefef guibg=#3a3a39 gui=bold
     hi TabLine         guifg=#b6bf98 guibg=#353535 gui=bold
     hi CursorColumn    guifg=#dcdccc guibg=#4f4f4f
+    hi NonText         guifg=#5b605e gui=bold
 endif
 
 
@@ -257,18 +327,25 @@ else
 endif
 
 if exists("g:zenburn_alternate_Error")
-    " use a bit different Error
-    hi Error           guifg=#ef9f9f guibg=#201010 gui=bold
+    " use more jumpy Error
+    hi Error        guifg=#e37170 guibg=#664040 gui=bold
 else
-    " default
-    hi Error           guifg=#e37170 guibg=#332323 gui=none
+    " default is something more zenburn-compatible
+    hi Error        guifg=#e37170 guibg=#3d3535 gui=none
 endif
 
 if exists("g:zenburn_alternate_Include")
     " original setting
-    hi Include         guifg=#ffcfaf gui=bold
+    hi Include      guifg=#ffcfaf gui=bold
 else
     " new, less contrasted one
-    hi Include         guifg=#dfaf8f gui=bold
+    hi Include      guifg=#dfaf8f gui=bold
 endif
-    " TODO check for more obscure syntax groups that they're ok
+
+if exists("g:zenburn_color_also_Ignore")
+    " color the Ignore groups
+    " note: if you get strange coloring for your files, turn this off (unlet)
+    hi Ignore guifg=#545a4f
+endif
+
+" TODO check for more obscure syntax groups that they're ok

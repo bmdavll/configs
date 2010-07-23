@@ -11,7 +11,7 @@ add ()
 
 [ $(whoami) = root ] && exit 1
 
-echo "Installing X ..."
+echo "Installing X ..." ##1
 
 # libraries
 list=()
@@ -37,9 +37,9 @@ add mesa
 
 sudo pacman -S $PFLAGS "${list[@]}"
 
-echo "Installing Xfce ..."
+echo "Installing Xfce ..." ##1
 
-# xfce4
+##2 xfce4
 list=()
 add gtk-xfce-engine
 add terminal
@@ -56,7 +56,7 @@ add xfwm4 # xfwm4-themes
 
 sudo pacman -S $PFLAGS "${list[@]}"
 
-# xfce4-goodies
+##2 xfce4-goodies
 list=()
 add thunar-archive-plugin thunar-volman thunar-media-tags-plugin
 add verve-plugin
@@ -66,7 +66,7 @@ add xfce4-power-manager
 add xfce4-screenshooter
 add xfce4-taskmanager
 
-# panel plugins
+##2 panel plugins
 add xfce4-battery-plugin
 add xfce4-clipman-plugin
 add xfce4-cpufreq-plugin
@@ -93,7 +93,7 @@ add xfce4-xkb-plugin
 
 sudo pacman -S $PFLAGS "${list[@]}"
 
-echo "Installing the rest ..."
+echo "Installing the rest ..." ##1
 list=()
 
 # login manager
@@ -115,3 +115,5 @@ add gvim
 add firefox
 
 sudo pacman -S $PFLAGS "${list[@]}"
+
+##1 vim:set ts=4 sw=4 noet fdm=marker fmr=##,##:

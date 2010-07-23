@@ -8,6 +8,11 @@
  * @version 0.2
  *
  **/
+
+// configuration variables
+var notify = true;
+var mpd_dir = '~/music';
+
 var INFO =
 <plugin name="minion" version="0.2"
 		href="https://addons.mozilla.org/en-US/firefox/addon/6324/"
@@ -29,7 +34,7 @@ var INFO =
 		</p></description>
 	</item>
 	<item>
-		<tags>mpd-action</tags>
+		<tags>mpd-action mpd-info</tags>
 		<spec>:mp[d] <a>action</a></spec>
 		<description><p>
 			Issue one of the following simple commands:<code>
@@ -41,7 +46,17 @@ info
 			</code>
 			The actions taken are mostly self-descriptive.
 			Issuing the 'info' command will simply display the current song
-			information on the command line.
+			information on the command line. The format is:
+			(all on one line)<code>
+TITLE · by ARTIST · #TRACK from ALBUM (YEAR)
+    | ▶ POSITION/TRACK_LENGTH @BITRATE
+    | SONG_NUMBER of PLAYLIST_LENGTH [STATUS]
+			</code>
+			The playback status indicators are ▶, ▷, and ◼ for playing, paused,
+			and stopped, respectively (make sure your command-line font can
+			display characters in the U+2500 block). The status indicators at
+			the end may show <em>[?]</em> for shuffle and/or <em>[&amp;]</em>
+			for repeat.
 		</p></description>
 	</item>
 	<item>
@@ -146,8 +161,6 @@ u     update
 
 
 if (typeof(nsMPM) != 'undefined') {
-
-var notify = true;
 
 function MPVimperator() {
 
@@ -460,17 +473,23 @@ function MPVimperator() {
 			}
 		},
 
+		_rm: function() {
+			if (mpd.file) {
+				liberator.echomsg("Removing "+mpd.file);
+				liberator.execute('!trash-put '+mpd_dir+'/"'+mpd.file+'"', null, true);
+			}
+		},
+
+		_f: function() {
+			if (mpd.file) {
+				liberator.execute('!f '+mpd_dir+'/"'+mpd.file+'"', null, true);
+			}
+		},
+
 		_cmd: function(args) {
 			mpdCmd(args.join(' '), function() {
 				liberator.echomsg(mpd.lastResponse)
 			})
-		},
-
-		_rm: function(args) {
-			if (mpd.file) {
-				liberator.echomsg("Removing "+mpd.file);
-				liberator.execute('! trash-put ~/music/"'+mpd.file+'"', null, true);
-			}
 		},
 
 		_execute: function(args) {
