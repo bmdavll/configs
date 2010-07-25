@@ -283,5 +283,5 @@ function mp3collect
 	done
 	return $code
 }
-
-# vim:set ts=4 sw=4 noet fmr={{,}} fdm=marker:
+#}}
+# vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:

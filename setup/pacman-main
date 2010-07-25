@@ -23,6 +23,7 @@ add zenity
 ##1 command-line
 add bc
 add colordiff
+add fbida # image viewer
 add lesspipe # input filter for less
 add pinfo # alternate info viewer
 add pkgtools
@@ -112,6 +113,7 @@ add testdisk
 add fdupes # find duplicate files
 add openoffice-base
 add words
+add antiword
 
 ##2 compression
 add p7zip

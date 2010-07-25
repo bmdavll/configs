@@ -1,3 +1,9 @@
 set t_vb=
-set columns=82
-set lines=42
+
+if &diff
+	set columns=167
+	set lines=42
+else
+	set columns=82
+	set lines=42
+endif

@@ -1,37 +1,70 @@
 #!/bin/bash
+# 2010-07-24
+
+# top-level folders to exclude
+EXCLUDE='launchers|setup'
 
 IFS=$'\n'
-set -e
+
+declare -i code=0
 
 recurse() {
 	local wd="$PWD" file target
 
 	for file in *
 	do
-		if	[ ! "$1" ] &&
-			[[ "$file" =~ ^("$this"|launchers|setup)$ ]]
-		then
+		if	[[ -z "$1" && "$file" =~ ^("$this"|$EXCLUDE)$ ]]; then
 			continue
 		fi
-
 		target="$HOME/${1:-.}$file"
 
-		if [ -h "$target" ]; then
-			rm "$target"
-		elif [ -d "$target" ]; then
-			if [ -d "$file" ]; then
-				cd "$file"
-				recurse "${1:-.}$file/"
-				cd "$wd"
-				continue
+		if [ -h "$target" ]
+		then
+			# silently re-link matching or non-existent symlinks
+			if   [[ -d "$file" && -d "$target" ]]
+			then
+				ln -sfT "$wd/$file" "$target"
+
+			elif [[ -f "$file" && -f "$target" || ! -e "$target" ]]
+			then
+				ln -sf  "$wd/$file" "$target"
 			else
-				cd "$HOME"
-				ls -d "${1:-.}$file"
-				false
+				! echo "File-directory mismatch: $target"
 			fi
+
+		elif [ -d "$target" ]
+		then
+			# recurse if directory
+			if [ -d "$file" ]
+			then
+				if ! cd "$file"; then
+					false
+				else
+					# append a level
+					recurse "${1:-.}$file/"
+					cd "$wd"
+				fi
+			else
+				! echo "File-directory mismatch: $target"
+			fi
+
+		elif [ -e "$target" ]
+		then
+			# replace existing file?
+			ls -lh "$target"
+			echo -n "Remove and link? [y/N] " && read
+			if [[ "$REPLY" == [Yy]* ]]; then
+				ln -sf "$wd/$file" "$target"
+			else
+				continue
+			fi
+
+		else
+			# new link
+			ln -s "$wd/$file" "$target"
 		fi
 
-		ln -s "$wd/$file" "$target"
+		code+=$?
 	done
 }
 
@@ -41,3 +74,5 @@ this=$(basename -- "$path")
 cd "${path%$this}"
 
 recurse
+exit $code
+

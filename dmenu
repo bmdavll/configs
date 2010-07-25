@@ -1,5 +1,5 @@
-254	gvim 
-74	t 
+262	gvim 
+75	t 
 28	f 
 27	t timer 
 8	t cpuset 
@@ -20,6 +20,7 @@
 2	xfce4-mixer
 2	clipboard 
 2	dropboxd
+2	urxvt
 1	soffice
 1	mirage
 0	transmission 

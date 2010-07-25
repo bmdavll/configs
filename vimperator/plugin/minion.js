@@ -480,6 +480,13 @@ function MPVimperator() {
 			}
 		},
 
+		_mv: function() {
+			if (mpd.file) {
+				liberator.echomsg("Moving "+mpd.file);
+				liberator.execute('!mv -it ~/music/unsorted '+mpd_dir+'/"'+mpd.file+'"', null, true);
+			}
+		},
+
 		_f: function() {
 			if (mpd.file) {
 				liberator.execute('!f '+mpd_dir+'/"'+mpd.file+'"', null, true);

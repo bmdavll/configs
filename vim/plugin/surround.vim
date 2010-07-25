@@ -186,7 +186,8 @@ function! s:wrap(string,char,type,...)
   elseif newchar ==# "p"
     let before = "\n"
     let after  = "\n\n"
-  elseif newchar =~# "[tT\<C-T><,]"
+"-elseif newchar =~# "[tT\<C-T><,]"
+  elseif newchar =~# "[tT\<C-T>,]"
     let dounmapp = 0
     let dounmapb = 0
     if !maparg(">","c")

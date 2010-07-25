@@ -1,5 +1,5 @@
 " Vim 7.2 vimrc
-" Section: encoding {{{1
+" Section: encoding {{1
 scriptencoding utf-8
 
 " global encoding
@@ -12,285 +12,7 @@ if has('multi_byte')
 	endif
 endif
 
-" Section: options {{{1
-" interface {{{2
-set nocompatible		" use vim settings instead of vi settings
-set mouse=a				" enable mouse in all modes
-set noinsertmode		" enforce in case of EZ-mode
-set visualbell t_vb=	" disable bell
-" tabs {{{2
-set noexpandtab			" whether to expand tabs into spaces
-set tabstop=4			" number of spaces for tab character
-set shiftwidth=4		" number of spaces for autoindent and soft tab stops
-" window {{{2
-set scrolloff=3			" minimum lines of buffer when vertically scrolling
-set sidescroll=1		" redraw with every column when side scrolling
-set winminheight=0		" fully minimize split windows
-set winminwidth=0		" fully minimize vertically split windows
-set cmdwinheight=12		" set command-line window height
-set cmdheight=1			" number of command lines
-set showcmd				" display incomplete commands
-set ruler				" show the cursor position at all times
-set number				" show line numbers by default
-set numberwidth=1		" only use as much space as needed for line numbers
-set shortmess=atToOI	" abbreviate file messages
-" search {{{2
-set incsearch			" do incremental searching
-set ignorecase			" ignore case for search patterns
-						" (override with \C anywhere in a search pattern)
-set smartcase			" don't ignore case for patterns with uppercase chars
-set hlsearch			" highlight search pattern matches
-" display {{{2
-set nowrap				" don't wrap lines by default
-set listchars=tab:▏\ ,precedes:‹,extends:›
-						" display characters for tabs and extended lines
-let &showbreak = "\u21aa "
-						" display character for wrapped lines
-set linebreak			" don't break mid-word when wrapping
-" control {{{2
-set whichwrap=b,<,>,[,] " move freely between lines
-set virtualedit=block	" allow virtual selection in blockwise visual mode
-set timeoutlen=666		" milliseconds before mapped key sequences time out
-" editing {{{2
-set formatoptions+=r	" auto insert comment leader
-set formatoptions+=n	" recognize numbered lists when formatting
-set backspace=2			" allow backspacing over everything in insert mode
-set delcombine			" delete combining characters separately
-" vim {{{2
-set updatetime=1000		" interval for CursorHold updates and swap file writes
-set nobackup			" do not keep a backup file
-set history=1000		" lines of command line history to keep
-set viminfo='50,s100,h	" settings for vim cache
-set sessionoptions=curdir,folds,tabpages,winsize,localoptions
-						" what to save with mksession
-set cpoptions+=>		" put a line break before appending to a register
-set diffopt+=iwhite		" ignore whitespace in diff mode
-set foldmethod=indent	" define folds automatically based on indent level
-" completion {{{2
-set complete-=i			" don't scan included files for completion options
-set completeopt+=longest
-						" complete to the longest common match in insert mode
-set wildmenu			" enhanced command-line completion menu
-set wildcharm=<C-Z>		" character for command-line completion in mappings
-set wildignore+=*.o		" files to ignore for filename completion
-set wildignore+=*.class
-set wildignore+=*.pyc
-
-" win32 {{{2
-if !has('gui_win32')
-	" directories for swap files
-	set directory=~/tmp//,.,/var/tmp//,/tmp//
-	" don't source interactive scripts
-	set shell=env\ TERM=dumb\ $SHELL
-	" use login shell (read .profile)
-	set shellcmdflag=-lc
-else
-	set directory=~//,.
-endif
-
-" Section: gui {{{1
-if has('gui_running')
-	" options {{{2
-	set mousemodel=popup		" use popup menu when right-clicking
-	set guicursor=a:blinkon0	" disable cursor blinking
-	set guioptions-=m			" disable menu bar and toolbar
-	set guioptions-=T
-	set guioptions+=c			" use console dialogs
-
-	if hostname() ==# "perro"
-		set guioptions-=e		" disable gui tabs
-		set guioptions-=L		" disable left scrollbar
-	else
-		set cursorline			" enable current line highlighting
-	endif
-
-	" font {{{2
-	function! <SID>SetGUIFont(font)
-		if has('gui_win32') || has('gui_mac')
-			let sep = ':h'
-		else
-			let sep = ' '
-		endif
-		exec 'set guifont='.escape(a:font[0].sep.string(a:font[1]), ' ')
-	endfunction
-
-	" display font (:set guifont=* to select interactively)
-	if has('gui_win32')
-		let g:font_select = [ ['Consolas', 9], ['DejaVu Sans Mono', 8] ]
-	else
-		let g:font_select = [ ['DejaVu Sans Mono', 9], ['Consolas', 10.5] ]
-	endif
-	let g:font_index = 0
-	call <SID>SetGUIFont(g:font_select[g:font_index])
-	" }}}
-endif
-
-" Section: terminal {{{1
-if !has('gui_running')
-	set ttimeoutlen=50			" timeout for terminal keycodes (in ms)
-	" emenu access
-	source $VIMRUNTIME/menu.vim
-
-	" keycodes {{{
-	if &term =~ 'xterm'
-		" unset vim keycodes
-		set <Help>=
-		set <Undo>=
-		" associate terminal keycodes with vim keycodes
-		exec "set <F1>=\eO1;*P"
-		exec "set <F2>=\eO1;*Q"
-		exec "set <F3>=\eO1;*R"
-		exec "set <F4>=\eO1;*S"
-		" exec "set <F1>=\e[1;*P"
-		" exec "set <F2>=\e[1;*Q"
-		" exec "set <F3>=\e[1;*R"
-		" exec "set <F4>=\e[1;*S"
-		exec "set <F13>=\e[25;*~"
-		exec "set <F14>=\e[26;*~"
-	endif
-
-	" map <C-Space>
-	map  <Nul> <C-Space>
-	map! <Nul> <C-Space>
-
-	" fast keycodes for <M-key> {{{
-	" http://vim.wikia.com/wiki/Mapping_fast_keycodes_in_terminal_Vim
-	" makes use of unused vim keycodes <[S-]F15> to <[S-]F37>.
-	let s:i = 0
-
-	" Meta sends <Esc> prefix
-	" only catch used Meta combos to prevent breaking macros containing
-	" <Esc> followed by a mapped character; i.e. not
-	"   let s:keys = []
-	"   let s:c = char2nr('a')
-	"   for s:n in range(25)
-	"   	call add(s:keys, nr2char(s:c+s:n))
-	"   endfor
-	let s:keys = [ 'a', 'x', 'c', 'v', 'h', 'j', 'k', 'l', 'p', 'n',
-				\  'b', 'f', 'd', 'r', 'y',                '/', '?',
-				\  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ]
-	for s:k in range(len(s:keys))
-		if s:i == 46 | break | endif
-		exec "set  <".(s:i/23==0 ? '' : 'S-')."F".(15+s:i%23)."> =\e".s:keys[s:k]
-		exec "map  <".(s:i/23==0 ? '' : 'S-')."F".(15+s:i%23)."> <M-".s:keys[s:k].">"
-		exec "map! <".(s:i/23==0 ? '' : 'S-')."F".(15+s:i%23)."> <M-".s:keys[s:k].">"
-		let s:i += 1
-	endfor " }}}
-	" }}}
-endif
-
-" Section: colors {{{1
-if has('gui_running') || &t_Co > 2
-	" enable syntax highlighting
-	syntax on
-
-	" hack: assume xterm has 256 colors
-	if &term =~ 'xterm' && &t_Co > 2
-		set t_Co=256
-	endif
-
-	" set the color scheme
-	function! <SID>SetColorScheme(color)
-		set background=dark
-		try
-			exec "colorscheme" a:color
-		catch
-			return
-		endtry
-		" custom highlighting for color schemes {{{
-		if g:colors_name == 'desert256'
-			hi Normal					ctermbg=234					guibg=#1c1c1c
-			hi LineNr					ctermbg=233					guibg=#121212
-			hi CursorLine	cterm=NONE	ctermbg=236					guibg=#303030
-			hi Search		ctermfg=6	ctermbg=18	guifg=#87ceeb	guibg=#000087
-			hi SpecialKey	ctermfg=240	ctermbg=235	guifg=#585858	guibg=#262626
-			hi Cursor								guifg=#222222
-			hi! link NonText LineNr
-			hi! link CursorColumn CursorLine
-		endif " }}}
-		" highlighting for ColumnMarker
-		hi RightMargin ctermbg=239 guibg=#4e4e4e
-	endfunction
-
-	" color schemes to use from ~/.vim/colors
-	let g:colors_select = [ 'wombat256mod', 'zenburn', 'desert256' ]
-
-	function! <SID>NextColorScheme()
-		if !exists("g:colors_select")
-			let g:colors_select = split(globpath(&rtp, 'colors/*.vim'))
-			call map(g:colors_select, 'fnamemodify(v:val, ":t:r")')
-			let g:colors_select = <SID>RemoveDuplicates(g:colors_select)
-			let s:colors_next = 0
-		elseif !exists("s:colors_next")
-			let s:colors_next = 0
-		endif
-		call <SID>SetColorScheme(g:colors_select[s:colors_next])
-		let s:colors_next = (s:colors_next+1) % len(g:colors_select)
-	endfunction
-	unlet! s:colors_next
-	call <SID>NextColorScheme()
-endif
-
-" Section: autocommands {{{1
-if !has('autocmd')
-	" always set autoindenting on
-	set autoindent
-else
-	" enable file type detection
-	" use the default filetype settings, so that mail gets 'tw' set to 72,
-	" 'cindent' is on in C files, etc
-	" also load indent files for language-dependent indenting
-	filetype plugin indent on
-
-	" default group {{{2
-	augroup vimrc
-		au!
-		" don't auto-split lines
-		au BufReadPre  * set textwidth=0
-
-		" restore cursor position, except when the position is invalid or
-		" when inside an event handler (when dropping a file on gvim)
-		au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-
-		" open all folds
-		au BufReadPost * normal! zR
-
-		" enable soft tab stops
-		au BufWinEnter * let &softtabstop=&shiftwidth
-
-		" reading Word documents
-		" au BufReadPre  *.doc set readonly
-		" au BufReadPost *.doc %! antiword "%"
-	augroup END
-
-	" automatically enter hex mode and handle file writes properly {{{2
-	" see vim -b
-	augroup Binary
-		au!
-		au BufReadPre  *.bin,*.hex setlocal binary
-		au BufReadPost * if &binary | Hexmode | endif
-		au BufWritePre *
-			\	if exists("b:edit_hex") && b:edit_hex && &binary
-			\|		let ro_save = &ro | set noreadonly
-			\|		let ma_save = &ma | set modifiable
-			\|		exec '%!xxd -r'
-			\|		let &ro = ro_save | let &ma = ma_save
-			\|		unlet ro_save | unlet ma_save
-			\|	endif
-		au BufWritePost *
-			\	if exists("b:edit_hex") && b:edit_hex && &binary
-			\|		let ro_save = &ro | set noreadonly
-			\|		let ma_save = &ma | set modifiable
-			\|		exec '%!xxd'
-			\|		exe "set nomod"
-			\|		let &ro = ro_save | let &ma = ma_save
-			\|		unlet ro_save | unlet ma_save
-			\|	endif
-	augroup END
-	" }}}
-endif
-
-" Section: utility functions {{{1
+" Section: utility functions {{1
 " returns text with all instances of pat removed
 function! StripFrom(text, pat)
 	return substitute(a:text, a:pat, '', 'g')
@@ -332,8 +54,326 @@ function! <SID>ErrorMsg(msg)
 	echohl ErrorMsg | echomsg a:msg | echohl None
 endfunction
 
-" Section: commands {{{1
-" diff {{{2
+" Section: options {{1
+" interface {{2
+set nocompatible		" use vim settings instead of vi settings
+set mouse=a				" enable mouse in all modes
+set noinsertmode		" enforce in case of EZ-mode
+set visualbell t_vb=	" disable bell
+" tabs {{2
+set noexpandtab			" whether to expand tabs into spaces
+set tabstop=4			" number of spaces for tab character
+set shiftwidth=4		" number of spaces for autoindent and soft tab stops
+" window {{2
+set scrolloff=3			" minimum lines of padding when vertically scrolling
+set sidescrolloff=4		" minimum columns of padding when horizontally scrolling
+set sidescroll=2		" redraw with every column when side scrolling
+set winminheight=0		" fully minimize split windows
+set winminwidth=0		" fully minimize vertically split windows
+set cmdwinheight=12		" set command-line window height
+set cmdheight=1			" number of command lines
+set showcmd				" display incomplete commands
+set ruler				" show the cursor position at all times
+set number				" show line numbers by default
+set numberwidth=1		" only use as much space as needed for line numbers
+set shortmess=atToOI	" abbreviate file messages
+" search {{2
+set incsearch			" do incremental searching
+set ignorecase			" ignore case for search patterns
+						" (override with \C anywhere in a search pattern)
+set smartcase			" don't ignore case for patterns with uppercase chars
+set hlsearch			" highlight search pattern matches
+" display {{2
+set nowrap				" don't wrap lines by default
+set listchars=tab:▏\ ,precedes:‹,extends:›
+						" display characters for tabs and extended lines
+let &showbreak = "\u21aa "
+						" display character for wrapped lines
+set linebreak			" don't break mid-word when wrapping
+set display+=lastline	" show as much of the last (long) line as possible
+" control {{2
+set whichwrap=b,<,>,[,] " move freely between lines
+set virtualedit=block	" allow virtual selection in blockwise visual mode
+set timeoutlen=666		" milliseconds before mapped key sequences time out
+" editing {{2
+set formatoptions+=r	" auto insert comment leader
+set formatoptions+=n	" recognize numbered lists when formatting
+set backspace=2			" allow backspacing over everything in insert mode
+set delcombine			" delete combining characters separately
+" vim {{2
+set updatetime=1000		" interval for CursorHold updates and swap file writes
+set nobackup			" do not keep a backup file
+set history=1000		" lines of command line history to keep
+set viminfo='50,s100,h	" settings for vim cache
+set sessionoptions=curdir,folds,tabpages,winsize,localoptions
+						" what to save with mksession
+set cpoptions+=>		" put a line break before appending to a register
+set diffopt+=iwhite		" ignore whitespace in diff mode
+set diffopt+=foldcolumn:1
+						" use narrow fold column
+set foldmethod=indent	" define folds automatically based on indent level
+" completion {{2
+set complete-=i			" don't scan included files for completion options
+set completeopt+=longest
+						" complete to the longest common match in insert mode
+set wildmenu			" enhanced command-line completion menu
+set wildcharm=<C-Z>		" character for command-line completion in mappings
+set wildignore+=*.o		" files to ignore for filename completion
+set wildignore+=*.class
+set wildignore+=*.pyc
+
+" win32 {{2
+if !has('gui_win32')
+	" directories for swap files
+	set directory=~/tmp//,.,/var/tmp//,/tmp//
+	" don't source interactive scripts
+	set shell=env\ TERM=dumb\ $SHELL
+	" use login shell (read .profile)
+	set shellcmdflag=-lc
+else
+	set directory=~//,.
+endif
+
+" Section: gui {{1
+if has('gui_running')
+	" options {{2
+	set mousemodel=popup		" use popup menu when right-clicking
+	set guicursor=a:blinkon0	" disable cursor blinking
+	set guioptions-=m			" disable menu bar and toolbar
+	set guioptions-=T
+	set guioptions+=c			" use console dialogs
+
+	if hostname() ==# "perro"
+		set guioptions-=e		" disable gui tabs
+		set guioptions-=L		" disable left scrollbar
+	else
+		set cursorline			" enable current line highlighting
+	endif
+
+	" font {{2
+	function! <SID>SetGUIFont(font)
+		if has('gui_win32') || has('gui_mac')
+			let sep = ':h'
+		else
+			let sep = ' '
+		endif
+		exec 'set guifont='.escape(a:font[0].sep.string(a:font[1]), ' ')
+	endfunction
+	function! <SID>AdvanceFont(incr)
+		if !exists("s:font_select")
+			return
+		elseif !exists("s:font_index")
+			let s:font_index = 0
+		else
+			let s:font_index = (s:font_index+a:incr) % len(s:font_select)
+		endif
+		call <SID>SetGUIFont(s:font_select[s:font_index])
+	endfunction
+
+	" display fonts (:set guifont=* to select interactively)
+	if has('gui_win32')
+		let s:font_select = [ ['Consolas', 9], ['DejaVu Sans Mono', 8] ]
+	else
+		let s:font_select = [ ['DejaVu Sans Mono', 9], ['Consolas', 10.5] ]
+	endif
+	call <SID>AdvanceFont(0)
+	" }}
+endif
+
+" Section: terminal {{1
+if !has('gui_running')
+	set ttimeoutlen=50			" timeout for terminal keycodes (in ms)
+	source $VIMRUNTIME/menu.vim	" emenu access
+
+	" keycodes {{2
+	" map <C-Space>
+	map  <Nul> <C-Space>
+	map! <Nul> <C-Space>
+
+	" unset vim keycodes
+	set <Help>=
+	set <Undo>=
+
+	" Meta sends <Esc> {{3
+	set <M-a>=a | set <M-x>=x | set <M-c>=c | set <M-v>=v
+	set <M-h>=h | set <M-j>=j | set <M-k>=k | set <M-l>=l
+	set <M-p>=p | set <M-n>=n | set <M-b>=b | set <M-f>=f
+	set <M-d>=d | set <M-r>=r | set <M-y>=y | set <M-/>=/ | set <M-?>=?
+	set <M-1>=1 | set <M-2>=2 | set <M-3>=3 | set <M-4>=4 | set <M-5>=5
+	set <M-6>=6 | set <M-7>=7 | set <M-8>=8 | set <M-9>=9 | set <M-0>=0
+
+	" MapFastKeycode: helper for fast keycode mappings {{3
+	" http://vim.wikia.com/wiki/Mapping_fast_keycodes_in_terminal_Vim
+	" makes use of unused vim keycodes <[S-]F15> to <[S-]F37>
+	function! <SID>MapFastKeycode(key, keycode)
+		if s:fast_i == 46
+			call <SID>WarningMsg("Unable to map ".a:key.": out of spare keycodes")
+			return
+		endif
+		let vkeycode = '<'.(s:fast_i/23==0 ? '' : 'S-').'F'.(15+s:fast_i%23).'>'
+		exec 'set '.vkeycode.'='.a:keycode
+		exec 'map '.vkeycode.' '.a:key
+		let s:fast_i += 1
+	endfunction
+	let s:fast_i = 0
+	" associate terminal keycodes with vim keycodes {{3
+	if     &term =~ 'xterm' " {{4
+		set <F1>=O1;*P
+		set <F2>=O1;*Q
+		set <F3>=O1;*R
+		set <F4>=O1;*S
+		set <F13>=[25;*~
+		set <F14>=[26;*~
+	elseif &term =~ 'rxvt' " {{4
+		function! <SID>RxvtFMap(from, to, codenums, ...) " {{
+			if a:0 == 0 | return | endif
+			for bind in a:000
+				if bind[0] =~ 'C-'
+					let needs_fast = 1
+				else
+					let needs_fast = 0
+				endif
+				let i = 0
+				for n in range(a:from, a:to)
+					let keycode = "\e[".a:codenums[i].bind[1]
+					if needs_fast
+						call <SID>MapFastKeycode('<'.bind[0].'F'.n.'>', keycode)
+					else
+						exec 'set <'.bind[0].'F'.n.'>='.keycode
+					endif
+					let i += 1
+				endfor
+			endfor
+		endfunction " }}
+		call <SID>RxvtFMap(11, 14, range(23,26),    ['','~'], ['C-','^'], ['S-','$'], ['C-S-','@'])
+		call <SID>RxvtFMap( 1, 10, range(11,15)+range(17,21), ['C-','^'])
+		call <SID>RxvtFMap( 5, 10, range(28,29)+range(31,34),             ['S-','~'], ['C-S-','^'])
+	endif
+	" }}2
+endif
+
+" Section: colors {{1
+if has('gui_running') || &t_Co > 2
+	" enable syntax highlighting
+	syntax on
+
+	" color scheme
+	function! <SID>SetColorScheme(color) " {{2
+		set background=dark
+		try
+			exec "colorscheme" a:color
+		catch
+			return
+		endtry
+		" custom highlighting for color schemes {{3
+		if g:colors_name == 'desert256'
+			hi Normal						ctermbg=234								guibg=#1c1c1c
+			hi Search		ctermfg=6		ctermbg=18				guifg=#87ceeb	guibg=#000087
+			hi Folded		ctermfg=103		ctermbg=237				guifg=#a0a8b0	guibg=#3a4046
+			hi LineNr		ctermfg=241		ctermbg=232				guifg=#857b6f	guibg=#080808
+			hi SpecialKey	ctermfg=240		ctermbg=235				guifg=#585858	guibg=#262626
+			hi Cursor												guifg=#1c1c1c
+			hi CursorLine					ctermbg=236	cterm=none					guibg=#32322f
+			hi Pmenu		ctermfg=230		ctermbg=238				guifg=#ffffd7	guibg=#444444
+			hi PmenuSel		ctermfg=232		ctermbg=192				guifg=#080808	guibg=#cae982
+			hi Comment		ctermfg=103								guifg=#8787af					gui=italic
+			hi! link NonText LineNr
+			hi! link CursorColumn CursorLine
+		endif
+		" global highlighting {{3
+		" Marker
+		hi RightMargin						ctermbg=239								guibg=#4e4e4e
+		" diff
+		hi DiffAdd			ctermfg=none	ctermbg=17	cterm=none	guifg=NONE		guibg=#2a0d6a	gui=none
+		hi DiffDelete		ctermfg=234		ctermbg=60	cterm=none	guifg=#242424	guibg=#3e3969	gui=none
+		hi DiffText			ctermfg=none	ctermbg=53	cterm=none	guifg=NONE		guibg=#73186e	gui=none
+		hi DiffChange		ctermfg=none	ctermbg=237	cterm=none	guifg=NONE		guibg=#382a37	gui=none
+		" }}
+	endfunction
+
+	function! <SID>AdvanceColorScheme(incr) " {{2
+		if !exists("g:colors_select")
+			let g:colors_select = split(globpath(StripFrom(&rtp, ',.*'), 'colors/*.vim'))
+			call map(g:colors_select, 'fnamemodify(v:val, ":t:r")')
+			let g:colors_select = <SID>RemoveDuplicates(g:colors_select)
+			let s:colors_index = 0
+		elseif !exists("s:colors_index")
+			let s:colors_index = 0
+		else
+			let s:colors_index = (s:colors_index+a:incr) % len(g:colors_select)
+		endif
+		call <SID>SetColorScheme(g:colors_select[s:colors_index])
+	endfunction " }}
+
+	" list of color schemes to select from
+	let g:colors_select = [ 'wombat256mod', 'zenburn', 'desert256' ]
+
+	" select the color scheme
+	unlet! s:colors_index
+	call <SID>AdvanceColorScheme(1)
+endif
+
+" Section: autocommands {{1
+if !has('autocmd')
+	" always set autoindenting on
+	set autoindent
+else
+	" enable file type detection
+	" use the default filetype settings, so that mail gets 'tw' set to 72,
+	" 'cindent' is on in C files, etc
+	" also load indent files for language-dependent indenting
+	filetype plugin indent on
+
+	" default group {{2
+	augroup vimrc
+		au!
+		" don't auto-split lines
+		au BufReadPre  * set textwidth=0
+
+		" restore cursor position, except when the position is invalid or
+		" when inside an event handler (when dropping a file on gvim)
+		au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+
+		" open all folds by default
+		au BufReadPost * normal! zR
+
+		" enable soft tab stops
+		au BufWinEnter * let &softtabstop=&shiftwidth
+
+		" reading Word documents
+		au BufReadPre  *.doc set readonly
+		au BufReadPost *.doc %! antiword "%"
+	augroup END
+
+	" binary mode and hex editing {{2
+	" see vim -b
+	augroup Binary
+		au!
+		au BufReadPre  *.bin,*.hex setlocal binary
+		" handle file writes properly
+		au BufWritePre *
+			\	if exists("b:edit_hex") && b:edit_hex && &binary
+			\|		let ro_save = &ro | set noreadonly
+			\|		let ma_save = &ma | set modifiable
+			\|		exec '%!xxd -r'
+			\|		let &ro = ro_save | let &ma = ma_save
+			\|		unlet ro_save | unlet ma_save
+			\|	endif
+		au BufWritePost *
+			\	if exists("b:edit_hex") && b:edit_hex && &binary
+			\|		let ro_save = &ro | set noreadonly
+			\|		let ma_save = &ma | set modifiable
+			\|		exec '%!xxd'
+			\|		exe "set nomod"
+			\|		let &ro = ro_save | let &ma = ma_save
+			\|		unlet ro_save | unlet ma_save
+			\|	endif
+	augroup END
+	" }}
+endif
+
+" Section: commands {{1
+" diff {{2
 " compare the current buffer and the saved file
 command! -nargs=0 DiffOrig
 	\	vertical new
@@ -344,7 +384,7 @@ command! -nargs=0 DiffOrig
 	\|	wincmd p
 	\|	diffthis
 
-" DiffRegs: diff contents of two registers {{{3
+" DiffRegs: diff contents of two registers {{3
 " usage: DiffRegs a z | DiffRegs az
 command! -nargs=+ DiffRegs call s:DiffRegs(<f-args>)
 function! s:DiffRegs(...)
@@ -373,9 +413,9 @@ function! s:DiffRegs(...)
 	vertical new | set buftype=nofile
 	exec "silent put" reg1
 	0 delete _ | diffthis
-endfunction " }}}3
+endfunction " }}3
 
-" registers {{{2
+" registers {{2
 " Reg: check full contents of registers
 command! -nargs=1 Reg call s:Reg(<q-args>)
 function! s:Reg(regstr)
@@ -398,8 +438,8 @@ command! -nargs=0 -register ClearRegister
 	\|		let @z = @_
 	\|	endif
 
-" files {{{2
-" TabOpen: open files in new tabs {{{3
+" files {{2
+" TabOpen: open files in new tabs {{3
 command! -nargs=* -complete=file TabOpen call s:TabOpen(<f-args>)
 function! s:TabOpen(...)
 	if a:0 == 0
@@ -422,7 +462,7 @@ function! s:TabOpen(...)
 			endif
 		endfor
 	endfor
-endfunction " }}}3
+endfunction " }}3
 
 " change the working directory to the current file's directory
 command! -nargs=0 CD exec 'cd' expand('%:h')
@@ -433,9 +473,9 @@ command! -nargs=0 RmFile echo "rm" @% "(".delete(@%).")"
 " delete all buffers
 command! -nargs=0 BD bufdo bdelete
 
-" settings and views {{{2
+" settings and views {{2
 " highlight with RightMargin beyond a column number
-command! -nargs=? ColumnMarker
+command! -nargs=? Marker
 	\	if <q-args> != ''
 	\|		try
 	\|			match RightMargin /\%><args>v.\+/
@@ -452,7 +492,7 @@ command! -nargs=? TextWidth
 	\|		set tw?
 	\|	endif
 
-" FontSize: change the current font size {{{3
+" FontSize: change the current font size {{3
 command! -nargs=? FontSize call s:FontSize(<q-args>)
 function! s:FontSize(op)
 	if !has('gui_running')
@@ -487,7 +527,7 @@ command! -nargs=? BigFont
 	\|	endif
 	\|	set lines=13 columns=47
 
-" Lines, Columns: check/set the number of usable lines/columns {{{3
+" Lines, Columns: check/set the number of usable lines/columns {{3
 command! -nargs=? Lines call s:Lines(<q-args>)
 function! s:Lines(arg)
 	let extra = &cmdheight
@@ -515,8 +555,8 @@ command! -nargs=? Columns
 	\|			endif
 	\|	endif
 
-" editing {{{2
-" CopyMatches: copy matches of the last search to a register (default is ") {{{3
+" editing {{2
+" CopyMatches: copy matches of the last search to a register (default is ") {{3
 " only works for single-line searches
 " accepts a range (default is the whole file)
 " matches are appended to the register and each match is terminated by \n
@@ -539,7 +579,7 @@ function! s:CopyMatches(line1, line2, reg)
 	let &ic = ic_save
 endfunction
 
-" CutMatches: cut matches of the last search to a register (default is ") {{{3
+" CutMatches: cut matches of the last search to a register (default is ") {{3
 " matches are appended to the register and each match is terminated by \n
 command! -nargs=0 -register CutMatches call s:CutMatches("<reg>")
 function! s:CutMatches(reg)
@@ -555,14 +595,14 @@ function! s:CutMatchesSave(reg, txt)
 	return ''
 endfunction
 
-" Reverse: reverse lines in range {{{3
+" Reverse: reverse lines in range {{3
 command! -range -nargs=0 Reverse
 	\	let @z = @/
 	\|	<line2>mark a
 	\|	<line1>,<line2>g/^/m'a
 	\|	let @/ = @z
 
-" LeadingSpacesToTabs: convert as many leading spaces to tabs as possible {{{3
+" LeadingSpacesToTabs: convert as many leading spaces to tabs as possible {{3
 command! -range=% -nargs=? LeadingSpacesToTabs
 	\ call s:LeadingSpacesToTabs(<line1>, <line2>, <q-args>)
 function! s:LeadingSpacesToTabs(line1, line2, arg)
@@ -577,7 +617,7 @@ function! s:LeadingSpacesToTabs(line1, line2, arg)
 	endfor
 endfunction
 
-" ExpandTabs: expand all tabs to spaces, or to the argument given {{{3
+" ExpandTabs: expand all tabs to spaces, or to the argument given {{3
 command! -range=% -nargs=? ExpandTabs call s:ExpandTabs(<line1>, <line2>, <q-args>)
 function! s:ExpandTabs(line1, line2, arg)
 	if a:arg == ''
@@ -598,7 +638,7 @@ function! s:ExpandTabs(line1, line2, arg)
 	endfor
 endfunction
 
-" InternalTabsToSpaces: expand tabs within lines (used for alignment) to spaces {{{3
+" InternalTabsToSpaces: expand tabs within lines (used for alignment) to spaces {{3
 command! -range=% -nargs=0 InternalTabsToSpaces
 	\ call s:InternalTabsToSpaces(<line1>, <line2>)
 function! s:InternalTabsToSpaces(line1, line2)
@@ -612,7 +652,7 @@ function! s:InternalTabsToSpaces(line1, line2)
 	endfor
 endfunction
 
-" Overline, Underline, DoubleUnderline, Strikethrough {{{3
+" Overline, Underline, DoubleUnderline, Strikethrough {{3
 " modify selected text using combining diacritics
 command! -range -nargs=0 Overline        call s:CombineSelection(<line1>, <line2>, '0305')
 command! -range -nargs=0 Underline       call s:CombineSelection(<line1>, <line2>, '0332')
@@ -623,7 +663,7 @@ function! s:CombineSelection(line1, line2, cp)
 	exec a:line1.','.a:line2.'s/\%V[^[:cntrl:]]\%V/&'.char.'/ge'
 endfunction
 
-" CodeReadability: insert whitespace in code for readability {{{3
+" CodeReadability: insert whitespace in code for readability {{3
 command! -range=% -nargs=0 CodeReadability call s:CodeReadability(<line1>, <line2>)
 function! s:CodeReadability(line1, line2)
 try
@@ -640,7 +680,7 @@ try
 catch /^Interrupted$/ | endtry
 endfunction
 
-" Hexmode: toggle for hex mode {{{3
+" Hexmode: toggle for hex mode {{3
 command! -nargs=0 -bar Hexmode call s:ToggleHex()
 function! s:ToggleHex()
 	let mod_save = &modified
@@ -666,7 +706,7 @@ function! s:ToggleHex()
 	let &ma = ma_save
 endfunction
 
-" WordProcess and Ascii: character conversion {{{3
+" WordProcess and Ascii: character conversion {{3
 " convert quotes, apostrophes, and dashes into their unicode counterparts
 command! -range=% -nargs=0 WordProcess call s:WordProcess(<line1>, <line2>)
 function! s:WordProcess(line1, line2)
@@ -696,20 +736,25 @@ function! s:Ascii(line1, line2)
 	exec range.'s/—/--/ge'
 endfunction
 
-" }}}1 commands
-" Section: mappings {{{1
+" }}1 commands
+" Section: mappings {{1
 " see :help map-modes
 " temp marks: 'a, 'z
 " temp registers: @z
-" general {{{2
+" basic {{2
 " externally map CapsLock to Control
-" basic {{{3
-" no-ops
+" <Nop> {{3
 noremap			K			<Nop>
+noremap			<C-E>		<Nop>
+inoremap		<F1>		<Nop>
+cnoremap		<C-K>		<Nop>
 
-" make <Enter> more useful: enter command line or cancel pending operation
+" common operations {{3
+" use <Enter> to enter cmdline mode
 noremap			<CR>		:
-onoremap		<CR>		<C-C>
+" disable in command-line window
+autocmd vimrc CmdwinEnter * unmap   <CR>
+autocmd vimrc CmdwinLeave * noremap <CR> :
 
 " set <Space> to toggle a fold
 noremap<silent><Space>		:<C-U>exec 'silent! normal! za'.(foldlevel('.')?'':'')<CR>
@@ -719,10 +764,20 @@ noremap			<C-Space>	<Esc>
 inoremap		<C-Space>	<Esc>
 cnoremap		<C-Space>	<C-\><C-N>
 
-" use <BackSpace> for deleting visual selections
+" deleting visual selections
 xnoremap		<BS>		d
 snoremap		<BS>		<BS>i
 
+" save shortcut
+nnoremap		<C-S>		:w<CR>
+xnoremap		<C-S>		:<C-U>w<CR>gv
+inoremap		<C-S>		<C-O>:w<CR>
+
+" force 'hlsearch'
+nnoremap<silent>n			:set hlsearch<CR>n
+nnoremap<silent>N			:set hlsearch<CR>N
+
+" "fix" Vim behavior {{3
 " make Y consistent with D and C
 nnoremap		Y			y$
 
@@ -731,93 +786,107 @@ nnoremap		x			"_x
 nnoremap		X			"_X
 nnoremap		s			"_s
 
-" <C-[HLJK]> {{{3
-" first remap <C-K> (digraphs) to <C-B>
-noremap!		<C-B>		<C-K>
-" and <C-L> (redraw) to <C-Y>
-noremap			<C-Y>		<C-L>
-noremap			<C-E>		<Nop>
-" anchor the cursor and scroll
-noremap			<C-H>		2zh
-noremap			<C-L>		2zl
+" paste X selection register
+noremap!		<S-Insert>	<C-R>*
+
+" motions {{3
+" scrolling {{4
 noremap			<C-J>		<C-E>
 noremap			<C-K>		<C-Y>
+noremap			<C-H>		3zh
+noremap			<C-L>		3zl
+" insert mode
 inoremap		<C-J>		<C-X><C-E>
 inoremap		<C-K>		<C-X><C-Y>
-" kill line
-cnoremap		<C-K>		<C-F>D<C-C><End>
-" <C-H> remains <BS> by default; use <C-L> to go right
-noremap!		<C-L>		<Right>
-" in command-line mode, use <C-T> for partial completion and listing matches
-cnoremap		<C-T>		<C-L><C-D>
 
-" <M-[hljk]> {{{3
-" use as movement keys
-noremap!		<M-h>		<Left>
-noremap!		<M-l>		<Right>
-inoremap		<M-j>		<C-O>gj
-inoremap		<M-k>		<C-O>gk
-" recall command history, matching current command line
-cnoremap		<M-j>		<Down>
-cnoremap		<M-k>		<Up>
-" switch between windows in normal mode
-nnoremap		<M-h>		<C-W>h
-nnoremap		<M-l>		<C-W>l
-nnoremap		<M-j>		<C-W>j
-nnoremap		<M-k>		<C-W>k
-" go from select mode to insert mode
-snoremap		<M-h>		<C-\><C-N>`<i
-snoremap		<M-l>		<C-\><C-N>`>a
-
-" move in virtual lines {{{3
+" move in virtual lines {{4
 nnoremap		j			gj
 xnoremap		j			gj
 nnoremap		k			gk
 xnoremap		k			gk
 noremap			<Up>		gk
-inoremap		<Up>		<C-O>gk
 noremap			<Down>		gj
-inoremap		<Down>		<C-O>gj
 
-" emacs-style bindings for word movement and deletion {{{3
+" cursor movment in insert and cmdline modes {{4
+inoremap		<M-j>		<C-O>gj
+inoremap		<M-k>		<C-O>gk
+inoremap		<Down>		<C-O>gj
+inoremap		<Up>		<C-O>gk
+
+noremap!		<M-h>		<Left>
+noremap!		<M-l>		<Right>
+noremap!		<C-L>		<Right>
+
+" bash/emacs-like word movement and deletion {{4
 noremap			<M-b>		b
 noremap			<M-f>		w
 noremap!		<M-b>		<S-Left>
 noremap!		<M-f>		<S-Right>
 
+" kill word
 function! <SID>KillWord()
 	return (col('.')==col('$') ? "\<Del>" : "\<C-O>de")
 endfunction
 inoremap<silent><M-d>		<C-R>=<SID>KillWord()<CR>
-noremap!		<M-BS>		<C-W>
 
-" use <C-O>D for <C-K>
+" beginning/end of line
 inoremap		<C-A>		<C-O>^
 cnoremap		<C-A>		<Home>
 noremap!		<C-E>		<End>
+
+" delete char
 cnoremap		<C-D>		<Del>
-" in insert mode:
-" use <C-F> as the default <C-A> (insert previously inserted text),
-" and <C-G> as the default <C-E> (insert the char below cursor)
+
+" remap original key functionality {{4
+" insert previously inserted text
 inoremap		<C-F>		<C-A>
+" insert the character below the cursor
 inoremap		<C-G>		<C-E>
 
-" register yank, delete, and paste with Meta {{{3
+" digraphs
+noremap!		<C-B>		<C-K>
+
+" redraw
+noremap			<C-Y>		<C-L>
+" }}
+
+" text editing {{3
+" wordwise yank from line above
+inoremap<silent><M-y>		<C-C>mzklyiw`zpa
+
+" yank, delete, paste with Meta {{4
+" working with registers {{5
+
+" yank/delete into register
 vnoremap<silent><M-y>		:<C-U>exec 'normal gv"'.nr2char(getchar()).'y'<CR>
 vnoremap<silent><M-d>		:<C-U>exec 'normal gv"'.nr2char(getchar()).'d'<CR>
 
+" paste from register
 function! <SID>PasteRegister(visual)
 	exec 'normal '.(a:visual ? 'gv' : '').'"'.nr2char(getchar()).'p'
 endfunction
 noremap	<silent><M-r>		:<C-U>call <SID>PasteRegister(0)<CR>
 vnoremap<silent><M-r>		:<C-U>call <SID>PasteRegister(1)<CR>
+inoremap		<M-r>		<C-R>
 
 " paste most recently used register
-nnoremap		<M-p>		o<C-R>"<C-C>
-nnoremap		<M-S-p>		O<C-R>"<C-C>
 inoremap		<M-p>		<C-R>"
 
-" increment/decrement all characters with <C-A> and <C-X> {{{3
+" windows-like shortcuts {{5
+" select all
+noremap			<M-a>		<C-\><C-N>ggVG
+" cut
+vnoremap		<M-x>		"+x
+" yank
+vnoremap		<M-c>		"+y
+" paste
+noremap			<M-v>		<C-\><C-N>"+gP
+exec 'vnoremap <script> <M-v>' paste#paste_cmd['v']
+exec 'inoremap <script> <M-v>' paste#paste_cmd['i']
+cnoremap		<M-v>		<C-R>+
+" }}
+
+" increment/decrement all characters with <C-A> and <C-X> {{4
 function! <SID>OffsetCharacter(offset)
 	normal! "zyl
 	if @z =~ '\d\|\a' || &nrformats !~# '\<alpha\>'
@@ -829,71 +898,67 @@ function! <SID>OffsetCharacter(offset)
 endfunction
 nnoremap<silent><C-A>		:call <SID>OffsetCharacter(1)<CR>
 nnoremap<silent><C-X>		:call <SID>OffsetCharacter(-1)<CR>
-" works only if incrementing alphabetic chars is allowed
+" works only if incrementing alphabetic chars is allowed ('nrformats')
+" }}
 
-" windows-style clipboard shortcuts emulated with Meta {{{3
-" select all
-noremap			<M-a>		<C-\><C-N>ggVG
-" cut
-vnoremap		<M-x>		"+x
-" copy
-vnoremap		<M-c>		"+y
-" paste
-noremap			<M-v>		<C-\><C-N>"+gP
-exec 'vnoremap <script> <M-v>' paste#paste_cmd['v']
-exec 'inoremap <script> <M-v>' paste#paste_cmd['i']
-cnoremap		<M-v>		<C-R>+
+" command line {{3
+" recall command history, matching current line
+cnoremap		<M-j>		<Down>
+cnoremap		<M-k>		<Up>
 
-" misc {{{3
-" re-enable 'hlsearch' with each search
-nnoremap<silent>n			:set hlsearch<CR>n
-nnoremap<silent>N			:set hlsearch<CR>N
+" partial completion and list matches
+cnoremap		<C-T>		<C-L><C-D>
 
-" tab switching
-noremap			<C-Tab>		:<C-U>tabnext<CR>
-noremap			<C-S-Tab>	:<C-U>tabprevious<CR>
-
-" visual mode indenting
+" visual {{3
+" indenting
 xnoremap		<Tab>		>gv
 xnoremap		<S-Tab>		<gv
 
-" save shortcut
-nnoremap		<C-S>		:w<CR>
-xnoremap		<C-S>		:<C-U>w<CR>gv
-inoremap		<C-S>		<C-O>:w<CR>
+" go from select mode to insert mode
+snoremap		<M-h>		<C-\><C-N>`<i
+snoremap		<M-l>		<C-\><C-N>`>a
 
-" paste X selection register
-noremap!		<S-Insert>	<C-R>*
+" windows and tabs {{3
+" switch between windows
+nnoremap		<M-h>		<C-W>h
+nnoremap		<M-l>		<C-W>l
+nnoremap		<M-j>		<C-W>j
+nnoremap		<M-k>		<C-W>k
 
-" nothing to see here; move along {{{3
-if !has('gui_running') && &term =~ 'xterm' && &t_Co == 256
+" cycle tabs
+noremap			<C-Tab>		:<C-U>tabnext<CR>
+noremap			<C-S-Tab>	:<C-U>tabprevious<CR>
+
+" misc {{3
+if !has('gui_running') && &t_Co == 256
+
 fun! Rave(time)
 	let ravers = [ 'Number', 'String', 'Comment', 'Statement', 'Function', 'Special' ]
 	let len = len(ravers)
-	if !exists("g:wtf")
-		let g:wtf = []
+	if !exists("s:wtf")
+		let s:wtf = []
 		let rand = localtime()
 		for i in range(len)
 			let rand += 232 / len
-			let g:wtf += [ rand ]
+			let s:wtf += [ rand ]
 		endfor
 	endif
 	for i in range(len)
-		let g:wtf[i] = (g:wtf[i]+a:time) % 232
-		if g:wtf[i] == 0
-			let g:wtf[i] = 1
-		elseif g:wtf[i] == 7  || g:wtf[i] == 8
-			let g:wtf[i] = 9
-		elseif g:wtf[i] == 15 || g:wtf[i] == 16
-			let g:wtf[i] = 17
+		let s:wtf[i] = (s:wtf[i]+a:time) % 232
+		if s:wtf[i] == 0
+			let s:wtf[i] = 1
+		elseif s:wtf[i] == 7  || s:wtf[i] == 8
+			let s:wtf[i] = 9
+		elseif s:wtf[i] == 15 || s:wtf[i] == 16
+			let s:wtf[i] = 17
 		endif
-		exec "hi ".ravers[i]." ctermfg=".g:wtf[i]
+		exec "hi ".ravers[i]." ctermfg=".s:wtf[i]
 	endfor
-	hi! link Constant Number
-	hi! link PreProc Number
-	hi! link Identifier Function
-	hi! link Type Function
-	hi! link Keyword Statement
+	hi! link Constant	Number
+	hi! link PreProc	Number
+	hi! link Identifier	Function
+	hi! link Type		Function
+	hi! link Keyword	Statement
 endfun
 fun! Raveon(auto)
 	if !exists("g:bpm")
@@ -904,27 +969,28 @@ fun! Raveon(auto)
 		exec "sleep" float2nr(60000/g:bpm) "m"
 	endwhile
 endfun
-silent! unlet g:wtf
+silent! unlet s:wtf
 map	<silent>	<M-F14>		:call Rave(1)<CR>
 map	<silent>	<M-F13>		:call Rave(64)<CR>
 map	<silent>	<M-F12>		:call Raveon(1)<CR>
-endif " }}}3
 
-" function keys {{{2
-" (clear mappings) {{{3
-function! <SID>ClearMapsF(key1, key2)
-	for fkey in range(a:key1, a:key2)
-		for modifier in [ '', 'C-', 'S-', 'C-S-' ]
-			exec 'noremap <silent> <'.modifier.'F'.fkey.'> '.
-				\':<C-U>call <SID>WarningMsg("Unmapped")<CR>'
-			exec 'silent! unmap! <'.modifier.'F'.fkey.'>'
-			exec 'inoremap <'.modifier.'F'.fkey.'> <Nop>'
+endif
+" }}3
+
+" function keys {{2
+" clear function and meta key mappings {{3
+function! <SID>ClearMaps(modifiers, from, to)
+	for n in range(a:from, a:to)
+		for mod in a:modifiers
+			exec 'noremap <silent> <'.mod.n.'> :<C-U>call <SID>WarningMsg("Unmapped")<CR>'
+			exec 'silent! unmap! <'.mod.n.'>'
 		endfor
 	endfor
 endfunction
-call <SID>ClearMapsF(1,14)
+call <SID>ClearMaps([ 'F', 'C-F', 'S-F', 'C-S-F' ], 1, 14)
+call <SID>ClearMaps([ 'M-' ], 0, 9)
 
-" <F1> to <F3>      plugins {{{3
+" <F1> to <F3>      plugins {{3
 " toggle taglist
 map				<F1>		:<C-U>TlistToggle<CR>
 vmap			<F1>		:<C-U>TlistToggle<CR>gv
@@ -932,7 +998,7 @@ vmap			<F1>		:<C-U>TlistToggle<CR>gv
 map				<F2>		:<C-U>NERDTreeToggle<CR>
 " toggle yank ring
 map				<F3>		:<C-U>YRShow<CR>
-" toggle clipboard <C-F3> {{{4
+" toggle clipboard <C-F3> {{4
 function! <SID>ToggleClipBrd()
 	let clipnr = bufnr('*\[Clip Board\]$')
 	if bufwinnr(clipnr) == winnr()
@@ -947,9 +1013,9 @@ function! <SID>ToggleClipBrd()
 	endif
 endfunction
 map	<silent>	<C-F3>		:<C-U>call <SID>ToggleClipBrd()<CR>
-" }}}
+" }}
 
-" <F4>              trim trailing whitespace {{{3
+" <F4>              trim trailing whitespace {{3
 function! <SID>Trim()
 	%s/\s\+$//e
 endfunction
@@ -957,99 +1023,83 @@ map	<silent>	<F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`z
 vmap<silent>	<F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agv
 imap<silent>	<F4>		<C-C>:let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agi
 
-" <C-F4>            autoindent entire file {{{3
-map				<C-F4>		<C-\><C-N>maHmzgg=G`zzt`a
-vmap			<C-F4>		<C-\><C-N>maHmzgg=G`zzt`agv
+" <C-F4>            highlight characters beyond column ... {{3
+map				<C-F4>		:<C-U>Marker<Space>
+imap			<C-F4>		<C-O>:Marker<Space>
 
-" <F5>              remove search highlighting {{{3
+" <F5>              remove search highlighting {{3
 " let @/=@_
 map	<silent>	<F5>		:<C-U>nohlsearch<CR>
 vmap<silent>	<F5>		:<C-U>nohlsearch<CR>gv
 imap<silent>	<F5>		<C-O>:nohlsearch<CR>
 
-" <C-F5>            toggle scrollbind {{{3
-map	<silent>	<C-F5>		:<C-U>setlocal scrollbind! scb?<CR>
-vmap<silent>	<C-F5>		:<C-U>setlocal scrollbind! scb?<CR>gv
-imap<silent>	<C-F5>		<C-O>:setlocal scrollbind! scb?<CR>
+" <C-F5>            toggle diff {{3
+function! <SID>ToggleDiff()
+	if &diff
+		diffoff
+		setlocal nowrap
+		if exists("w:fdm_save")
+			exec 'setlocal foldmethod='.w:fdm_save
+		else
+			setlocal foldmethod=indent
+		endif
+	else
+		let w:fdm_save = &foldmethod
+		diffthis
+	endif
+endfunction
+map	<silent>	<C-F5>		:<C-U>call <SID>ToggleDiff()<CR>
+vmap<silent>	<C-F5>		:<C-U>call <SID>ToggleDiff()<CR>gv
+imap<silent>	<C-F5>		<C-O>:call <SID>ToggleDiff()<CR>
 
-" <F6>              toggle list mode (show tabs) {{{3
+" <F6>              toggle list mode (show tabs) {{3
 map	<silent>	<F6>		:<C-U>setlocal list! list?<CR>
 vmap<silent>	<F6>		:<C-U>setlocal list! list?<CR>gv
 imap<silent>	<F6>		<C-O>:setlocal list! list?<CR>
 
-" <C-F6>            highlight characters beyond column … {{{3
-map				<C-F6>		:<C-U>ColumnMarker<Space>
-imap			<C-F6>		<C-O>:ColumnMarker<Space>
-
-" <F7>              toggle tabstop {{{3
-function! <SID>ToggleTabstop()
-	if &tabstop == 4
-		setlocal tabstop=8
-	elseif &tabstop == 8
-		setlocal tabstop=4
-	endif
+" <F7>              change tabstop {{3
+function! <SID>NextTabstop()
+	let stops = [ 2, 4, 8 ]
+	for i in range(len(stops))
+		if &tabstop == stops[i]
+			exec 'setlocal tabstop='.stops[(i+1)%len(stops)]
+			break
+		endif
+	endfor
 	set ts?
 endfunction
-map	<silent>	<F7>		:<C-U>call <SID>ToggleTabstop()<CR>
-vmap<silent>	<F7>		:<C-U>call <SID>ToggleTabstop()<CR>gv
-imap<silent>	<F7>		<C-O>:call <SID>ToggleTabstop()<CR>
+map	<silent>	<F7>		:<C-U>call <SID>NextTabstop()<CR>
+vmap<silent>	<F7>		:<C-U>call <SID>NextTabstop()<CR>gv
+imap<silent>	<F7>		<C-O>:call <SID>NextTabstop()<CR>
 
-" <C-F7>            toggle expandtab {{{3
-map	<silent>	<C-F7>		:<C-U>setlocal expandtab! et?<CR>
-vmap<silent>	<C-F7>		:<C-U>setlocal expandtab! et?<CR>gv
-imap<silent>	<C-F7>		<C-O>:setlocal expandtab! et?<CR>
-
-" <F8>              toggle line wrapping {{{3
+" <F8>              toggle line wrapping {{3
 map	<silent>	<F8>		:<C-U>setlocal wrap! wrap?<CR>
 vmap<silent>	<F8>		:<C-U>setlocal wrap! wrap?<CR>gv
 imap<silent>	<F8>		<C-O>:setlocal wrap! wrap?<CR>
 
-" <C-F8>            view/set maximum line length to … {{{3
+" <C-F8>            view textwidth/set maximum line length to ... {{3
 " (set to 0 to disable auto-truncation)
 map				<C-F8>		:<C-U>TextWidth<Space>
 imap			<C-F8>		<C-O>:TextWidth<Space>
 
-" <F9>              cycle color schemes {{{3
-map	<silent>	<F9>		:<C-U>call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>
-vmap<silent>	<F9>		:<C-U>call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>gv
-imap<silent>	<F9>		<C-C>:call <SID>NextColorScheme()<CR>:echo g:colors_name<CR>gi
+" <F9> <C-F9>       cycle color schemes {{3
+map	<silent>	<F9>		:<C-U>call <SID>AdvanceColorScheme( 1)<CR>:echo g:colors_name<CR>
+vmap<silent>	<F9>		:<C-U>call <SID>AdvanceColorScheme( 1)<CR>:echo g:colors_name<CR>gv
+imap<silent>	<F9>		<C-C>:call <SID>AdvanceColorScheme( 1)<CR>:echo g:colors_name<CR>gi
+map	<silent>	<C-F9>		:<C-U>call <SID>AdvanceColorScheme(-1)<CR>:echo g:colors_name<CR>
+vmap<silent>	<C-F9>		:<C-U>call <SID>AdvanceColorScheme(-1)<CR>:echo g:colors_name<CR>gv
+imap<silent>	<C-F9>		<C-C>:call <SID>AdvanceColorScheme(-1)<CR>:echo g:colors_name<CR>gi
 
-" <C-F9>            cycle fonts {{{3
-function! <SID>NextFont()
-	if !exists("g:font_select") || !exists("g:font_index")
-		return
-	endif
-	let g:font_index = (g:font_index+1) % len(g:font_select)
-	call <SID>SetGUIFont(g:font_select[g:font_index])
-endfunction
-map	<silent>	<C-F9>		:<C-U>call <SID>NextFont()<CR>:echo &guifont<CR>
-vmap<silent>	<C-F9>		:<C-U>call <SID>NextFont()<CR>:echo &guifont<CR>gv
-imap<silent>	<C-F9>		<C-C>:call <SID>NextFont()<CR>:echo &guifont<CR>gi
+" <S-F9>            cycle fonts {{3
+map	<silent>	<S-F9>		:<C-U>call <SID>AdvanceFont(1)<CR>:echo &guifont<CR>
+vmap<silent>	<S-F9>		:<C-U>call <SID>AdvanceFont(1)<CR>:echo &guifont<CR>gv
+imap<silent>	<S-F9>		<C-C>:call <SID>AdvanceFont(1)<CR>:echo &guifont<CR>gi
 
-" <S-F9>            toggle line numbers {{{3
-map	<silent>	<S-F9>		:<C-U>setlocal number! nu?<CR>
-vmap<silent>	<S-F9>		:<C-U>setlocal number! nu?<CR>gv
-imap<silent>	<S-F9>		<C-O>:setlocal number! nu?<CR>
-
-" <F10>             toggle menu bar and toolbar {{{3
-function! <SID>ToggleBars()
-	if &guioptions =~# 'm'
-		set guioptions-=m
-		set guioptions-=T
-	else
-		set guioptions+=m
-		set guioptions+=T
-	endif
-	set go?
-endfunction
-map	<silent>	<F10>		:<C-U>call <SID>ToggleBars()<CR>
-vmap<silent>	<F10>		:<C-U>call <SID>ToggleBars()<CR>gv
-
-" <F11>             maximize current window {{{3
+" <F11>             maximize current window {{3
 map				<F11>		<C-\><C-N><C-W>_<C-W>\|
 vmap			<F11>		<C-\><C-N><C-W>_<C-W>\|gv
 
-" <C-F10> <S-F10>   change window width, height {{{3
+" <C-F10> <S-F10>   change window width, height {{3
 map				<C-F10>		<C-\><C-N>3<C-W><
 vmap			<C-F10>		<C-\><C-N>3<C-W><gv
 map				<C-F11>		<C-\><C-N>3<C-W>>
@@ -1059,7 +1109,7 @@ vmap			<S-F10>		<C-\><C-N>3<C-W>-gv
 map				<S-F11>		<C-\><C-N>3<C-W>+
 vmap			<S-F11>		<C-\><C-N>3<C-W>+gv
 
-" <F12>             toggle spellcheck and autocorrect {{{3
+" <F12>             toggle spellcheck and autocorrect {{3
 function! <SID>ToggleSpellCorrect()
 	if &spell
 		iabclear
@@ -1072,97 +1122,89 @@ map	<silent>	<F12>		:<C-U>call <SID>ToggleSpellCorrect()<CR>
 vmap<silent>	<F12>		:<C-U>call <SID>ToggleSpellCorrect()<CR>gv
 imap<silent>	<F12>		<C-O>:call <SID>ToggleSpellCorrect()<CR>
 
-" <C-F12>           toggle cursorline {{{3
+" <C-F12>           toggle cursorline {{3
 map	<silent>	<C-F12>		:<C-U>setlocal cursorline! cul?<CR>
 vmap<silent>	<C-F12>		:<C-U>setlocal cursorline! cul?<CR>gv
 imap<silent>	<C-F12>		<C-O>:setlocal cursorline! cul?<CR>
 
-" <F13> <F14>       switch buffers {{{3
+" <F13> <F14>       switch buffers {{3
 map				<F13>		:<C-U>bprevious<CR>
 map				<F14>		:<C-U>bnext<CR>
 
-" <C-F13> <C-F14>   choose buffer; split all buffers {{{3
+" <C-F13> <C-F14>   choose buffer; split all buffers into tabs {{3
 map				<C-F13>		:<C-U>ls<CR>:buffer<Space>
 map				<C-F14>		:<C-U>tab ball<CR>
 
-" <S-F13> <S-F14>   redirect command-line output to @z; end redirect {{{3
+" <S-F13> <S-F14>   redirect command-line output to @z; end redirect {{3
 map				<S-F13>		:<C-U>let @z=@_<CR>:redir @z><CR>
 vmap			<S-F13>		:<C-U>let @z=@_<CR>:redir @z><CR>gv
 nmap			<S-F14>		:<C-U>redir END<CR>
 vmap			<S-F14>		:<C-U>redir END<CR>gv
-" }}}
+" }}
 
-" macros {{{2
-" misc {{{3
-" surround selected area (obsoleted by surround.vim)
-xnoremap		'			<C-C>`>a'<C-C>`<i'<C-C>
-xnoremap		(			<C-C>`>a)<C-C>`<i(<C-C>
+" macros {{2
+let mapleader = '\'
 
+" display {{3
 " close all folds except this
-nnoremap<silent>zT			:exec 'normal zM'.foldlevel('.').'zo'<CR>
+nnoremap<silent>MM			:exec 'silent! normal! zM'.foldlevel('.').'zozz'<CR>
 
-" display current file in two columns
-noremap	<silent>ZC			:<C-U>let @z=&so<CR>:set so=0<CR>maHmz:set noscb<CR>
-							\:vs<CR><C-W>wLzt:set scb<CR><C-W>p:set scb<CR>
-							\`zzt`a:let &so=@z<CR>
+" fold top level
+noremap			zT			<C-\><C-N>:%foldclose<CR>
 
-" diff mode
-noremap			du			:<C-U>diffupdate<CR>
-" jump between diffs
-noremap			dN			<C-\><C-N>[czz
-noremap			dn			<C-\><C-N>]czz
-
-" <M-0> to <M-9> {{{3
-function! <SID>ClearMapsM(key1, key2)
-	for mkey in range(a:key1, a:key2)
-		exec 'noremap <silent> <M-'.mkey.'> '.
-			\':<C-U>call <SID>WarningMsg("Unmapped")<CR>'
-		exec 'silent! unmap! <M-'.mkey.'>'
-	endfor
-endfunction
-call <SID>ClearMapsM(0,9)
-
-" quickfix {{{4
-map				<M-1>		<C-\><C-N>:cprevious<CR>
-map				<M-2>		<C-\><C-N>:cnext<CR>
-map				<M-3>		<C-\><C-N>:clist<CR>
-map				<M-4>		<C-\><C-N>:make<Space><Up><CR>
-cmap<silent>	<M-4>		<C-R>=expand('%:t:r')<CR>
-" fold one level
-map				<M-5>		<C-\><C-N>:%foldclose<CR>
-" highlight without jumping
-xmap<silent>	<M-8>		:<C-U>let @/="\\V<C-R>=escape(<SID>FidgetWhitespace(escape(<SID>GetSelection(),'\')),'\"')<CR>"<CR>
-"							exec "let @/='\\<".expand("<cword>")."\\>'"
-nmap<silent>	<M-8>		:<C-U>normal! #*<CR>
-imap<silent>	<M-8>		<C-O>:normal! #*<CR>
-
-" change font size {{{4
-map	<silent>	<M-0>		:<C-U>call <SID>NextFont(0)<CR>
-vmap<silent>	<M-0>		:<C-U>call <SID>NextFont(0)<CR>
+" font size
+map	<silent>	<M-0>		:<C-U>call <SID>AdvanceFont(0)<CR>
+vmap<silent>	<M-0>		:<C-U>call <SID>AdvanceFont(0)<CR>
 map	<silent>	<M-->		:<C-U>FontSize -<CR>:set guifont?<CR>
 vmap<silent>	<M-->		:<C-U>FontSize -<CR>:set guifont?<CR>gv
 map	<silent>	<M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>
 vmap<silent>	<M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>gv
 
-" <leader> {{{3
-let mapleader = '\'
-
-" replace last search pattern
-map				<leader>s		:%s///gc<Left><Left><Left>
-xmap			<leader>s		:s///gc<Left><Left><Left>
-" execute command on lines matching last search pattern
-map				<leader>g		:g//
-
-" files {{{4
+" files {{3
 " load this file for editing and re-source
-map				<leader>v		:<C-U>TabOpen $MYVIMRC<CR>
+map				<leader>v		:<C-U>TabOpen $MYVIMRC<CR>:exec 'set columns='.max([&columns,100])<CR>
 map				<leader>u		:<C-U>source $MYVIMRC<CR>
 " load config files for editing
 map	<silent>	<leader>b		:<C-U>TabOpen ~/.bash{rc,_aliases,_hacks}<CR>:tabnext 2<CR>
 map	<silent>	<leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{Content,Chrome}.css
 											\ ~/Application\ Data/Mozilla/Firefox/Profiles/*.default/chrome/userChrome.css<CR>
 
-" tabs {{{4
+" changing text {{3
+" surround selected area (obsoleted by surround.vim)
+xnoremap		'			<C-C>`>a'<C-C>`<i'<C-C>
+xnoremap		(			<C-C>`>a)<C-C>`<i(<C-C>
+
+" substitution cypher {{4
+function! <SID>R()
+	if !exists("*Random") || !exists("*Srand")
+		call <SID>ErrorMsg("Random function not defined")
+		return
+	endif
+	let input = input('# ')
+	if input[0] == '0' | let input = '1'.input | endif
+	let key = str2nr(input)
+	if key < 1000
+		call <SID>ErrorMsg("Invalid numeric key")
+		return
+	endif
+	call Srand(key)
+	let ascii = range(33,126)
+	let alpha1 = ''
+	let alpha2 = ''
+	while !empty(ascii)
+		let c1 = nr2char(remove(ascii, Random(len(ascii))))
+		let c2 = nr2char(remove(ascii, Random(len(ascii))))
+		let alpha1 .= c1.c2
+		let alpha2 .= c2.c1
+	endwhile
+	let @z = tr(<SID>GetSelection(), alpha1, alpha2)
+	exec 'normal! gv"zp'
+	let @z = @_
+endfunction
+xmap<silent>	<leader>r		:<C-U>call <SID>R()<CR>
+" }}
+
+" whitespace {{3
 " expand tabs in selected lines to spaces
 xmap<silent>	<leader>e		:<C-U>let @z=&et<CR>:set et<CR>gv:retab<CR>:let &et=@z<CR>
 " convert spaces to tabs
@@ -1171,91 +1213,98 @@ xmap<silent>	<leader>t		:retab!<CR>
 " insert expanded tabs (tabs as spaces)
 imap<silent>	<leader><TAB>	<C-R>=repeat(' ', &tabstop - (virtcol('.')-1) % &tabstop)<CR>
 
-" deletion {{{4
+" insert {{3
+" append modeline
+nmap<silent>	<leader>m		ovim:ts=4 sw=4 noet:<C-C>^
+imap<silent>	<leader>m		 vim:ts=4 sw=4 noet:<C-C>^
+
+" date
+imap<silent>	<leader>dd		<C-R>=strftime('%Y-%m-%d')<CR>
+" logdate
+imap<silent>	<leader>l		<C-v>u25d81 <C-R>=strftime('%m/%d %a \| [] ')<CR><Left><Left>
+
+" delete {{3
 " delete into the null register
 map				<leader>d		"_d
 map				<leader>D		"_D
 map				<leader>c		"_c
 map				<leader>C		"_C
+
 " delete the stretch of whitespace at or before the cursor
 nmap<silent>	<leader><BS>	:normal! gE<CR>
 								\:exec(getline('.')[col('.')-1]=~'\S' ? "normal! \<lt>Right>":"")<CR>
 								\:exec(getline('.')[col('.')-1]=~'\s' ? 'normal! dw':'')<CR>
 
-" text insertion {{{4
-" append modeline
-nmap<silent>	<leader>m		ovim:set ts=4 sw=4 noet:<C-C>^
+" diff {{3
+noremap			du			:<C-U>diffupdate<CR>
 
-" date
-imap<silent>	<leader>dd		<C-R>=strftime('%Y-%m-%d')<CR>
-imap<silent>	<leader>l		<C-v>u25d81 <C-R>=strftime('%m/%d %a \| [] ')<CR><Left><Left>
+" jump between diffs
+noremap			dN			<C-\><C-N>[czz
+noremap			dn			<C-\><C-N>]czz
 
-" encryption {{{4
-function! <SID>R()
-	if !exists("*Random") || !exists("*Srand")
-		call <SID>ErrorMsg("Random function not defined")
-		return
-	endif
-	let key = str2nr(input('# '))
-	if key < 1000
-		call <SID>ErrorMsg("Invalid key")
-		return
-	endif
-	call Srand(key)
-	let ascii = split("!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~", '\zs')
-	let alpha1 = ''
-	let alpha2 = ''
-	while !empty(ascii)
-		let c1 = remove(ascii, Random(len(ascii)))
-		let c2 = remove(ascii, Random(len(ascii)))
-		let alpha1 .= c1.c2
-		let alpha2 .= c2.c1
-	endwhile
-	let @z = tr(<SID>GetSelection(), alpha1, alpha2)
-	exec 'normal! gv"zp'
-endfunction
-xmap<silent>	<leader>r		:<C-U>call <SID>R()<CR>
+" quickfix {{3
+map				<M-1>		<C-\><C-N>:cprevious<CR>
+map				<M-2>		<C-\><C-N>:cnext<CR>
+map				<M-3>		<C-\><C-N>:clist<CR>
+map				<M-4>		<C-\><C-N>:make<Space><Up><CR>
+cmap			<M-4>		<C-R>=expand('%:t:r')<CR>
 
-" spellchecking {{{4
-nmap			<leader>[		[s
-nmap			<leader>]		]s
-nmap			<leader>=		z=
+" search {{3
+" replace last search pattern
+map				<leader>s		:%s///gc<Left><Left><Left>
+xmap			<leader>s		:s///gc<Left><Left><Left>
+" execute command on lines matching last search pattern
+map				<leader>g		:g//
 
-" search {{{3
 " search for a word
 map				<leader>w		<C-\><C-N>/\<\><Left><Left>
-cmap			<leader>W		\<\><Left><Left>
 
-" search for visually selected text {{{4
+" search for visually selected text {{4
 function! <SID>FidgetWhitespace(pat)
 	let pat = substitute(a:pat,'\_s\+$','\\s\\*', '')
 	let pat = substitute(pat, '^\_s\+', '\\s\\*', '')
 	return    substitute(pat,  '\_s\+', '\\_s\\+','g')
 endfunction
+
 " fuzzy whitespace
 xmap<silent>	*				<C-C>/\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'/\'))<CR><CR>
 xmap<silent>	#				<C-C>?\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'?\'))<CR><CR>
+
 " exact match
 xmap<silent>	<leader>*		<C-C>/\V<C-R>=substitute(escape(<SID>GetSelection(),'/\'),'\n','\\n','g')<CR><CR>
 xmap<silent>	<leader>#		<C-C>?\V<C-R>=substitute(escape(<SID>GetSelection(),'?\'),'\n','\\n','g')<CR><CR>
 
-" regex shortcuts {{{4
+" highlight without jumping {{4
+xmap<silent>	<M-8>		:<C-U>let @/="\\V<C-R>=escape(<SID>FidgetWhitespace(escape(<SID>GetSelection(),'\')),'\"')<CR>"<CR>
+"							exec "let @/='\\<".expand("<cword>")."\\>'"
+nmap<silent>	<M-8>		:<C-U>normal! #*<CR>
+imap<silent>	<M-8>		<C-O>:normal! #*<CR>
+
+" regex quick-keys {{4
+" parens
+cnoremap		<leader>9		\(\)<Left><Left>
 " brace multi, non-greedy multi
 cnoremap		<leader>{		\{}<Left>
 cnoremap		<leader>-		\{-}
-" }}}3
+" flexible whitespace
+cnoremap		<leader>g		\_s\+
+" }}3
 
-" }}}1 mappings
-" Section: plugins {{{1
-" ClipBrd {{{2
+" }}1 mappings
+" Section: plugins {{1
+" ClipBrd {{2
 let g:clipbrdDefaultReg = '+'
 
-" echofunc {{{2
+" echofunc {{2
 let g:EchoFuncKeyPrev = '<M-p>'
 let g:EchoFuncKeyNext = '<M-n>'
 let g:EchoFuncMaxBalloonDeclarations = 6
 
-" NERD Commenter {{{2
+" eregex {{2
+nnoremap		/			:M/
+nnoremap		<leader>/	/
+
+" NERD Commenter {{2
 let g:NERDBlockComIgnoreEmpty = 1
 let g:NERDCommentWholeLinesInVMode = 2
 let g:NERDDefaultNesting = 0
@@ -1265,20 +1314,20 @@ let g:NERDSexyComs = 0
 let g:NERDCompactSexyComs = 0
 let g:NERDShutUp = 1
 
-" NERD Tree {{{2
+" NERD Tree {{2
 let g:NERDTreeWinPos = "right"
 
-" session_dialog {{{2
+" session_dialog {{2
 let g:SessionSaveDirectory = "~"
 let g:SessionPath = ".,~"
-" let g:SessionFilePrefix = ""
-" let g:SessionFileSuffix = ""
+"let g:SessionFilePrefix = ""
+"let g:SessionFileSuffix = ""
 let g:SessionDefault = ""
 let g:SessionConfirmOverwrite = 0
 let g:SessionQuitAfterSave = 0
 let g:SessionCreateDefaultMaps = 1
 
-" snippetsEmu {{{2
+" snippetsEmu {{2
 let g:snip_start_tag = "\u2039"
 let g:snip_end_tag = "\u203a"
 
@@ -1308,10 +1357,10 @@ endfunction
 " highlight snippets
 command! -nargs=0 HighlightSnippets exec 'silent! normal! /\<Snippet\s\+\zs\S\+<CR>'
 
-" speeddating {{{2
+" speeddating {{2
 let g:speeddating_no_mappings = 0
 
-function! <SID>ToggleCtrlAX() " {{{3
+function! <SID>ToggleCtrlAX() " {{3
 if hasmapto('<Plug>SpeedDatingUp')
 	unmap		<C-A>
 	unmap		<C-X>
@@ -1331,14 +1380,14 @@ else
 	set nrformats-=alpha
 	echo "speeddating"
 endif
-endfunction " }}}3
+endfunction " }}3
 map	<silent>	<leader><C-A>	:<C-U>call <SID>ToggleCtrlAX()<CR>
 map	<silent>	<leader><C-X>	:<C-U>call <SID>ToggleCtrlAX()<CR>
 
-" taglist {{{2
+" taglist {{2
 let g:Tlist_Show_One_File = 1
 
-" YankRing {{{2
+" YankRing {{2
 if !has('gui_win32')
 	let g:yankring_history_file = ".yankring_history"
 else
@@ -1353,20 +1402,20 @@ nnoremap		s			"_s
 endfunction
 if exists("loaded_yankring") | call YRRunAfterMaps() | endif
 
-" }}}1 plugins
-" Section: development {{{1
+" }}1 plugins
+" Section: development {{1
 if !has('autocmd')
 	finish
 endif
 
-" C/C++ {{{2
+" C/C++ {{2
 augroup cpp
 	au!
 	" use syntax folding
 	au FileType c,cpp setl foldmethod=syntax
 augroup END
 
-" java {{{2
+" java {{2
 augroup java
 	au!
 	" use syntax folding
@@ -1376,10 +1425,10 @@ augroup java
 	au FileType java setl efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#,%-G%.%#
 augroup END
 
-" python {{{2
+" python {{2
 if has('python')
 python << EOF
-# script {{{
+# script {{
 import os
 import sys
 import vim
@@ -1423,7 +1472,7 @@ def RemoveBreakpoints():
 		if nLine < nCurrentLine:
 			nCurrentLine -= 1
 	vim.command('normal %dG' % nCurrentLine)
-# }}}
+# }}
 EOF
 endif
 
@@ -1439,11 +1488,17 @@ augroup python
 	au FileType python map <buffer> <M-0> <C-\><C-N>:python RemoveBreakpoints()<CR>
 augroup END
 
-" git {{{2
+" git {{2
 augroup git
 	au!
 	au FileType git* setl textwidth=72
 augroup END
 
-" }}}1 development
-" vim:set ts=4 sw=4 noet fdl=0 fdm=marker:
+" }}1 development
+" TODO
+function! FoldText()
+	return repeat('*', v:foldlevel)
+endfunction
+set foldtext=FoldText()
+" camel case
+" vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:

@@ -45,15 +45,12 @@ NERD_tree.vim
 	+ added mapping  <space> to g:NERDTreeMapActivateNode
 	+ added mapping g<space> to g:NERDTreeMapPreview
 
-pydoc.vim
-	+ changed mapping <leader>pw to <leader>pd
-	+ changed mapping <leader>pW to <leader>pD
-
 smartword.vim
 	+ added standard mappings
 
 surround.vim
 	+ reversed whether ({[< and )}]> insert spaces
+	+ changed < to add a <> surround instead of tags
 
 taglist.vim
 	* catch error if no fold
@@ -68,6 +65,16 @@ yankring.vim
 	+ removed inoremap for YRGetChar
 
 2010-07-12
-ragtag.vim
 speeddating.vim
+
+2010-07-24
+vis.vim
+	cecutil.vim
+visincr.vim
+vissort.vim
+LargeFile.vim
+
+2010-07-25
+eregex.vim
+mru.vim
 

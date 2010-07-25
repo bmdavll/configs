@@ -31,7 +31,7 @@ hi StatusLine	ctermfg=230		ctermbg=238		cterm=none		guifg=#ffffd7	guibg=#444444	
 hi VertSplit	ctermfg=238		ctermbg=238		cterm=none		guifg=#444444	guibg=#444444	gui=none
 hi StatusLineNC	ctermfg=241		ctermbg=238		cterm=none		guifg=#857b6f	guibg=#444444	gui=none
 hi LineNr		ctermfg=241		ctermbg=232		cterm=none		guifg=#857b6f	guibg=#080808	gui=none
-hi SpecialKey	ctermfg=241		ctermbg=235		cterm=none		guifg=#626262	guibg=#2b2b2b	gui=none
+hi SpecialKey	ctermfg=240		ctermbg=235		cterm=none		guifg=#585858	guibg=#2b2b2b	gui=none
 hi WarningMsg	ctermfg=203										guifg=#ff5f55
 hi ErrorMsg		ctermfg=196		ctermbg=236		cterm=bold		guifg=#ff2026	guibg=#3a3a3a	gui=bold
 
@@ -44,10 +44,10 @@ hi PmenuSel		ctermfg=232		ctermbg=192						guifg=#080808	guibg=#cae982
 endif
 
 " Diff highlighting
-hi DiffAdd						ctermbg=17										guibg=#2a0d6a
+hi DiffAdd		ctermfg=none	ctermbg=17		cterm=none		guifg=NONE		guibg=#2a0d6a	gui=none
 hi DiffDelete	ctermfg=234		ctermbg=60		cterm=none		guifg=#242424	guibg=#3e3969	gui=none
-hi DiffText						ctermbg=53		cterm=none						guibg=#73186e	gui=none
-hi DiffChange					ctermbg=237										guibg=#382a37
+hi DiffText		ctermfg=none	ctermbg=53		cterm=none		guifg=NONE		guibg=#73186e	gui=none
+hi DiffChange	ctermfg=none	ctermbg=237		cterm=none		guifg=NONE		guibg=#382a37	gui=none
 
 "hi CursorIM
 "hi Directory

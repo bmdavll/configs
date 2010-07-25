@@ -264,7 +264,7 @@
 <Multi_key> <B> <asciicircum>			: "▀"	U2580 # UPPER HALF BLOCK
 <Multi_key> <B> <underscore>			: "▄"	U2584 # LOWER HALF BLOCK
 <Multi_key> <B> <F>						: "█"	U2588 # FULL BLOCK
-<Multi_key> <F> <B>						: "█"	U2588 # FULL BLOCK
+<Multi_key> <f> <b>						: "█"	U2588 # FULL BLOCK
 <Multi_key> <B> <less>					: "▌"	U258C # LEFT HALF BLOCK
 <Multi_key> <B> <greater>				: "▐"	U2590 # RIGHT HALF BLOCK
 <Multi_key> <B> <bar>					: "▕▏"	U2595 # RIGHT ONE EIGHTH BLOCK

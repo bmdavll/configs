@@ -17,7 +17,60 @@ if [ -z "$DISPLAY" -a -f "$HOME/.loadkeys" ]; then
 	(loadkeys "$HOME/.loadkeys" || sudo loadkeys "$HOME/.loadkeys") &>/dev/null
 fi
 
-#{{1 Cygwin
+#{{1 options and environment variables
+#{{2 bash
+shopt -s no_empty_cmd_completion
+shopt -s checkwinsize	# if necessary, update LINES/COLUMNS after each command
+shopt -s cmdhist		# multi-line histories
+shopt -s dotglob		# include hidden files in pathname expansions
+shopt -s extglob		# extended pattern matching
+shopt -s histappend		# append to history file rather than overwrite
+shopt -s nocaseglob		# case-insensitive matching
+
+# ignore 2 EOF's before exiting
+IGNOREEOF=1
+
+# history file
+export HISTFILE="$HOME/.commandline_history"
+# max number of lines in history file
+HISTFILESIZE=50000
+# max number of commands
+HISTSIZE=47000
+
+# commands to exclude from history
+HISTIGNORE='?:??:???:o*(o):dirs:free:clear:reset:exit'
+
+# exclude duplicate commands and command lines starting with space
+HISTCONTROL=ignoreboth
+
+# time builtin format
+TIMEFORMAT=$'\n%3lR\t%P%%'
+
+# allow scripts access to window dimensions
+export LINES COLUMNS
+
+#{{2 pager
+export PAGER=less
+export LESS='-MiRSx4'
+export LESS_TERMCAP_mb=$'\e[01;31m'		# blinking
+export LESS_TERMCAP_md=$'\e[01;94m'		# begin bold
+export LESS_TERMCAP_so=$'\e[01;90;103m'	# begin stand-out mode (search highlighting)
+export LESS_TERMCAP_us=$'\e[01;36m'		# begin underline
+export LESS_TERMCAP_me=$'\e[0m'			# end mode
+export LESS_TERMCAP_se=$'\e[0m'			# end stand-out mode
+export LESS_TERMCAP_ue=$'\e[0m'			# end underline
+
+#{{2 text editors
+export EDITOR=vim
+export VISUAL=vim
+
+#{{2 python
+export PYTHONPATH="$HOME/code/lang/py/modules"
+if [ -f "$HOME/.pythonrc" ]; then
+	export PYTHONSTARTUP="$HOME/.pythonrc"
+fi
+
+#{{2 Cygwin
 if [ "$(uname -o)" = "Cygwin" ]; then
 	CYGWIN=$(uname -s)
 
@@ -26,8 +79,10 @@ if [ "$(uname -o)" = "Cygwin" ]; then
 	# unexpected consequences
 	unset TMP TEMP
 fi
+#}}
 
 #{{1 prompt
+#{{2 main prompt
 if [ "$TERM" = "linux" ]; then
 	# long prompt (system console)
 	PS1="\u@\h[\#]\W\$ "
@@ -51,12 +106,16 @@ else
 	[ -t 0 ] && stty -ixon
 fi
 
-# set variable identifying the chroot you work in
-if [ -z "$debian_chroot" -a -r /etc/debian_chroot ]; then
-	debian_chroot=$(cat /etc/debian_chroot)
-fi
-PS1="${debian_chroot:+($debian_chroot)}$PS1"
+#{{2 prompt command
+PROMPT_COMMAND='history -a'
+# set title bar
+case "$TERM" in
+xterm*|*rxvt*)
+	PROMPT_COMMAND+=';echo -ne "\033]0;$USER@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
+	;;
+esac
 
+#{{2 switch prompt
 function PS1
 {
 	if [[ "$PS1" == *promptwd* ]]; then
@@ -79,70 +138,17 @@ function PS1
 #	fi
 #}
 
-# title bar
-PROMPT_COMMAND='history -a'
-case "$TERM" in
-xterm*|*rxvt*)
-	PROMPT_COMMAND+=';echo -ne "\033]0;$USER@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
-	;;
-esac
-
-#{{1 options and variables
-shopt -s no_empty_cmd_completion
-shopt -s checkwinsize	# if necessary, update LINES/COLUMNS after each command
-shopt -s cmdhist		# multi-line histories
-shopt -s dotglob		# include hidden files in pathname expansions
-shopt -s extglob		# extended pattern matching
-shopt -s histappend		# append to history file rather than overwrite
-shopt -s nocaseglob		# case-insensitive matching
-
-# ignore 2 EOF's before exiting
-IGNOREEOF=2
-
-# history file
-export HISTFILE="$HOME/.commandline_history"
-# max number of lines in history file
-HISTFILESIZE=50000
-# max number of commands
-HISTSIZE=47000
-
-# commands to exclude from history
-HISTIGNORE='?:??:???:o*(o):dirs:free:clear:reset:exit'
-
-# exclude duplicate commands and command lines starting with space
-HISTCONTROL=ignoreboth
-
-# time builtin format
-TIMEFORMAT=$'\n%3lR\t%P%%'
-
-# allow scripts access to window dimensions
-export LINES COLUMNS
-
-# pager
-export PAGER=less
-export LESS='-MiRSx4'
-export LESS_TERMCAP_mb=$'\e[01;31m'		# blinking
-export LESS_TERMCAP_md=$'\e[01;94m'		# begin bold
-export LESS_TERMCAP_so=$'\e[01;90;103m'	# begin stand-out mode (search highlighting)
-export LESS_TERMCAP_us=$'\e[01;36m'		# begin underline
-export LESS_TERMCAP_me=$'\e[0m'			# end mode
-export LESS_TERMCAP_se=$'\e[0m'			# end stand-out mode
-export LESS_TERMCAP_ue=$'\e[0m'			# end underline
-
-# text editors
-export EDITOR=vim
-export VISUAL=vim
-
-# python
-export PYTHONPATH="$HOME/code/lang/py/modules"
-if [ -f "$HOME/.pythonrc" ]; then
-	export PYTHONSTARTUP="$HOME/.pythonrc"
+#{{2 chroot
+# set variable identifying the chroot you work in
+if [ -z "$debian_chroot" -a -r /etc/debian_chroot ]; then
+	debian_chroot=$(cat /etc/debian_chroot)
 fi
+PS1="${debian_chroot:+($debian_chroot)}$PS1"
+#}}
 
 #{{1 user bin directory
 BIN="$HOME/bin"
-
-function abspath
+function abspath #{{2
 {
 	[ $# -ne 1 ] && return 2
 	local IFS=$'\n' abspath
@@ -159,7 +165,7 @@ function abspath
 	else return 2
 	fi
 }
-function lnbin
+function lnbin #{{2
 {
 	[ ! -d "$BIN" ] && return 1
 	local IFS=$'\n'
@@ -174,9 +180,10 @@ function lnbin
 	done
 	return $code
 }
+#}}
 
-#{{1 bootstrap other scripts and set PATH
-function addpath
+#{{1 bootstrap scripts and set PATH
+function addpath #{{2
 {
 	[ $# -ne 1 ] && return 2
 	if ! echo "$PATH" | grep '\(:\|^\)'"$1"'\(:\|$\)' >/dev/null
@@ -184,7 +191,7 @@ function addpath
 	else return 1
 	fi
 }
-function addsource
+function addsource #{{2
 {
 	[ $# -eq 0 ] && return 2
 	local -i code=0
@@ -198,14 +205,17 @@ function addsource
 	done
 	return $code
 }
+#}}
+
+addpath /usr/local/bin
 addsource "$HOME/.bash_aliases"
 
-if [ "$TERM" != "dumb" ] || [ "$CYGWIN" ]; then
+if [[ "$TERM" != "dumb" || "$CYGWIN" ]]; then
 	addsource "$HOME/.bash_hacks"
 	addpath .
 fi
-#}}1
+#}}
 
 # done
 true
-# vim:set ts=4 sw=4 noet fmr={{,}} fdm=marker:
+# vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:

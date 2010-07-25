@@ -1,10 +1,16 @@
 #!/bin/bash
 
-TERMINALS=(Terminal gnome-terminal)
+# preferred terminals, in order
+TERMINALS=(
+	# terminal-command directory-option execute-option
+	'urxvt -cd -e'
+	'Terminal --working-directory -x'
+	'gnome-terminal --working-directory -x'
+)
 
 for arg in "$@"; do
 	if [[ "$arg" =~ ^-[?] ]]; then
-		echo "Usage: $(basename "$0") [1-9] [dir|file] [cmd]"
+		echo "Usage: $(basename "$0") [1-9] [dir|file] [opts|cmd]"
 		exit
 	fi
 done
@@ -14,13 +20,15 @@ then count=$1 && shift
 else count=1
 fi
 
+# "manual" home directory globbing
 if [ $# -gt 0 ]; then
-	dir="${1/#\$HOME/$HOME}" && shift
+	dir="${1/#\$HOME\//$HOME/}" && shift
 	dir="${dir/#\~\//$HOME/}"
 	set -- "$dir" "$@"
 fi
 
-if [[ -d "$1" || "$1" =~ /$ ]]; then
+# get working directory
+if [[ -d "$1" || "$1" == /* || "$1" == */ ]]; then
 	dir="$1"
 	shift
 elif [ -e "$1" ]; then
@@ -29,16 +37,17 @@ elif [ -e "$1" ]; then
 else
 	dir="$PWD"
 fi
-
-if [ $# -gt 0 ] && type "$1" &>/dev/null; then
-	set -- --title="$1" --geometry=80x24 -x "$@"
-fi
+dir=$(readlink -m "$dir")
 
 for terminal in "${TERMINALS[@]}"; do
-	if type "$terminal" &>/dev/null; then
+	terminal=($terminal)
+	if type "${terminal[0]}" &>/dev/null; then
+		if [ $# -gt 0 ] && type "$1" &>/dev/null; then
+			set -- "${terminal[2]}" "$@"
+		fi
 		for count in $(seq 1 $count); do
 			# LANG="en_US.UTF-8" LC_ALL="en_US.UTF-8"
-			$terminal --working-directory="$dir" "$@"
+			"${terminal[0]}" "${terminal[1]}" "$dir" "$@"
 		done
 		exit
 	fi

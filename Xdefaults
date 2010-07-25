@@ -1,0 +1,34 @@
+! 232 gray3
+! 233 gray7
+! 234 gray11
+! 235 gray15
+! 236 gray19
+! 245 gray54
+! 246 gray58
+! 247 gray62
+! 248 gray66
+URxvt.background:	gray3
+URxvt.foreground:	#c0c0ba
+URxvt.cursorColor:	#eae788
+URxvt.cursorColor2:	gray15
+URxvt.color0:		black
+URxvt.color1:		red3
+URxvt.color2:		green3
+URxvt.color3:		yellow3
+URxvt.color4:		blue2
+URxvt.color5:		magenta3
+URxvt.color6:		cyan3
+URxvt.color7:		gray90
+URxvt.color8:		gray50
+URxvt.color9:		red
+URxvt.color10:		green
+URxvt.color11:		yellow
+URxvt.color12:		#5c5cff
+URxvt.color13:		magenta
+URxvt.color14:		cyan
+URxvt.color15:		white
+URxvt.geometry:		88x28
+URxvt.font:			xft:DejaVu Sans Mono:pixelsize=12.5:antialias=false
+URxvt.scrollstyle:	plain
+URxvt.scrollBar_right:true
+URxvt.scrollBar:	false

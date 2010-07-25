@@ -335,10 +335,4 @@ else
     hi Error         cterm=bold ctermfg=7 ctermbg=1
 endif
 
-" Diff highlighting
-hi DiffAdd                      ctermbg=17                                      guibg=#2a0d6a
-hi DiffDelete   ctermfg=234     ctermbg=60      cterm=none      guifg=#242424   guibg=#3e3969   gui=none
-hi DiffText                     ctermbg=53      cterm=none                      guibg=#73186e   gui=none
-hi DiffChange                   ctermbg=237                                     guibg=#382a37
-
-" vim: set fdl=0 fdm=marker et:
+" vim: set fdl=0 fdm=marker:

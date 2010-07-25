@@ -1,16 +1,16 @@
 #!/bin/bash
 # bash aliases and command-line functions
-#{{1 convenience variables
-NBSP=' '
-
-# patterns
+# TODO
+# unzipper
+#{{1 patterns
+# help option
 HELP_PAT='^-[?]'
 
-# file matchers
+# files
 CODE_PAT='?*.@(c|C|cc|cpp|h|H|hh|hpp|java|cs|py|rb|pl|sh|vim|js|php|l|y)'
-# the '*' before a literal is a compgen hack
-MAKE_PAT='@(*[Mm]akefile|*configure)?(.@(ac|am|in))'
 TEXT_PAT='@(*README|*INSTALL|?*.@(txt|log|rst))'
+MAKE_PAT='@(*[Mm]akefile|*configure)?(.@(ac|am|in))'
+# (the '*' before a literal is a compgen hack)
 
 #{{1 utility functions
 #{{2 return the maximum integer value from a list
@@ -174,7 +174,7 @@ function file_glob #{{
 }
 #}}2
 
-#{{1 essentials
+#{{1 main
 #{{2 colors
 if [ -x /bin/tput -o -x /usr/bin/tput ] && tput setaf 1 &>/dev/null || [ "$CYGWIN" ]
 then :
@@ -799,7 +799,7 @@ function typef
 complete -c typef
 #}}2
 
-#{{1 the rest
+#{{1 etc
 alias cat4='expand -t4'
 alias db='diff -bB'
 alias df='df -h'
@@ -1151,4 +1151,4 @@ function tune
 }
 
 #}}1
-# vim:set ts=4 sw=4 noet fmr={{,}} fdm=marker:
+# vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:
