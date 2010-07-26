@@ -6,7 +6,15 @@ EXCLUDE='launchers|setup'
 
 IFS=$'\n'
 
+exec >&2
 declare -i code=0
+
+# no action
+if [ "$1" = "-n" ]; then
+	dry_run=echo
+else
+	dry_run=
+fi
 
 recurse() {
 	local wd="$PWD" file target
@@ -16,18 +24,30 @@ recurse() {
 		if	[[ -z "$1" && "$file" =~ ^("$this"|$EXCLUDE)$ ]]; then
 			continue
 		fi
-		target="$HOME/${1:-.}$file"
+		target="${1:-$HOME/.}$file"
+
+		if [[ "$file" =~ [*?] ]]
+		then
+			glob=$(ls -d $target 2>/dev/null)
+			if [[ $? -ne 0 || ! -e "$glob" ]]; then
+				echo "No match: $target"
+				code+=1
+				continue
+			else
+				target="$glob"
+			fi
+		fi
 
 		if [ -h "$target" ]
 		then
 			# silently re-link matching or non-existent symlinks
 			if   [[ -d "$file" && -d "$target" ]]
 			then
-				ln -sfT "$wd/$file" "$target"
+				$dry_run ln -sfT "$wd/$file" "$target"
 
 			elif [[ -f "$file" && -f "$target" || ! -e "$target" ]]
 			then
-				ln -sf  "$wd/$file" "$target"
+				$dry_run ln -sf  "$wd/$file" "$target"
 			else
 				! echo "File-directory mismatch: $target"
 			fi
@@ -41,7 +61,7 @@ recurse() {
 					false
 				else
 					# append a level
-					recurse "${1:-.}$file/"
+					recurse "$target/"
 					cd "$wd"
 				fi
 			else
@@ -54,14 +74,14 @@ recurse() {
 			ls -lh "$target"
 			echo -n "Remove and link? [y/N] " && read
 			if [[ "$REPLY" == [Yy]* ]]; then
-				ln -sf "$wd/$file" "$target"
+				$dry_run ln -sf "$wd/$file" "$target"
 			else
 				continue
 			fi
 
 		else
 			# new link
-			ln -s "$wd/$file" "$target"
+			$dry_run ln -s "$wd/$file" "$target"
 		fi
 
 		code+=$?

@@ -1,5 +1,5 @@
-262	gvim 
-75	t 
+280	gvim 
+82	t 
 28	f 
 27	t timer 
 8	t cpuset 
@@ -12,15 +12,14 @@
 3	scim-run gvim 
 3	clementine
 3	gmpc 
-2	pokerth
+3	urxvt
+3	dropboxd
 2	inkscape 
 2	easytag
 2	galculator 
 2	scim-run stardict 
 2	xfce4-mixer
 2	clipboard 
-2	dropboxd
-2	urxvt
 1	soffice
 1	mirage
 0	transmission 

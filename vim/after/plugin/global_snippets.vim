@@ -16,23 +16,6 @@ let g:snip_args = st."\"...\":CleanupArgs(@z)".et
 let g:snip_post_args = st."\"...\":Decorate(CleanupArgs(@z), ', ', '')".et
 
 " common functions {{{1
-" returns text with all instances of pat removed
-function! StripFrom(text, pat) "{{{2
-	return substitute(a:text, a:pat, '', 'g')
-endfunction "}}}2
-
-" returns the number of occurrences of needle in haystack
-function! Count(haystack, needle) "{{{2
-	let counter = 0
-	let index = match(a:haystack, a:needle)
-	while index > -1
-		let counter += 1
-		let end = matchend(a:haystack, a:needle, index)
-		let index = match(a:haystack, a:needle, end)
-	endwhile
-	return counter
-endfunction "}}}2
-
 " returns the number of contiguous needles in haystack, skipping only
 " intermittent poop
 " returns 0 unless all of haystack is matched, from start to end, by either
@@ -53,19 +36,6 @@ function! CountSkipping(haystack, needle, poop) "{{{2
 	else
 		return counter
 	endif
-endfunction "}}}2
-
-" returns a list of pat occurrences in str
-function! MatchList(str, pat) "{{{2
-	let matches = []
-	let end = 0
-	while 1
-		let mat = matchstr(a:str, a:pat, end)
-		if mat == '' | break | endif
-		call add(matches, mat)
-		let end = matchend(a:str, a:pat, end)
-	endwhile
-	return matches
 endfunction "}}}2
 
 " returns replacement if text equals match, otherwise returns text unchanged

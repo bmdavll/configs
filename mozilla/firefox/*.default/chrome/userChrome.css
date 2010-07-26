@@ -1,0 +1,166 @@
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+
+/* tabs */
+.tabbrowser-tabs {
+	font-size: 90% !important;
+	height: 28px !important;
+}
+.tabbrowser-tab {
+	max-height: 25px !important;
+}
+/* disable close tab, new tab, and list all tabs buttons */
+.tab-close-button,
+.tabs-newtab-button,
+.tabs-container > stack
+{
+	display: none !important;
+}
+
+/* bookmarks toolbar */
+#PersonalToolbar {
+	padding: 0px !important;
+	font-size: 90% !important;
+	height: 29px !important;
+	min-height: 24px !important;
+}
+/* toolbar buttons */
+#PersonalToolbar .toolbarbutton-icon {
+	max-width:  20px !important;
+	max-height: 20px !important;
+}
+#PersonalToolbar .toolbarbutton-menu-dropmarker {
+	display: none !important;
+}
+
+/* statusbar */
+#status-bar
+{
+	height: 18px !important;
+}
+#status-bar > * ,
+#status-bar > * > *
+{
+	margin:  0px !important;
+	padding: 1px !important;
+}
+
+/* disable stuff */
+#throbber-box,
+#sync-menu-button .statusbarpanel-text,
+#fbStatusText
+{
+	display: none !important;
+}
+
+/* bookmarks toolbar customization
+toolbarbutton[label='Name']				.toolbarbutton-icon { list-style-image: url('name.ico')			!important; display: block !important; -moz-image-region: auto !important; }
+.bookmark-item[label='Name']								{ list-style-image: url('name.ico')			!important; display: block !important; -moz-image-region: auto !important; }
+ */
+toolbarbutton[label='Cal']				.toolbarbutton-icon { list-style-image: url('berkeley.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+.bookmark-item[label='CalMail']								{ list-style-image: url('berkeley.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+.bookmark-item[label='bSpace']								{ list-style-image: url('bspace.gif')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='C++']				.toolbarbutton-icon { list-style-image: url('cpp.ico')			!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Java']				.toolbarbutton-icon { list-style-image: url('sun.ico')			!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Python']			.toolbarbutton-icon { list-style-image: url('python.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Google']			.toolbarbutton-icon { list-style-image: url('google.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Wiki']				.toolbarbutton-icon { list-style-image: url('wikipedia.ico')	!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='W|A']				.toolbarbutton-icon { list-style-image: url('wolfram.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Dict']				.toolbarbutton-icon { list-style-image: url('dictionary.ico')	!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='WR']				.toolbarbutton-icon { list-style-image: url('wordreference.ico')!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Translate']		.toolbarbutton-icon { list-style-image: url('google2.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Español']			.toolbarbutton-icon { list-style-image: url('espanol.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Chinese']			.toolbarbutton-icon { list-style-image: url('chinese.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Read']				.toolbarbutton-icon { list-style-image: url('readability.png')	!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='NYT']				.toolbarbutton-icon { list-style-image: url('nytimes.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='lh']				.toolbarbutton-icon { list-style-image: url('lifehacker.ico')	!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Torrents']			.toolbarbutton-icon { list-style-image: url('utorrent.ico')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Ocio']				.toolbarbutton-icon { list-style-image: url('beh.png')			!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Poker']			.toolbarbutton-icon { list-style-image: url('poker.png')		!important; display: block !important; -moz-image-region: auto !important; }
+
+toolbarbutton[label='@']				.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/preferences/mail.png')			!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Unsorted']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/unsortedBookmarks.png')	!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Macros']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/bookmarksToolbar.png')	!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Other']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/allBookmarks.png')		!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Other']			.toolbarbutton-icon { list-style-image: url('bookmarks.png')	!important; display: block !important; -moz-image-region: auto !important; }
+
+toolbarbutton							.toolbarbutton-text { display: none   !important; }
+
+/* remove context menu items */
+	#context-openlink,                      /*	*/
+	#context-openlinkintab,                 /*	*/
+	#context-sep-open,                      /*	*/
+	#context-bookmarklink,                  /*	*/
+/*	#context-savelink,                      /*	*/
+	#context-sendlink,                      /*	*/
+/*	#context-copyemail,                     /*	*/
+/*	#context-copylink,                      /*	*/
+/*	#context-sep-copylink,                  /*	*/
+/*	#context-showimage,                     /*	*/
+/*	#context-viewimage,                     /*	*/
+/*	#context-copyimage-contents,            /*	*/
+/*	#context-copyimage,                     /*	*/
+/*	#context-sep-copyimage,                 /*	*/
+/*	#context-saveimage,                     /*	*/
+	#context-sendimage,                     /*	*/
+	#context-setDesktopBackground,          /*	*/
+	#context-blockimage,                    /*	*/
+	#context-back,                          /*	*/
+	#context-forward,                       /*	*/
+	#context-reload,                        /*	*/
+	#context-stop,                          /*	*/
+	#context-sep-stop,                      /*	*/
+/*	#context-bookmarkpage,                  /*	*/
+/*	#context-savepage,                      /*	*/
+	#context-sendpage,                      /*	*/
+	#context-sep-viewbgimage,               /*	*/
+/*	#context-viewbgimage,                   /*	*/
+/*	#context-undo,                          /*	*/
+/*	#context-sep-undo,                      /*	*/
+/*	#context-cut,                           /*	*/
+/*	#context-copy,                          /*	*/
+/*	#context-paste,                         /*	*/
+	#context-delete,                        /*	*/
+/*	#context-sep-paste,                     /*	*/
+/*	#context-selectall,                     /*	*/
+/*	#context-sep-selectall,                 /*	*/
+/*	#context-keywordfield,                  /*	*/
+/*	#context-searchselect,                  /*	*/
+/*	#frame-sep,                             /*	*/
+/*	#frame,                                 /*	*/
+/*	#context-showonlythisframe,             /*	*/
+	#context-openframe,                     /*	*/
+/*	#context-openframeintab,                /*	*/
+/*	#context-openframeintab+menuseparator,  /*	*/
+/*	#context-reloadframe,                   /*	*/
+/*	#context-reloadframe+menuseparator,     /*	*/
+/*	#context-bookmarkframe,                 /*	*/
+/*	#context-saveframe,                     /*	*/
+	#context-saveframe+menuseparator,       /*	*/
+/*	#context-printframe,                    /*	*/
+/*	#context-printframe+menuseparator,      /*	*/
+/*	#context-viewframesource,               /*	*/
+/*	#context-viewframeinfo,                 /*	*/
+/*	#context-sep-properties,                /*	*/
+/*	#context-viewpartialsource-selection,   /*	*/
+/*	#context-viewpartialsource-mathml,      /*	*/
+/*	#context-viewsource,                    /*	*/
+/*	#context-viewinfo,                      /*	*/
+/*	#context-metadata,                      /*	*/
+	#context-sep-bidi,                      /*	*/
+	#context-bidi-text-direction-toggle,    /*	*/
+	#context-bidi-page-direction-toggle,    /*	*/
+/* addons */
+	#abp-frame-menuitem,
+	#abp-image-menuitem,
+	#abp-media-menuitem,
+	#abp-object-menuitem,
+	#abp-removeWhitelist-menuitem,
+	#liveclick-lbt-link,
+	#liveclick-lbt-page,
+	#liveclick-lbt-menu,
+	#dtaCtxSepBack-direct
+{
+	display: none !important;
+}
+
+/* vim:set ts=4 sw=4 noet: */

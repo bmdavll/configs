@@ -1,4 +1,7 @@
 " Vim 7.2 vimrc
+" Author:		David Liang
+" Soure:		http://github.com/bmdavll/configs/blob/master/vimrc
+" Last Change:	2010-07-25
 " Section: encoding {{1
 scriptencoding utf-8
 
@@ -13,16 +16,43 @@ if has('multi_byte')
 endif
 
 " Section: utility functions {{1
+" global {{2
 " returns text with all instances of pat removed
 function! StripFrom(text, pat)
 	return substitute(a:text, a:pat, '', 'g')
 endfunction
 
 " returns the length of str, counting each multi-byte character as 1
-function! CharLen(str)
+function! Strlen(str)
 	return strlen(substitute(a:str, '.', 'x', 'g'))
 endfunction
 
+" returns the number of occurrences of needle in haystack
+function! Count(haystack, needle)
+	let counter = 0
+	let index = match(a:haystack, a:needle)
+	while index > -1
+		let counter += 1
+		let end = matchend(a:haystack, a:needle, index)
+		let index = match(a:haystack, a:needle, end)
+	endwhile
+	return counter
+endfunction
+
+" returns a list of pat occurrences in str -- cf. matchlist()
+function! MatchList(str, pat)
+	let matches = []
+	let end = 0
+	while 1
+		let mat = matchstr(a:str, a:pat, end)
+		if mat == '' | break | endif
+		call add(matches, mat)
+		let end = matchend(a:str, a:pat, end)
+	endwhile
+	return matches
+endfunction
+
+" local to script {{2
 " returns a new list with duplicate items removed
 function! <SID>RemoveDuplicates(list)
 	let uniq = []
@@ -53,6 +83,7 @@ endfunction
 function! <SID>ErrorMsg(msg)
 	echohl ErrorMsg | echomsg a:msg | echohl None
 endfunction
+" }}
 
 " Section: options {{1
 " interface {{2
@@ -100,18 +131,25 @@ set formatoptions+=r	" auto insert comment leader
 set formatoptions+=n	" recognize numbered lists when formatting
 set backspace=2			" allow backspacing over everything in insert mode
 set delcombine			" delete combining characters separately
+" folding {{2
+set foldmethod=indent	" define folds automatically based on indent level
+function! MyFoldText()	" custom fold text function
+	return repeat('----', v:foldlevel-1).
+			\tr(v:foldlevel, '0123456789', '⁰¹²³⁴⁵⁶⁷⁸⁹').
+			\substitute(foldtext(), '^+--\+', '', '')
+endfunction
+set foldtext=MyFoldText()
 " vim {{2
 set updatetime=1000		" interval for CursorHold updates and swap file writes
 set nobackup			" do not keep a backup file
 set history=1000		" lines of command line history to keep
 set viminfo='50,s100,h	" settings for vim cache
-set sessionoptions=curdir,folds,tabpages,winsize,localoptions
+set sessionoptions=curdir,folds,localoptions,resize,tabpages,winsize
 						" what to save with mksession
 set cpoptions+=>		" put a line break before appending to a register
 set diffopt+=iwhite		" ignore whitespace in diff mode
 set diffopt+=foldcolumn:1
 						" use narrow fold column
-set foldmethod=indent	" define folds automatically based on indent level
 " completion {{2
 set complete-=i			" don't scan included files for completion options
 set completeopt+=longest
@@ -126,10 +164,6 @@ set wildignore+=*.pyc
 if !has('gui_win32')
 	" directories for swap files
 	set directory=~/tmp//,.,/var/tmp//,/tmp//
-	" don't source interactive scripts
-	set shell=env\ TERM=dumb\ $SHELL
-	" use login shell (read .profile)
-	set shellcmdflag=-lc
 else
 	set directory=~//,.
 endif
@@ -198,7 +232,8 @@ if !has('gui_running')
 	set <M-a>=a | set <M-x>=x | set <M-c>=c | set <M-v>=v
 	set <M-h>=h | set <M-j>=j | set <M-k>=k | set <M-l>=l
 	set <M-p>=p | set <M-n>=n | set <M-b>=b | set <M-f>=f
-	set <M-d>=d | set <M-r>=r | set <M-y>=y | set <M-/>=/ | set <M-?>=?
+	set <M-d>=d | set <M-r>=r | set <M-y>=y
+	set <M-/>=/ | set <M-?>=? | set <M-->=- | set <M-=>==
 	set <M-1>=1 | set <M-2>=2 | set <M-3>=3 | set <M-4>=4 | set <M-5>=5
 	set <M-6>=6 | set <M-7>=7 | set <M-8>=8 | set <M-9>=9 | set <M-0>=0
 
@@ -416,11 +451,17 @@ function! s:DiffRegs(...)
 endfunction " }}3
 
 " registers {{2
-" Reg: check full contents of registers
-command! -nargs=1 Reg call s:Reg(<q-args>)
+" Reg: check full contents of registers (@", @*, and @+ by default)
+" Usage: Reg abc to see registers a, b, c
+command! -nargs=? Reg call s:Reg(<q-args>)
 function! s:Reg(regstr)
-	for i in range(len(a:regstr))
-		let reg = a:regstr[i]
+	if a:regstr == ''
+		let regs = '"*+'
+	else
+		let regs = a:regstr
+	endif
+	for i in range(len(regs))
+		let reg = regs[i]
 		let contents = getreg(reg)
 		if contents != ''
 			echohl Visual | echo '"'.reg | echohl None
@@ -439,7 +480,7 @@ command! -nargs=0 -register ClearRegister
 	\|	endif
 
 " files {{2
-" TabOpen: open files in new tabs {{3
+" TabOpen: open files in new tabs, with globbing {{3
 command! -nargs=* -complete=file TabOpen call s:TabOpen(<f-args>)
 function! s:TabOpen(...)
 	if a:0 == 0
@@ -625,13 +666,13 @@ function! s:ExpandTabs(line1, line2, arg)
 	else
 		let fill = a:arg
 	endif
-	let fill_len = CharLen(fill)
+	let fill_len = Strlen(fill)
 	let last = matchstr(fill, '.$')
 	let tabpat = '\v^([^\t]*)(\t+)'
 	for line in range(a:line1, a:line2)
 		while match(getline(line), tabpat) != -1
 			let list = matchlist(getline(line), tabpat)
-			let len = len(list[2])*&tabstop - CharLen(list[1])%&tabstop
+			let len = len(list[2])*&tabstop - Strlen(list[1])%&tabstop
 			exec line.'s/^[^\t]*\zs\t\+/'.
 				\repeat(fill, len/fill_len).repeat(last, len%fill_len).'/'
 		endwhile
@@ -647,7 +688,7 @@ function! s:InternalTabsToSpaces(line1, line2)
 		while match(getline(line), tabpat) != -1
 			let list = matchlist(getline(line), tabpat)
 			exec line.'s/^\t*[^\t]\+\zs\t\+/'.
-				\repeat(' ', len(list[2])*&tabstop - CharLen(list[1])%&tabstop).'/'
+				\repeat(' ', len(list[2])*&tabstop - Strlen(list[1])%&tabstop).'/'
 		endwhile
 	endfor
 endfunction
@@ -663,7 +704,7 @@ function! s:CombineSelection(line1, line2, cp)
 	exec a:line1.','.a:line2.'s/\%V[^[:cntrl:]]\%V/&'.char.'/ge'
 endfunction
 
-" CodeReadability: insert whitespace in code for readability {{3
+" CodeReadability: insert whitespace, and other mods for readability {{3
 command! -range=% -nargs=0 CodeReadability call s:CodeReadability(<line1>, <line2>)
 function! s:CodeReadability(line1, line2)
 try
@@ -757,7 +798,7 @@ autocmd vimrc CmdwinEnter * unmap   <CR>
 autocmd vimrc CmdwinLeave * noremap <CR> :
 
 " set <Space> to toggle a fold
-noremap<silent><Space>		:<C-U>exec 'silent! normal! za'.(foldlevel('.')?'':'')<CR>
+noremap<silent><Space>		:<C-U>exec 'silent! normal! za'<CR>
 
 " use <C-Space> as <Esc>
 noremap			<C-Space>	<Esc>
@@ -852,7 +893,10 @@ noremap			<C-Y>		<C-L>
 
 " text editing {{3
 " wordwise yank from line above
-inoremap<silent><M-y>		<C-C>mzklyiw`zpa
+inoremap<silent><M-y>		<C-C>:let @z = @"<CR>mz
+							\:exec 'normal!' (col('.')==1 && col('$')==1 ? 'k' : 'kl')<CR>
+							\:exec (col('.')==col('$')-1 ? 'let @" = @_' : 'normal! ye')<CR>
+							\`zp:let @" = @z<CR>a
 
 " yank, delete, paste with Meta {{4
 " working with registers {{5
@@ -868,9 +912,8 @@ endfunction
 noremap	<silent><M-r>		:<C-U>call <SID>PasteRegister(0)<CR>
 vnoremap<silent><M-r>		:<C-U>call <SID>PasteRegister(1)<CR>
 inoremap		<M-r>		<C-R>
-
 " paste most recently used register
-inoremap		<M-p>		<C-R>"
+inoremap		<M-r><M-r>	<C-R>"
 
 " windows-like shortcuts {{5
 " select all
@@ -970,9 +1013,8 @@ fun! Raveon(auto)
 	endwhile
 endfun
 silent! unlet s:wtf
-map	<silent>	<M-F14>		:call Rave(1)<CR>
-map	<silent>	<M-F13>		:call Rave(64)<CR>
-map	<silent>	<M-F12>		:call Raveon(1)<CR>
+map	<silent>	<M-->		:call Rave(1)<CR>
+map	<silent>	<M-=>		:call Rave(64)<CR>
 
 endif
 " }}3
@@ -1019,9 +1061,9 @@ map	<silent>	<C-F3>		:<C-U>call <SID>ToggleClipBrd()<CR>
 function! <SID>Trim()
 	%s/\s\+$//e
 endfunction
-map	<silent>	<F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`a
-vmap<silent>	<F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agv
-imap<silent>	<F4>		<C-C>:let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agi
+noremap	<silent><F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`a
+vnoremap<silent><F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agv
+inoremap<silent><F4>		<C-C>:let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agi
 
 " <C-F4>            highlight characters beyond column ... {{3
 map				<C-F4>		:<C-U>Marker<Space>
@@ -1096,18 +1138,18 @@ vmap<silent>	<S-F9>		:<C-U>call <SID>AdvanceFont(1)<CR>:echo &guifont<CR>gv
 imap<silent>	<S-F9>		<C-C>:call <SID>AdvanceFont(1)<CR>:echo &guifont<CR>gi
 
 " <F11>             maximize current window {{3
-map				<F11>		<C-\><C-N><C-W>_<C-W>\|
-vmap			<F11>		<C-\><C-N><C-W>_<C-W>\|gv
+noremap			<F11>		<C-\><C-N><C-W>_<C-W>\|
+vnoremap		<F11>		<C-\><C-N><C-W>_<C-W>\|gv
 
 " <C-F10> <S-F10>   change window width, height {{3
-map				<C-F10>		<C-\><C-N>3<C-W><
-vmap			<C-F10>		<C-\><C-N>3<C-W><gv
-map				<C-F11>		<C-\><C-N>3<C-W>>
-vmap			<C-F11>		<C-\><C-N>3<C-W>>gv
-map				<S-F10>		<C-\><C-N>3<C-W>-
-vmap			<S-F10>		<C-\><C-N>3<C-W>-gv
-map				<S-F11>		<C-\><C-N>3<C-W>+
-vmap			<S-F11>		<C-\><C-N>3<C-W>+gv
+noremap			<C-F10>		<C-\><C-N>3<C-W><
+vnoremap		<C-F10>		<C-\><C-N>3<C-W><gv
+noremap			<C-F11>		<C-\><C-N>3<C-W>>
+vnoremap		<C-F11>		<C-\><C-N>3<C-W>>gv
+noremap			<S-F10>		<C-\><C-N>3<C-W>-
+vnoremap		<S-F10>		<C-\><C-N>3<C-W>-gv
+noremap			<S-F11>		<C-\><C-N>3<C-W>+
+vnoremap		<S-F11>		<C-\><C-N>3<C-W>+gv
 
 " <F12>             toggle spellcheck and autocorrect {{3
 function! <SID>ToggleSpellCorrect()
@@ -1153,12 +1195,14 @@ nnoremap<silent>MM			:exec 'silent! normal! zM'.foldlevel('.').'zozz'<CR>
 noremap			zT			<C-\><C-N>:%foldclose<CR>
 
 " font size
+if has('gui_running')
 map	<silent>	<M-0>		:<C-U>call <SID>AdvanceFont(0)<CR>
 vmap<silent>	<M-0>		:<C-U>call <SID>AdvanceFont(0)<CR>
 map	<silent>	<M-->		:<C-U>FontSize -<CR>:set guifont?<CR>
 vmap<silent>	<M-->		:<C-U>FontSize -<CR>:set guifont?<CR>gv
 map	<silent>	<M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>
 vmap<silent>	<M-=>		:<C-U>FontSize +<CR>:set guifont?<CR>gv
+endif
 
 " files {{3
 " load this file for editing and re-source
@@ -1211,27 +1255,27 @@ xmap<silent>	<leader>e		:<C-U>let @z=&et<CR>:set et<CR>gv:retab<CR>:let &et=@z<C
 xmap<silent>	<leader>t		:retab!<CR>
 
 " insert expanded tabs (tabs as spaces)
-imap<silent>	<leader><TAB>	<C-R>=repeat(' ', &tabstop - (virtcol('.')-1) % &tabstop)<CR>
+inoremap<silent><leader><TAB>	<C-R>=repeat(' ', &tabstop - (virtcol('.')-1) % &tabstop)<CR>
 
 " insert {{3
 " append modeline
-nmap<silent>	<leader>m		ovim:ts=4 sw=4 noet:<C-C>^
-imap<silent>	<leader>m		 vim:ts=4 sw=4 noet:<C-C>^
+nnoremap<silent><leader>m		ovim:ts=4 sw=4 noet:<C-C>^
+inoremap<silent><leader>m		 vim:ts=4 sw=4 noet:<C-C>^
 
 " date
-imap<silent>	<leader>dd		<C-R>=strftime('%Y-%m-%d')<CR>
+inoremap<silent><leader>dd		<C-R>=strftime('%Y-%m-%d')<CR>
 " logdate
-imap<silent>	<leader>l		<C-v>u25d81 <C-R>=strftime('%m/%d %a \| [] ')<CR><Left><Left>
+inoremap<silent><leader>l		<C-v>u25d81 <C-R>=strftime('%m/%d %a \| [] ')<CR><Left><Left>
 
 " delete {{3
 " delete into the null register
-map				<leader>d		"_d
-map				<leader>D		"_D
-map				<leader>c		"_c
-map				<leader>C		"_C
+noremap			<leader>d		"_d
+noremap			<leader>D		"_D
+noremap			<leader>c		"_c
+noremap			<leader>C		"_C
 
 " delete the stretch of whitespace at or before the cursor
-nmap<silent>	<leader><BS>	:normal! gE<CR>
+nnoremap<silent><leader><BS>	:normal! gE<CR>
 								\:exec(getline('.')[col('.')-1]=~'\S' ? "normal! \<lt>Right>":"")<CR>
 								\:exec(getline('.')[col('.')-1]=~'\s' ? 'normal! dw':'')<CR>
 
@@ -1243,11 +1287,11 @@ noremap			dN			<C-\><C-N>[czz
 noremap			dn			<C-\><C-N>]czz
 
 " quickfix {{3
-map				<M-1>		<C-\><C-N>:cprevious<CR>
-map				<M-2>		<C-\><C-N>:cnext<CR>
-map				<M-3>		<C-\><C-N>:clist<CR>
-map				<M-4>		<C-\><C-N>:make<Space><Up><CR>
-cmap			<M-4>		<C-R>=expand('%:t:r')<CR>
+noremap			<M-1>		<C-\><C-N>:cprevious<CR>
+noremap			<M-2>		<C-\><C-N>:cnext<CR>
+noremap			<M-3>		<C-\><C-N>:clist<CR>
+noremap			<M-4>		<C-\><C-N>:make<Space><Up><CR>
+cnoremap		<M-4>		<C-R>=expand('%:t:r')<CR>
 
 " search {{3
 " replace last search pattern
@@ -1267,18 +1311,18 @@ function! <SID>FidgetWhitespace(pat)
 endfunction
 
 " fuzzy whitespace
-xmap<silent>	*				<C-C>/\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'/\'))<CR><CR>
-xmap<silent>	#				<C-C>?\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'?\'))<CR><CR>
+xnoremap<silent>*				<C-C>/\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'/\'))<CR><CR>
+xnoremap<silent>#				<C-C>?\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelection(),'?\'))<CR><CR>
 
 " exact match
-xmap<silent>	<leader>*		<C-C>/\V<C-R>=substitute(escape(<SID>GetSelection(),'/\'),'\n','\\n','g')<CR><CR>
-xmap<silent>	<leader>#		<C-C>?\V<C-R>=substitute(escape(<SID>GetSelection(),'?\'),'\n','\\n','g')<CR><CR>
+xnoremap<silent><leader>*		<C-C>/\V<C-R>=substitute(escape(<SID>GetSelection(),'/\'),'\n','\\n','g')<CR><CR>
+xnoremap<silent><leader>#		<C-C>?\V<C-R>=substitute(escape(<SID>GetSelection(),'?\'),'\n','\\n','g')<CR><CR>
 
 " highlight without jumping {{4
-xmap<silent>	<M-8>		:<C-U>let @/="\\V<C-R>=escape(<SID>FidgetWhitespace(escape(<SID>GetSelection(),'\')),'\"')<CR>"<CR>
+xnoremap<silent><M-8>		:<C-U>let @/="\\V<C-R>=escape(<SID>FidgetWhitespace(escape(<SID>GetSelection(),'\')),'\"')<CR>"<CR>
 "							exec "let @/='\\<".expand("<cword>")."\\>'"
-nmap<silent>	<M-8>		:<C-U>normal! #*<CR>
-imap<silent>	<M-8>		<C-O>:normal! #*<CR>
+nnoremap<silent><M-8>		:<C-U>normal! #*<CR>
+inoremap<silent><M-8>		<C-O>:normal! #*<CR>
 
 " regex quick-keys {{4
 " parens
@@ -1301,8 +1345,7 @@ let g:EchoFuncKeyNext = '<M-n>'
 let g:EchoFuncMaxBalloonDeclarations = 6
 
 " eregex {{2
-nnoremap		/			:M/
-nnoremap		<leader>/	/
+nnoremap		<M-/>		:M/
 
 " NERD Commenter {{2
 let g:NERDBlockComIgnoreEmpty = 1
@@ -1495,10 +1538,4 @@ augroup git
 augroup END
 
 " }}1 development
-" TODO
-function! FoldText()
-	return repeat('*', v:foldlevel)
-endfunction
-set foldtext=FoldText()
-" camel case
 " vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:

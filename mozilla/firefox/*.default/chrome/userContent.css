@@ -1,0 +1,16 @@
+/* obviate need to zoom on many sites */
+html > body {
+	line-height: normal !important;
+}
+
+/* disable the deprecated <font> tag (reduces need to zoom) */
+font {
+	font-family: inherit !important;
+	font-size: inherit !important;
+	color: inherit !important;
+}
+
+/* improve scroll performance on slow machines on some sites */
+* {
+	background-attachment: scroll !important;
+}
