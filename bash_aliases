@@ -1,7 +1,5 @@
 #!/bin/bash
 # bash aliases and command-line functions
-# TODO
-# unzipper
 #{{1 patterns
 # help option
 HELP_PAT='^-[?]'
@@ -421,7 +419,7 @@ function rcd
 #{{2 find
 _finder() { :
 	if pat_in "$HELP_PAT" "$@"; then
-		echo "Usage: [find_option|path|iname|^exclude]... [find_spec]..." && return
+		echo "Usage: [find_option|path|iname|^path_exclude]... [find_spec]..." && return
 	fi
 	local IFS=$'\n' specs=() opts=() paths=() special gflag pat i
 	local nocaseglob=$(shopt -p nocaseglob) && shopt -u nocaseglob

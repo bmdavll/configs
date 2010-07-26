@@ -3,15 +3,6 @@
 
 umask 0022
 
-#{{1 completion
-if [ ! "${BASH_COMPLETION+set}" ]; then
-	if [ -f "$HOME/.bash_completion" ]; then
-		source "$HOME/.bash_completion"
-	elif [ -f /etc/bash_completion ]; then
-		source /etc/bash_completion
-	fi
-fi
-
 #{{1 remap console keys
 if [ -z "$DISPLAY" -a -f "$HOME/.loadkeys" ]; then
 	(loadkeys "$HOME/.loadkeys" || sudo loadkeys "$HOME/.loadkeys") &>/dev/null

@@ -4,6 +4,6 @@ if exists("did_load_filetypes")
 endif
 
 augroup filetypedetect
-	au! BufRead,BufNewFile *.vimp		setfiletype vimperator
+	au BufRead,BufNewFile *.vimp	setfiletype vimperator
 augroup END
 

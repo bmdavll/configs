@@ -354,8 +354,6 @@ if !has('autocmd')
 	set autoindent
 else
 	" enable file type detection
-	" use the default filetype settings, so that mail gets 'tw' set to 72,
-	" 'cindent' is on in C files, etc
 	" also load indent files for language-dependent indenting
 	filetype plugin indent on
 
@@ -794,8 +792,8 @@ cnoremap		<C-K>		<Nop>
 " use <Enter> to enter cmdline mode
 noremap			<CR>		:
 " disable in command-line window
-autocmd vimrc CmdwinEnter * unmap   <CR>
-autocmd vimrc CmdwinLeave * noremap <CR> :
+au vimrc CmdwinEnter * unmap   <CR>
+au vimrc CmdwinLeave * noremap <CR> :
 
 " set <Space> to toggle a fold
 noremap<silent><Space>		:<C-U>exec 'silent! normal! za'<CR>
@@ -1057,7 +1055,7 @@ endfunction
 map	<silent>	<C-F3>		:<C-U>call <SID>ToggleClipBrd()<CR>
 " }}
 
-" <F4>              trim trailing whitespace {{3
+" <F4>              remove trailing whitespace {{3
 function! <SID>Trim()
 	%s/\s\+$//e
 endfunction
@@ -1156,7 +1154,7 @@ function! <SID>ToggleSpellCorrect()
 	if &spell
 		iabclear
 	else
-		runtime autocorrect.vim
+		runtime spell/autocorrect.vim
 	endif
 	setlocal spell! spell?
 endfunction
@@ -1280,8 +1278,6 @@ nnoremap<silent><leader><BS>	:normal! gE<CR>
 								\:exec(getline('.')[col('.')-1]=~'\s' ? 'normal! dw':'')<CR>
 
 " diff {{3
-noremap			du			:<C-U>diffupdate<CR>
-
 " jump between diffs
 noremap			dN			<C-\><C-N>[czz
 noremap			dn			<C-\><C-N>]czz
@@ -1397,9 +1393,6 @@ function! EditSnippetsComplete(a,l,p)
 	return join(<SID>RemoveDuplicates(types), "\n")
 endfunction
 
-" highlight snippets
-command! -nargs=0 HighlightSnippets exec 'silent! normal! /\<Snippet\s\+\zs\S\+<CR>'
-
 " speeddating {{2
 let g:speeddating_no_mappings = 0
 
@@ -1446,96 +1439,4 @@ endfunction
 if exists("loaded_yankring") | call YRRunAfterMaps() | endif
 
 " }}1 plugins
-" Section: development {{1
-if !has('autocmd')
-	finish
-endif
-
-" C/C++ {{2
-augroup cpp
-	au!
-	" use syntax folding
-	au FileType c,cpp setl foldmethod=syntax
-augroup END
-
-" java {{2
-augroup java
-	au!
-	" use syntax folding
-	au FileType java setl foldmethod=syntax
-	" make
-	au FileType java setl mp=javac\ -g\ $*\ %
-	au FileType java setl efm=%A%f:%l:\ %m,%-Z%p^,%-C%.%#,%-G%.%#
-augroup END
-
-" python {{2
-if has('python')
-python << EOF
-# script {{
-import os
-import sys
-import vim
-# set up path (allowing jumps to library files)
-for p in sys.path:
-	if os.path.isdir(p):
-		vim.command(r"set path+=%s" % p.replace(" ",r"\ "))
-# toggle a breakpoint at the current line
-def ToggleBreakpoint():
-	import re
-	strLine = vim.current.line
-	if strLine.lstrip()[:15] == 'pdb.set_trace()':
-		vim.command('normal dd')
-		return
-	strWhite = re.search('^(\s*)', strLine).group(1)
-	if strWhite == '': return
-	nLine = int(vim.eval('line(".")'))
-	vim.current.buffer.append(
-		"%(space)spdb.set_trace() %(mark)s Breakpoint %(mark)s" %
-		{'space':strWhite, 'mark':'#'*20}, nLine-1)
-	for strLine in vim.current.buffer:
-		if strLine == "import pdb":
-			break
-	else:
-		vim.current.buffer.append('import pdb', 0)
-		vim.command('normal j^')
-# remove all breakpoints
-def RemoveBreakpoints():
-	import re
-	nCurrentLine = int(vim.eval('line(".")'))
-	rmLines = []
-	nLine = 0
-	for strLine in vim.current.buffer:
-		nLine += 1
-		if strLine.lstrip().startswith('pdb.set_trace()') or strLine == 'import pdb':
-			rmLines.append(nLine)
-	rmLines.reverse()
-	for nLine in rmLines:
-		vim.command('normal %dG' % nLine)
-		vim.command('normal dd')
-		if nLine < nCurrentLine:
-			nCurrentLine -= 1
-	vim.command('normal %dG' % nCurrentLine)
-# }}
-EOF
-endif
-
-augroup python
-	au!
-	au FileType python setl expandtab
-	au FileType python setl diffopt-=iwhite
-	" make
-	au FileType python setl mp=python\ -c\ \"import\ py_compile;py_compile.compile(r'%')\"\ -t
-	au FileType python setl efm=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%C^,%C%[%^\ ]%\\@=%m,%Z
-	" breakpoints
-	au FileType python map <buffer> <M-9> <C-\><C-N>:python ToggleBreakpoint()<CR>
-	au FileType python map <buffer> <M-0> <C-\><C-N>:python RemoveBreakpoints()<CR>
-augroup END
-
-" git {{2
-augroup git
-	au!
-	au FileType git* setl textwidth=72
-augroup END
-
-" }}1 development
 " vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:

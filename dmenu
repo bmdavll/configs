@@ -1,11 +1,12 @@
-280	gvim 
-82	t 
+304	gvim 
+96	t 
 28	f 
 27	t timer 
 8	t cpuset 
 6	gucharmap 
+6	firefox 
+6	dropboxd
 5	f trash:
-5	firefox 
 5	chromium
 4	calculator
 4	gimp 
@@ -13,7 +14,6 @@
 3	clementine
 3	gmpc 
 3	urxvt
-3	dropboxd
 2	inkscape 
 2	easytag
 2	galculator 

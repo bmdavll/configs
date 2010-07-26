@@ -1,9 +1,9 @@
-" ==========================================================================
+"===========================================================================
 " File:         session_dialog.vim
 " Author:       David Liang <bmdavll at gmail dot com>
 " Version:      1.03
-" Last Change:  2009 Apr 25
-" License:      GPL
+" Last Change:  2010-07-25
+" License:      GPLv3
 "
 " Description:
 " session_dialog.vim provides a simple dialog and command-line based
@@ -15,14 +15,14 @@
 " Usage:
 " :SessionSave [SESSION]
 "   With no arguments, displays the save dialog. Otherwise, saves a new
-"   session with the given name in g:SessionSaveDirectory. The session file
-"   on disk will have the g:SessionFilePrefix and g:SessionFileSuffix
-"   attached (see Options). Spaces are allowed in the sesison name.
+"   session with the given name in SessionSaveDirectory. The session file on
+"   disk will have the SessionFilePrefix and SessionFileSuffix attached (see
+"   "Options" below). Spaces are allowed in the sesison name.
 "   e.g. :SessionSave foo bar creates the session "foo bar"
 "
 " :SessionRestore [GLOB_PATTERN]
 "   With no arguments, displays the restore dialog. Otherwise searches for a
-"   session to load in g:SessionPath. If more than one session was found (if
+"   session to load in SessionPath. If more than one session was found (if
 "   sessions with the same name were found in different paths or if the
 "   given pattern matched multiple sessions), you will be prompted to choose
 "   one.
@@ -38,17 +38,23 @@
 "   sessions beginning with "foo".
 "
 " :SessionList [GLOB_PATTERN]...
-"   Prints a list of all the sessions and their locations in g:SessionPath
-"   if no arguments were given. Otherwise prints a list of sessions that
-"   match the arguments.
+"   Prints a list of all the sessions and their locations in SessionPath if
+"   no arguments were given. Otherwise prints a list of sessions that match
+"   the arguments.
 "   e.g. :SessionList foo bar* *baz will show all the sessions named foo,
 "   starting with bar, or ending with baz.
 "
 " ZS ZR ZD ZL
 "   The default normal mode mappings for :SessionSave, :SessionRestore,
 "   :SessionDelete, and :SessionList, respectively. These can be disabled
-"   with g:SessionCreateDefaultMaps. Note that these will time out, unlike
-"   native commands such as ZZ. (see :help 'timeoutlen')
+"   with the option SessionCreateDefaultMaps. Note that these will time out,
+"   unlike native commands such as ZZ. (see :help 'timeoutlen')
+"
+" You can also map the commands yourself using:
+"   <Plug>SessionSave
+"   <Plug>SessionRestore
+"   <Plug>SessionDelete
+"   <Plug>SessionList
 "
 " Options:
 " g:SessionSaveDirectory
@@ -58,10 +64,10 @@
 "        let SessionSaveDirectory = "."
 "
 " g:SessionPath
-"   Default is set to the initial value of g:SessionSaveDirectory
+"   Default is set to the initial value of SessionSaveDirectory
 "   A comma-separated list of paths in which to look for session files to
 "   restore or delete.
-"   e.g. let g:SessionPath = ".,~,~/.vim/sessions"
+"   e.g. let SessionPath = ".,~,~/.vim/sessions"
 "
 " g:SessionFilePrefix
 "   Default is ".vimsession_" (on Windows, "_vimsession_")
@@ -70,10 +76,10 @@
 "   Default is "" (on Windows, ".vim")
 "
 "   Strings to prepend and append to session names when saving to
-"   g:SessionSaveDirectory. All files found in g:SessionPath with these
+"   SessionSaveDirectory. All files found in SessionPath with these
 "   attributes will be identified as sessions, so the combination of the two
 "   should uniquely identify session files (unless all files found in
-"   g:SessionPath will be Vim sessions).
+"   SessionPath will be Vim sessions).
 "
 " g:SessionDefault
 "   Unset by default
@@ -94,7 +100,7 @@
 "   0 or 1 (default)
 "   Whether to create the default normal mode mappings (ZS, ZR, ZD, and ZL).
 "
-" ==========================================================================
+"===========================================================================
 
 " initialization {{{
 if !has("mksession") || exists("loaded_session_dialog")
@@ -164,8 +170,13 @@ function! s:GenerateChoices(list, ...)
 				let taken += [char]
 				break
 			endif
+			let char = ''
 		endfor
-		let choices .= strpart(item, 0, i)."&".strpart(item, i)."\n"
+		if char != ''
+			let choices .= strpart(item, 0, i)."&".strpart(item, i)."\n"
+		else
+			let choices .= item."\n"
+		endif
 	endfor
 	return s:StripFrom(choices,'\n$')
 endfunction
@@ -320,6 +331,7 @@ function! s:SaveSession(session)
 	endif
 	try
 		exec "mksession! ".fnameescape(file)
+		echomsg "Saved session ".s:Quote(a:session)." at ".s:Shorten(file)
 		if g:SessionQuitAfterSave == 1
 			qall
 		endif
@@ -346,8 +358,10 @@ endfunction
 
 function! s:DeleteFile(file)
 	if a:file == '' | return | endif
-	if call("delete", [a:file]) != 0
+	if delete(a:file) != 0
 		call s:ErrorMsg("Could not delete ".s:Quote(s:Shorten(a:file)))
+	else
+		echomsg "Deleted session ".s:Quote(s:PathToSession(a:file))." at ".s:Shorten(a:file)
 	endif
 endfunction
 " }}}
@@ -477,6 +491,11 @@ command! -nargs=? -complete=custom,SessionComplete		SessionRestore	call s:Sessio
 command! -nargs=* -complete=custom,EscSessionComplete	SessionDelete	call s:SessionDelete(<f-args>)
 command! -nargs=* -complete=custom,EscSessionComplete	SessionList		call s:SessionList(<f-args>)
 
+nnoremap <silent> <Plug>SessionSave		:<C-U>call s:SessionSave()<CR>
+nnoremap <silent> <Plug>SessionRestore	:<C-U>call s:SessionRestore()<CR>
+nnoremap <silent> <Plug>SessionDelete	:<C-U>call s:SessionDelete()<CR>
+nnoremap <silent> <Plug>SessionList		:<C-U>call s:SessionList()<CR>
+
 if g:SessionCreateDefaultMaps == 1
 nnoremap	<silent>ZS	:SessionSave<CR>
 nnoremap	<silent>ZR	:SessionRestore<CR>
@@ -485,4 +504,4 @@ nnoremap	<silent>ZL	:SessionList<CR>
 endif
 " }}}
 
-" vim:set ts=4 sw=4 noet fdm=marker:
+" vim:ts=4 sw=4 noet fdm=marker:

@@ -119,14 +119,6 @@ function pacinstall
 	return $code
 }
 alias pacremove='sudo pacman -Rs'
-_pacinstall() {
-	COMPREPLY=($(compgen -W "$(pacman -Slq)" -- "$2"))
-}
-_pacremove() {
-	COMPREPLY=($(compgen -W "$(pacman -Qq)" -- "$2"))
-}
-complete -F _pacinstall pacinstall
-complete -F _pacremove pacremove
 
 function pacupdate
 {
@@ -147,6 +139,15 @@ alias pacsearch='_pacsearch S'
 alias paclsearch='_pacsearch Q'
 alias paclist='pacman -Ql'
 alias pacown='pacman -Qo'
+
+_pac_repos() {
+	COMPREPLY=($(compgen -W "$(pacman -Slq)" -- "$2"))
+}
+_pac_local() {
+	COMPREPLY=($(compgen -W "$(pacman -Qq)" -- "$2"))
+}
+complete -F _pac_repos pacinstall pacgrep pacsearch
+complete -F _pac_local pacremove paclgrep paclsearch paclist
 
 #{{1 git
 alias ga='git add'
