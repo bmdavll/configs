@@ -1,4 +1,5 @@
 startup_message off
+vbell off
 
 # alt screen for text editors, pagers, etc.
 altscreen on
@@ -10,8 +11,75 @@ terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
 # use X scrolling
 termcapinfo xterm* ti@:te@
 
+# buffer
+defscrollback 1000
+bufferfile screen-output
+
+# command key
+escape ^Q^Q
+
+# unbind duplicates
+bind ^A		# other
+bind ^C		# screen	c
+bind ^K		# kill		k
+bind ^V		# digraph
+bind ^H		# prev		p
+bind ^?		# prev
+bind ^@		# next		n
+bind \040	# next
+bind z		# suspend	^Z
+
+## default key bindings
+#                                               Command key:  ^A   Literal ^A:  a
+#
+#  break       ^B b        hardcopy    h           monitor     M           remove      X           version     v
+#  clear       C           help        ?           next        ^@ ^N sp n  removebuf   =           width       W
+#  colon       :           history     { }         number      N           reset       Z           windows     ^W w
+#  copy        ^[ [        info        i           only        Q           screen      ^C c        wrap        ^R r
+#  detach      ^D d        kill        ^K k        other       ^A          select      '           writebuf    >
+#  digraph     ^V          lastmsg     ^M m        pow_break   B           silence     _           xoff        ^S s
+#  displays    *           license     ,           pow_detach  D           split       S           xon         ^Q q
+#  dumptermcap .           lockscreen  ^X x        prev        ^H ^P p ^?  suspend     ^Z z
+#  fit         F           log         H           quit        ^\          time        ^T t
+#  flow        ^F f        login       L           readbuf     <           title       A
+#  focus       ^I          meta        a           redisplay   ^L l        vbell       ^G
+#
+# ^]  paste .
+# ]   paste .
+# "   windowlist -b
+# -   select -
+# 0   select 0
+# 1   select 1
+# 2   select 2
+# 3   select 3
+# 4   select 4
+# 5   select 5
+# 6   select 6
+# 7   select 7
+# 8   select 8
+# 9   select 9
+
+# bindings
+bind ^B	digraph
+bind ^C	copy
+bind ^V	paste .
+bind o	other
+bind \\	quit
+
+# copy mode bindings
+markkeys \040=v=y:y=V:@=\040
+
+# messages
+msgwait 3
+sorendition "=s wk"
+nethack on
+
+# status line
+hardstatus alwayslastline
+hardstatus string '%{= km}%?%-Lw%?%{R}[%n%f %t%? (%u)%?]%{m}%?%+Lw%?%=%{b}%D %m/%d  %0c%{-}'
+
 # start at screen 1
-bind c  screen 1
-bind ^c screen 1
-bind 0  select 10
+bind c	screen 1
+bind 0	select 10
 screen 1
+

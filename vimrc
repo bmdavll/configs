@@ -1,7 +1,7 @@
 " Vim 7.2 vimrc
 " Author:		David Liang
 " Soure:		http://github.com/bmdavll/configs/blob/master/vimrc
-" Last Change:	2010-07-25
+" Last Change:	2010-07-27
 " Section: encoding {{1
 scriptencoding utf-8
 
@@ -91,10 +91,23 @@ set nocompatible		" use vim settings instead of vi settings
 set mouse=a				" enable mouse in all modes
 set noinsertmode		" enforce in case of EZ-mode
 set visualbell t_vb=	" disable bell
-" tabs {{2
+" whitespace {{2
 set noexpandtab			" whether to expand tabs into spaces
 set tabstop=4			" number of spaces for tab character
 set shiftwidth=4		" number of spaces for autoindent and soft tab stops
+" search {{2
+set incsearch			" do incremental searching
+set ignorecase			" ignore case for search patterns
+						" (override with \C anywhere in a search pattern)
+set smartcase			" don't ignore case for patterns with uppercase chars
+set hlsearch			" highlight search pattern matches
+" editing {{2
+set formatoptions+=r	" auto insert comment leader
+set formatoptions+=n	" recognize numbered lists when formatting
+set formatoptions+=l	" don't break pre-existing long lines in insert mode
+set formatoptions+=1	" don't break after a one-letter word
+set backspace=2			" allow backspacing over everything in insert mode
+set delcombine			" delete combining characters separately
 " window {{2
 set scrolloff=3			" minimum lines of padding when vertically scrolling
 set sidescrolloff=4		" minimum columns of padding when horizontally scrolling
@@ -108,13 +121,7 @@ set ruler				" show the cursor position at all times
 set number				" show line numbers by default
 set numberwidth=1		" only use as much space as needed for line numbers
 set shortmess=atToOI	" abbreviate file messages
-" search {{2
-set incsearch			" do incremental searching
-set ignorecase			" ignore case for search patterns
-						" (override with \C anywhere in a search pattern)
-set smartcase			" don't ignore case for patterns with uppercase chars
-set hlsearch			" highlight search pattern matches
-" display {{2
+" text display {{2
 set nowrap				" don't wrap lines by default
 set listchars=tab:▏\ ,precedes:‹,extends:›
 						" display characters for tabs and extended lines
@@ -122,29 +129,25 @@ let &showbreak = "\u21aa "
 						" display character for wrapped lines
 set linebreak			" don't break mid-word when wrapping
 set display+=lastline	" show as much of the last (long) line as possible
+" folding {{2
+set foldmethod=indent	" define folds automatically based on indent level
+function! MyFoldText()	" custom fold text function
+	let indent = repeat(get([ '──', '─╌', '╌╌' ], v:foldlevel-2, '--'), &sw/2).(&sw%2 ? ' ' : '')
+	return repeat(indent, v:foldlevel-1).
+			\tr(v:foldlevel, '0123456789', '⁰¹²³⁴⁵⁶⁷⁸⁹').
+			\substitute(foldtext(), '\v^\+--+(\s*)(\d+) lines:', '\1[\2]', '')
+endfunction
+set foldtext=MyFoldText()
 " control {{2
 set whichwrap=b,<,>,[,] " move freely between lines
 set virtualedit=block	" allow virtual selection in blockwise visual mode
 set timeoutlen=666		" milliseconds before mapped key sequences time out
-" editing {{2
-set formatoptions+=r	" auto insert comment leader
-set formatoptions+=n	" recognize numbered lists when formatting
-set backspace=2			" allow backspacing over everything in insert mode
-set delcombine			" delete combining characters separately
-" folding {{2
-set foldmethod=indent	" define folds automatically based on indent level
-function! MyFoldText()	" custom fold text function
-	return repeat('----', v:foldlevel-1).
-			\tr(v:foldlevel, '0123456789', '⁰¹²³⁴⁵⁶⁷⁸⁹').
-			\substitute(foldtext(), '^+--\+', '', '')
-endfunction
-set foldtext=MyFoldText()
 " vim {{2
 set updatetime=1000		" interval for CursorHold updates and swap file writes
 set nobackup			" do not keep a backup file
 set history=1000		" lines of command line history to keep
 set viminfo='50,s100,h	" settings for vim cache
-set sessionoptions=curdir,folds,localoptions,resize,tabpages,winsize
+set sessionoptions=curdir,folds,localoptions,tabpages,winsize
 						" what to save with mksession
 set cpoptions+=>		" put a line break before appending to a register
 set diffopt+=iwhite		" ignore whitespace in diff mode
@@ -167,6 +170,7 @@ if !has('gui_win32')
 else
 	set directory=~//,.
 endif
+" }}
 
 " Section: gui {{1
 if has('gui_running')
@@ -229,13 +233,13 @@ if !has('gui_running')
 	set <Undo>=
 
 	" Meta sends <Esc> {{3
+	set <M-1>=1 | set <M-2>=2 | set <M-3>=3 | set <M-4>=4 | set <M-5>=5
+	set <M-6>=6 | set <M-7>=7 | set <M-8>=8 | set <M-9>=9 | set <M-0>=0
 	set <M-a>=a | set <M-x>=x | set <M-c>=c | set <M-v>=v
 	set <M-h>=h | set <M-j>=j | set <M-k>=k | set <M-l>=l
 	set <M-p>=p | set <M-n>=n | set <M-b>=b | set <M-f>=f
 	set <M-d>=d | set <M-r>=r | set <M-y>=y
 	set <M-/>=/ | set <M-?>=? | set <M-->=- | set <M-=>==
-	set <M-1>=1 | set <M-2>=2 | set <M-3>=3 | set <M-4>=4 | set <M-5>=5
-	set <M-6>=6 | set <M-7>=7 | set <M-8>=8 | set <M-9>=9 | set <M-0>=0
 
 	" MapFastKeycode: helper for fast keycode mappings {{3
 	" http://vim.wikia.com/wiki/Mapping_fast_keycodes_in_terminal_Vim
@@ -252,14 +256,26 @@ if !has('gui_running')
 	endfunction
 	let s:fast_i = 0
 	" associate terminal keycodes with vim keycodes {{3
-	if     &term =~ 'xterm' " {{4
+	if     &term =~ 'xterm' || $COLORTERM =~ 'Terminal' " {{4
 		set <F1>=O1;*P
 		set <F2>=O1;*Q
 		set <F3>=O1;*R
 		set <F4>=O1;*S
+		set <xF1>=OP
+		set <xF2>=OQ
+		set <xF3>=OR
+		set <xF4>=OS
+		set <F5>=[15;*~
+		set <F6>=[17;*~
+		set <F7>=[18;*~
+		set <F8>=[19;*~
+		set <F9>=[20;*~
+		set <F10>=[21;*~
+		set <F11>=[23;*~
+		set <F12>=[24;*~
 		set <F13>=[25;*~
 		set <F14>=[26;*~
-	elseif &term =~ 'rxvt' " {{4
+	elseif &term =~ 'rxvt'  || $COLORTERM =~ 'rxvt' " {{4
 		function! <SID>RxvtFMap(from, to, codenums, ...) " {{
 			if a:0 == 0 | return | endif
 			for bind in a:000
@@ -446,7 +462,7 @@ function! s:DiffRegs(...)
 	vertical new | set buftype=nofile
 	exec "silent put" reg1
 	0 delete _ | diffthis
-endfunction " }}3
+endfunction " }}
 
 " registers {{2
 " Reg: check full contents of registers (@", @*, and @+ by default)
@@ -501,7 +517,7 @@ function! s:TabOpen(...)
 			endif
 		endfor
 	endfor
-endfunction " }}3
+endfunction " }}
 
 " change the working directory to the current file's directory
 command! -nargs=0 CD exec 'cd' expand('%:h')
@@ -774,8 +790,8 @@ function! s:Ascii(line1, line2)
 	exec range."s/’/'/ge"
 	exec range.'s/—/--/ge'
 endfunction
+" }}2
 
-" }}1 commands
 " Section: mappings {{1
 " see :help map-modes
 " temp marks: 'a, 'z
@@ -856,7 +872,7 @@ noremap!		<M-h>		<Left>
 noremap!		<M-l>		<Right>
 noremap!		<C-L>		<Right>
 
-" bash/emacs-like word movement and deletion {{4
+" emulate bash/emacs-like word movement and deletion {{4
 noremap			<M-b>		b
 noremap			<M-f>		w
 noremap!		<M-b>		<S-Left>
@@ -867,6 +883,7 @@ function! <SID>KillWord()
 	return (col('.')==col('$') ? "\<Del>" : "\<C-O>de")
 endfunction
 inoremap<silent><M-d>		<C-R>=<SID>KillWord()<CR>
+cnoremap		<M-d>		<Space><S-Right><C-W><BS>
 
 " beginning/end of line
 inoremap		<C-A>		<C-O>^
@@ -895,6 +912,17 @@ inoremap<silent><M-y>		<C-C>:let @z = @"<CR>mz
 							\:exec 'normal!' (col('.')==1 && col('$')==1 ? 'k' : 'kl')<CR>
 							\:exec (col('.')==col('$')-1 ? 'let @" = @_' : 'normal! ye')<CR>
 							\`zp:let @" = @z<CR>a
+
+" do the opposite of the 'auto-insert comment leader' format option {{4
+function! <SID>ToggleCommentLeader()
+	if &formatoptions =~ 'r'
+		set formatoptions-=r
+	else
+		set formatoptions+=r
+	endif
+endfunction
+inoremap<silent><C-CR>		 <C-O>:call <SID>ToggleCommentLeader()<CR><CR>
+							\<C-O>:call <SID>ToggleCommentLeader()<CR>
 
 " yank, delete, paste with Meta {{4
 " working with registers {{5
@@ -1015,7 +1043,7 @@ map	<silent>	<M-->		:call Rave(1)<CR>
 map	<silent>	<M-=>		:call Rave(64)<CR>
 
 endif
-" }}3
+" }}
 
 " function keys {{2
 " clear function and meta key mappings {{3
@@ -1036,6 +1064,8 @@ map				<F1>		:<C-U>TlistToggle<CR>
 vmap			<F1>		:<C-U>TlistToggle<CR>gv
 " toggle NERD Tree
 map				<F2>		:<C-U>NERDTreeToggle<CR>
+" toggle MRU
+map				<C-F2>		:<C-U>MRU<CR>
 " toggle yank ring
 map				<F3>		:<C-U>YRShow<CR>
 " toggle clipboard <C-F3> {{4
@@ -1184,15 +1214,14 @@ vmap			<S-F14>		:<C-U>redir END<CR>gv
 
 " macros {{2
 let mapleader = '\'
-
-" display {{3
+" folding {{3
 " close all folds except this
-nnoremap<silent>MM			:exec 'silent! normal! zM'.foldlevel('.').'zozz'<CR>
+nnoremap<silent>ZZ			:exec 'silent! normal! zM'.foldlevel('.').'zozz'<CR>
 
 " fold top level
 noremap			zT			<C-\><C-N>:%foldclose<CR>
 
-" font size
+" font size {{3
 if has('gui_running')
 map	<silent>	<M-0>		:<C-U>call <SID>AdvanceFont(0)<CR>
 vmap<silent>	<M-0>		:<C-U>call <SID>AdvanceFont(0)<CR>
@@ -1204,8 +1233,8 @@ endif
 
 " files {{3
 " load this file for editing and re-source
-map				<leader>v		:<C-U>TabOpen $MYVIMRC<CR>:exec 'set columns='.max([&columns,100])<CR>
-map				<leader>u		:<C-U>source $MYVIMRC<CR>
+map	<silent>	<leader>v		:<C-U>TabOpen $MYVIMRC<CR>:if has('gui_running') \| exec 'set columns='.max([&columns,100]) \| endif<CR>
+map				<leader>u		:<C-U>source  $MYVIMRC<CR>
 " load config files for editing
 map	<silent>	<leader>b		:<C-U>TabOpen ~/.bash{rc,_aliases,_hacks}<CR>:tabnext 2<CR>
 map	<silent>	<leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{Content,Chrome}.css
@@ -1278,9 +1307,11 @@ nnoremap<silent><leader><BS>	:normal! gE<CR>
 								\:exec(getline('.')[col('.')-1]=~'\s' ? 'normal! dw':'')<CR>
 
 " diff {{3
+nnoremap		du			:diffupdate<CR>
+
 " jump between diffs
-noremap			dN			<C-\><C-N>[czz
-noremap			dn			<C-\><C-N>]czz
+nnoremap		dN			[czz
+nnoremap		dn			]czz
 
 " quickfix {{3
 noremap			<M-1>		<C-\><C-N>:cprevious<CR>
@@ -1328,9 +1359,9 @@ cnoremap		<leader>{		\{}<Left>
 cnoremap		<leader>-		\{-}
 " flexible whitespace
 cnoremap		<leader>g		\_s\+
-" }}3
 
-" }}1 mappings
+" }}2
+
 " Section: plugins {{1
 " ClipBrd {{2
 let g:clipbrdDefaultReg = '+'
@@ -1396,7 +1427,7 @@ endfunction
 " speeddating {{2
 let g:speeddating_no_mappings = 0
 
-function! <SID>ToggleCtrlAX() " {{3
+function! <SID>ToggleCtrlAX() " {{
 if hasmapto('<Plug>SpeedDatingUp')
 	unmap		<C-A>
 	unmap		<C-X>
@@ -1416,9 +1447,9 @@ else
 	set nrformats-=alpha
 	echo "speeddating"
 endif
-endfunction " }}3
+endfunction " }}
 map	<silent>	<leader><C-A>	:<C-U>call <SID>ToggleCtrlAX()<CR>
-map	<silent>	<leader><C-X>	:<C-U>call <SID>ToggleCtrlAX()<CR>
+map	<silent>	<leader><C-X>	<leader><C-A>
 
 " taglist {{2
 let g:Tlist_Show_One_File = 1
@@ -1438,5 +1469,5 @@ nnoremap		s			"_s
 endfunction
 if exists("loaded_yankring") | call YRRunAfterMaps() | endif
 
-" }}1 plugins
+" }}1
 " vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:

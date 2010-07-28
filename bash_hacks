@@ -24,7 +24,6 @@ function mkbin
 addsource ~/code/repos/[^.]*/*.sh
 addsource ~/code/repos/[^.]*/examples/*.sh
 addsource ~/code/scripts/j.sh
-addsource /etc/profile.d/pkgfile-hook.sh
 
 CODE_PATH="$HOME/code:$HOME/code/lang"
 CODE_PATH+=":$HOME/code/configs"
@@ -201,8 +200,7 @@ function mp3directcut
 }
 
 #{{1 misc. aliases
-alias dr='diffr'
-alias rename='rename.py -e'
+alias histop='history | awk "{print \$2}" | sort | uniq -c | sort -nr | head -n'
 
 alias dash='PS1="\$ " dash'
 alias zsh='PS1="\$ " zsh'
@@ -212,9 +210,12 @@ alias irb='irb --simple-prompt'
 alias pd='perldoc'
 eval $(complete -p perldoc 2>/dev/null | sed 's/perldoc$/pd/')
 
-alias xcc='xterm-color-chart.py -n -x 3 -y 2'
 alias mpdupdate='rm -f ~/.mpd/mpd.db && mpd --create-db >/dev/null'
 alias mpdrestart='sudo /etc/rc.d/mpd stop && sudo /etc/rc.d/mpd start'
+
+alias dr='diffr'
+alias rename='rename.py -e'
+alias xcc='xterm-color-chart.py -n -x 3 -y 2'
 
 # override commands
 alias more='less'

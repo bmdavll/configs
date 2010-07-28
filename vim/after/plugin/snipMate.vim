@@ -12,22 +12,6 @@ ino <silent> <s-tab> <c-r>=BackwardsSnippet(-2)<cr>
 snor <silent> <s-tab> <esc>i<right><c-r>=BackwardsSnippet(-2)<cr>
 "ino <silent> <c-r><tab> <c-r>=ShowAvailableSnips()<cr>
 
-ino <silent> <c-k> <c-r>=JumpLine('k')<cr>
-snor <silent> <c-k> <esc>i<right><c-r>=JumpLine('k')<cr>
-ino <silent> <c-j> <c-r>=JumpLine('j')<cr>
-snor <silent> <c-j> <esc>i<right><c-r>=JumpLine('j')<cr>
-ino <silent> <c-h> <c-r>=JumpLine('h')<cr>
-snor <silent> <c-h> <esc>i<right><c-r>=JumpLine('h')<cr>
-ino <silent> <c-l> <c-r>=JumpLine("l")<cr>
-snor <silent> <c-l> <esc>i<right><c-r>=NextLine("l")<cr>
-
-ino <silent> <c-B> <c-r>=NewLine()<cr>
-snor <silent> <c-B> <esc>i<right><c-r>=NewLine()<cr>
-
-
-"ino <c-r> <esc>l<s-r>
-"ino <c-i> <esc>la
-
 " The default mappings for these are annoying & sometimes break snipMate.
 " You can change them back if you want, I've put them here for convenience.
 snor <bs> b<bs>

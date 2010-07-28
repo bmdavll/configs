@@ -27,7 +27,7 @@ URxvt.color12:		#5c5cff
 URxvt.color13:		magenta
 URxvt.color14:		cyan
 URxvt.color15:		white
-URxvt.geometry:		88x28
+URxvt.geometry:		88x32
 URxvt.font:			xft:DejaVu Sans Mono:pixelsize=12.5:antialias=false
 URxvt.scrollstyle:	plain
 URxvt.scrollBar_right:true

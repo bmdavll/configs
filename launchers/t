@@ -3,8 +3,8 @@
 # preferred terminals, in order
 TERMINALS=(
 	# terminal-command directory-option execute-option
-	'urxvt -cd -e'
 	'Terminal --working-directory -x'
+	'urxvt -cd -e'
 	'gnome-terminal --working-directory -x'
 )
 

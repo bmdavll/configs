@@ -59,6 +59,9 @@ $endif
 # yank-last-arg, but insert a space
 "\e.":	" !$ \C-h"
 
+# search history
+"\eq":	"\C-a\C-khist "
+
 #{{{2 previous command
 # command substitute (output from last command here)
 "\e`":	" $(!!) \C-h"
@@ -81,7 +84,7 @@ $endif
 
 #{{{2 piping output
 # /dev/null
-"\ez":	"\C-e>/dev/null\eb\eb\C-b\C-b"
+"\ez":	">/dev/null\eb\eb\C-b\C-b"
 
 # less
 "\em":	"\C-e| less\C-m"
@@ -90,7 +93,7 @@ $endif
 "\ev":	"\C-e| vim +'set bt=nofile' +'normal zR' -"
 
 # egrep
-"\ee":	"\C-e| egrep ''\C-b"
+"\ee":	"\C-e| g ''\C-b"
 
 # awk
 "\ea":	"\C-e| awk '{print }'\C-b\C-b"
@@ -101,13 +104,9 @@ $endif
 #{{{2 misc
 # spawn gui application
 "\e\C-m":	"\C-agui \C-m"
-"\e\C-j":	"\C-agui \C-m"
 
 # pipe find to xargs
 "\ex":	"\C-e -print0 | xargs -0r "
-
-# egrep command-line history
-"\eq":	"\C-a\C-khist|tac|grep -v 'hist|' | egrep ''\C-b"
 
 # calculator
 "\ec":	'\C-acalc "\C-e"\C-b'

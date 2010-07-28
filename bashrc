@@ -1,6 +1,11 @@
 # .bashrc
 [ -z "$PS1" ] && return
 
+if [ -z "$STY" ]; then
+	exec screen -DR
+	:
+fi
+
 umask 0022
 
 #{{1 remap console keys
@@ -12,7 +17,7 @@ fi
 #{{2 bash
 shopt -s no_empty_cmd_completion
 shopt -s checkwinsize	# if necessary, update LINES/COLUMNS after each command
-shopt -s cmdhist		# multi-line histories
+shopt -s cmdhist		# compress multi-line commands to single history line
 shopt -s dotglob		# include hidden files in pathname expansions
 shopt -s extglob		# extended pattern matching
 shopt -s histappend		# append to history file rather than overwrite
@@ -207,6 +212,5 @@ if [[ "$TERM" != "dumb" || "$CYGWIN" ]]; then
 fi
 #}}
 
-# done
 true
 # vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:

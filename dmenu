@@ -1,13 +1,13 @@
-304	gvim 
-96	t 
+350	gvim 
+228	t 
 28	f 
 27	t timer 
+9	dropboxd
 8	t cpuset 
-6	gucharmap 
-6	firefox 
-6	dropboxd
+8	firefox 
+7	gucharmap 
+7	chromium
 5	f trash:
-5	chromium
 4	calculator
 4	gimp 
 3	scim-run gvim 

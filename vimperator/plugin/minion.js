@@ -10,8 +10,9 @@
  **/
 
 // configuration variables
-var notify = true;
-var mpd_dir = '~/music';
+var notify   = true;
+var mpd_dir  = '~/music'; // e.g. '~/music'
+var dest_dir = '~/music/unsorted';
 
 var INFO =
 <plugin name="minion" version="0.2"
@@ -210,6 +211,12 @@ function MPVimperator() {
 				_callbacks[ticket]();
 			delete _callbacks[ticket];
 		}
+	}
+
+	function fileOperation(action, shellcmd) {
+		liberator.echomsg(action+' '+mpd.file);
+		liberator.execute('!'+shellcmd, null, true);
+		setTimeout(mpdCmd, 1000*(mpd.Time - mpd.time + 10), 'update');
 	}
 
 	function autoNotify(init) {
@@ -473,21 +480,18 @@ function MPVimperator() {
 			}
 		},
 
-		_rm: function() {
-			if (mpd.file) {
-				liberator.echomsg("Removing "+mpd.file);
-				liberator.execute('!trash-put '+mpd_dir+'/"'+mpd.file+'"', null, true);
+		rm: function() {
+			if (mpd.file && mpd_dir) {
+				fileOperation("Removing", 'trash-put '+mpd_dir+'/"'+mpd.file+'"');
+			}
+		},
+		mv: function() {
+			if (mpd.file && mpd_dir && dest_dir) {
+				fileOperation("Moving", 'mv -it '+dest_dir+' '+mpd_dir+'/"'+mpd.file+'"');
 			}
 		},
 
-		_mv: function() {
-			if (mpd.file) {
-				liberator.echomsg("Moving "+mpd.file);
-				liberator.execute('!mv -it ~/music/unsorted '+mpd_dir+'/"'+mpd.file+'"', null, true);
-			}
-		},
-
-		_f: function() {
+		f: function() {
 			if (mpd.file) {
 				liberator.execute('!f '+mpd_dir+'/"'+mpd.file+'"', null, true);
 			}

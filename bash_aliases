@@ -416,110 +416,6 @@ function rcd
 	rmdir "$PWD" && cd ..
 }
 
-#{{2 find
-_finder() { :
-	if pat_in "$HELP_PAT" "$@"; then
-		echo "Usage: [find_option|path|iname|^path_exclude]... [find_spec]..." && return
-	fi
-	local IFS=$'\n' specs=() opts=() paths=() special gflag pat i
-	local nocaseglob=$(shopt -p nocaseglob) && shopt -u nocaseglob
-	#{{ parse
-	if [[ "$1" && "$1" != [-\!\(]* || "$1" == -[PLHO]* ]]; then
-		gflag=1
-	elif [[ "$1" == -special* ]]; then
-		special="${1#-special }" && shift
-	else
-		specs=(${1// /$IFS}) && shift
-	fi
-	while [ $# -gt 0 ]; do
-		if [[ "$1" == -[PLHO]* ]]; then
-			opts+=("$1")
-		elif [ -d "$1" ]; then
-			paths+=("$1")
-		elif [[ "$1" != [-\!\(]* ]]; then
-			if [ "$gflag" ]; then
-				pat="$1" && gflag=
-			elif [[ "$1" == ^* ]]; then
-				[ "${1:1}" ] && specs+=(! -path "*${1:1}*")
-			elif [ "$1" ]; then
-				unset i && [[ "$1" == *[A-Z]* ]] || i=i
-				specs+=(-${i}name "$1")
-			fi
-		else
-			break
-		fi
-		shift
-	done
-	[ ${#paths[@]} -eq 0 ] && paths='.'
-	#}}
-	#{{ execute
-	[ "$special" = "ed" ] && specs=(-depth "${specs[@]}")
-	local args=("${opts[@]}" "${paths[@]}" "${specs[@]}")
-	if [ "$special" ]; then
-		case "$special" in
-		bk)	# backup files
-			find "${args[@]}" \( -name "*~" -o -name "*.bak" -o -name "*.swp" -o \
-								 -name "a.out" -o -name "foo" \) "$@"
-			;;
-		bl)	# broken links
-			find -L "${args[@]}" -type l "$@"
-			;;
-		ed)	# empty directories
-			local dir
-			for dir in $(find "${args[@]}" -type d "$@"); do
-				[ -z "$(find "$dir" ! -type d)" ] && echo "$dir"
-			done
-			return 0
-			;;
-		*)	return 2
-			;;
-		esac
-	elif [ -z "$pat" ]; then
-		find "${args[@]}" "$@"
-	else
-		type _sd &>/dev/null && pat=$(_sd "$pat")
-		unset i && [[ "$pat" == *[A-Z]* ]] || i=i
-		local result
-		for result in \
-		$(find "${args[@]}" -regextype 'posix-egrep' -${i}regex ".*$pat[^/]*" "$@")
-		do
-			echo -n "$(dirname -- "$result")/"
-			if ! echo "$(basename -- "$result")" | egrep -${i}e "$pat"; then
-				echo "$(basename -- "$result")"
-			fi
-		done
-	fi
-	#}}
-	eval "$nocaseglob"
-}
-alias findg='_finder'
-alias findn='_finder ""'
-alias findf='_finder "-type f"'
-alias findd='_finder "-depth -type d"'
-alias findl='_finder "-maxdepth 1 -mindepth 1"'
-
-alias findbk='_finder "-special bk"'
-alias findbl='_finder "-special bl"'
-alias finded='_finder "-special ed"'
-
-_rm_special() { :
-	local -i code=0
-	local line spec="-special $1" && shift
-	_finder "$spec" "$@" | while read line
-	do
-		[ "$line" = "." ] && line="$PWD"
-		rm -r "$line" || code+=$?
-	done
-	[ ! -e "$PWD" ] && cd ..
-	return $code
-}
-alias rmbk='_rm_special bk'
-alias rmbl='_rm_special bl'
-alias rmed='_rm_special ed'
-
-complete -F _find -o filenames -o default \
-findg findn findf findd findl findbk findbl finded rmbk rmbl rmed
-
 #{{2 rm
 alias rmr='rm -r'
 
@@ -659,6 +555,110 @@ function swap
 alias bak='swap bak ""'
 alias cbak='_swap_hook="cp -a" swap bak ""'
 
+#{{2 find
+_finder() { :
+	if pat_in "$HELP_PAT" "$@"; then
+		echo "Usage: [find_option|path|iname|^path_exclude]... [find_spec]..." && return
+	fi
+	local IFS=$'\n' specs=() opts=() paths=() special gflag pat i
+	local nocaseglob=$(shopt -p nocaseglob) && shopt -u nocaseglob
+	#{{ parse
+	if [[ "$1" && "$1" != [-\!\(]* || "$1" == -[PLHO]* ]]; then
+		gflag=1
+	elif [[ "$1" == -special* ]]; then
+		special="${1#-special }" && shift
+	else
+		specs=(${1// /$IFS}) && shift
+	fi
+	while [ $# -gt 0 ]; do
+		if [[ "$1" == -[PLHO]* ]]; then
+			opts+=("$1")
+		elif [ -d "$1" ]; then
+			paths+=("$1")
+		elif [[ "$1" != [-\!\(]* ]]; then
+			if [ "$gflag" ]; then
+				pat="$1" && gflag=
+			elif [[ "$1" == ^* ]]; then
+				[ "${1:1}" ] && specs+=(! -path "*${1:1}*")
+			elif [ "$1" ]; then
+				unset i && [[ "$1" == *[A-Z]* ]] || i=i
+				specs+=(-${i}name "$1")
+			fi
+		else
+			break
+		fi
+		shift
+	done
+	[ ${#paths[@]} -eq 0 ] && paths='.'
+	#}}
+	#{{ execute
+	[ "$special" = "ed" ] && specs=(-depth "${specs[@]}")
+	local args=("${opts[@]}" "${paths[@]}" "${specs[@]}")
+	if [ "$special" ]; then
+		case "$special" in
+		bk)	# backup files
+			find "${args[@]}" \( -name "*~" -o -name "*.bak" -o -name "*.swp" -o \
+								 -name "a.out" -o -name "foo" \) "$@"
+			;;
+		bl)	# broken links
+			find -L "${args[@]}" -type l "$@"
+			;;
+		ed)	# empty directories
+			local dir
+			for dir in $(find "${args[@]}" -type d "$@"); do
+				[ -z "$(find "$dir" ! -type d)" ] && echo "$dir"
+			done
+			return 0
+			;;
+		*)	return 2
+			;;
+		esac
+	elif [ -z "$pat" ]; then
+		find "${args[@]}" "$@"
+	else
+		type _sd &>/dev/null && pat=$(_sd "$pat")
+		unset i && [[ "$pat" == *[A-Z]* ]] || i=i
+		local result
+		for result in \
+		$(find "${args[@]}" -regextype 'posix-egrep' -${i}regex ".*$pat[^/]*" "$@")
+		do
+			echo -n "$(dirname -- "$result")/"
+			if ! echo "$(basename -- "$result")" | egrep -${i}e "$pat"; then
+				echo "$(basename -- "$result")"
+			fi
+		done
+	fi
+	#}}
+	eval "$nocaseglob"
+}
+alias findg='_finder'
+alias findn='_finder ""'
+alias findf='_finder "-type f"'
+alias findd='_finder "-depth -type d"'
+alias findl='_finder "-maxdepth 1 -mindepth 1"'
+
+alias findbk='_finder "-special bk"'
+alias findbl='_finder "-special bl"'
+alias finded='_finder "-special ed"'
+
+_rm_special() { :
+	local -i code=0
+	local line spec="-special $1" && shift
+	_finder "$spec" "$@" | while read line
+	do
+		[ "$line" = "." ] && line="$PWD"
+		rm -r "$line" || code+=$?
+	done
+	[ ! -e "$PWD" ] && cd ..
+	return $code
+}
+alias rmbk='_rm_special bk'
+alias rmbl='_rm_special bl'
+alias rmed='_rm_special ed'
+
+complete -F _find -o filenames -o default \
+findg findn findf findd findl findbk findbl finded rmbk rmbl rmed
+
 #{{2 jobs
 function psgrep
 { :
@@ -694,6 +694,66 @@ _ka() { :
 complete -F _ka ka
 complete -F _psgrep psgrep ok
 
+#{{2 history
+# search history for commands matching each perl pattern
+# prints chosen command to stdout and appends it to history
+function hist
+{
+	if pat_in "$HELP_PAT" "$@"; then
+		echo "Usage: hist perl_pattern..." && return
+	fi
+	local IFS=$'\n'
+	set -- $( history | tac | perl -e '
+		$/ = "\n";
+		my $cnt = 0;
+		my $hist_pat = qr/^\s+(\d+)\*?\s+(.*)/;
+		my $this_pat = qr/^hist\b/;
+		my @patterns = map qr/$_/i, @ARGV;
+		<STDIN>;
+		LINE: while (<STDIN>) {
+			next if not /$hist_pat/;
+			my $cmdline = $2;
+			next if $cmdline =~ $this_pat;
+			foreach (@patterns) {
+				next LINE if not $cmdline =~ $_;
+			}
+			if (++$cnt > 20) {
+				print STDERR "last 20 matches:\n";
+				exit;
+			} else {
+				print $1, $/, $cmdline, $/ if not $seen{$cmdline}++;
+			}
+		}' -- "$@" )
+
+	if [ $# -eq 0 ]; then
+		echo >&2 "no match"
+		return 1
+	fi
+
+	local matches=() num cmd
+	while [ $# -ne 0 ]; do
+		matches[$1]="$2"
+		shift 2
+	done
+	if (( ${#matches[@]} == 1 )); then
+		num="${!matches[@]}"
+		cmd="${matches[$num]}"
+	else
+		select cmd in "${matches[@]}"; do
+			if [ -n "$cmd" ]; then
+				set -- "${!matches[@]}"
+				shift $(( REPLY - 1 ))
+				num="$1"
+				break
+			else
+				return
+			fi
+		done || return 0 #EOF
+	fi
+	history -p "!$num"
+	history -s  "$cmd"
+}
+
 #{{2 file browser/terminal
 function f
 { : :
@@ -725,11 +785,11 @@ function h
 		elif ! type "$arg" &>/dev/null; then
 			error=1
 		else
-			output=$("$arg" -? 2>&1)
+			output=$(eval "$arg" -? 2>&1)
 			if [ $? -eq 0 -a -n "$output" ]
 			then echo "$output"
 			else
-				output=$("$arg" --help 2>&1)
+				output=$(eval "$arg" --help 2>&1)
 				if [ $? -eq 0 -a -n "$output" ]
 				then echo "$output"
 				else error=1
@@ -772,8 +832,6 @@ alias x='xargs -r'
 alias g='egrep -i'
 alias gv='egrep -iv'
 alias ch='chmod'
-alias hist='history | sort -nr | less'
-alias histop='history | awk "{print \$2}" | sort | uniq -c | sort -nr | head -n'
 
 # list path
 function path
@@ -1004,11 +1062,12 @@ function start-ssh-agent
 }
 
 #{{2 git
+# git status, and optionally push remote
 type __gitdir &>/dev/null &&
 function gs
 { :
 	if pat_in "$HELP_PAT" "$@"; then
-		echo "Usage: gs [directory]... [--push_remote]" && return
+		echo "Usage: gs [directory]... [--{push_remote}]" && return
 	fi
 	local IFS=$'\n' WD="$PWD" OWD dir gitdir sep=-n remote
 	split_opts -- "$@" || return $?
@@ -1026,8 +1085,12 @@ function gs
 		[[ ! "$gitdir" || "$PWD" == "$gitdir"* ]] && continue
 		echo $sep && unset sep
 		echo "${PWD#$(dirname "$(dirname "$gitdir")")/}" | grep '^[^/]*'
-		git status 2>/dev/null | grep '^#' \
-		| GREP_COLORS='ms=35' grep -P '(?<=^# On branch )\w+|'
+		git status \
+		| perl -pe 's/(?<=^# On branch )(\w+)/\e[30;1m$1\e[0m/;'  \
+				-e 's/(?<=^#\s)(renamed)(?=:\s)/\e[36m$1\e[0m/;'  \
+				-e 's/(?<=^#\s)(new file)(?=:\s)/\e[34m$1\e[0m/;' \
+				-e 's/(?<=^#\s)(modified)(?=:\s)/\e[35m$1\e[0m/;' \
+				-e 's/^#/\e[38;5;243m#\e[0m/;'
 		if [ "$remote" ] && git remote | grep "^$remote$" >/dev/null; then
 			if [ -f "$SSH_ENV" ]; then
 				source "$SSH_ENV" >/dev/null
