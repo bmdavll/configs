@@ -1,17 +1,16 @@
 # .bashrc
 [ -z "$PS1" ] && return
 
-if [ -z "$STY" ]; then
+# start screen if not a login shell
+if [ -z "$STY" -a "${0:0:1}" != "-" ]; then
 	exec screen -DR
 	:
 fi
 
 umask 0022
 
-#{{1 remap console keys
-if [ -z "$DISPLAY" -a -f "$HOME/.loadkeys" ]; then
-	(loadkeys "$HOME/.loadkeys" || sudo loadkeys "$HOME/.loadkeys") &>/dev/null
-fi
+# disable XON/XOFF
+[ -t 0 ] && stty -ixon
 
 #{{1 options and environment variables
 #{{2 bash
@@ -90,26 +89,15 @@ else
 		then GIT_PS1='\[\e['30';1m\]$(__git_ps1 "·%s")\[\e[0m\]'
 		else GIT_PS1=
 		fi
-	PS1='$( if [ $? -eq 0 ]
-			then echo "\[\e['30';1m\]·\[\e[0m\]"
-			else echo "\[\e['31';1m\]·\[\e[0m\]"
-			fi )\[\e['33';1m\]$(promptwd "\w")\[\e[0m\]'"$GIT_PS1"'\$ '
+		PS1='$( if [ $? -eq 0 ]
+				then echo "\[\e['30';1m\]·\[\e[0m\]"
+				else echo "\[\e['31';1m\]·\[\e[0m\]"
+				fi )\[\e['33';1m\]$(promptwd "\w")\[\e[0m\]'"$GIT_PS1"'\$ '
 		unset GIT_PS1
 	else
-	PS1='[\#]\W\$ '
+		PS1='[\#]\W\$ '
 	fi
-	# disable XON/XOFF
-	[ -t 0 ] && stty -ixon
 fi
-
-#{{2 prompt command
-PROMPT_COMMAND='history -a'
-# set title bar
-case "$TERM" in
-xterm*|*rxvt*)
-	PROMPT_COMMAND+=';echo -ne "\033]0;$USER@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
-	;;
-esac
 
 #{{2 switch prompt
 function PS1
@@ -140,28 +128,23 @@ if [ -z "$debian_chroot" -a -r /etc/debian_chroot ]; then
 	debian_chroot=$(cat /etc/debian_chroot)
 fi
 PS1="${debian_chroot:+($debian_chroot)}$PS1"
+
+#{{2 prompt command
+PROMPT_COMMAND='history -a'
+
+# set title bar
+case "$TERM" in
+xterm*|rxvt*)
+	PROMPT_COMMAND+=';echo -ne "\033]0;$USER@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
+	;;
+esac
 #}}
 
 #{{1 user bin directory
 BIN="$HOME/bin"
-function abspath #{{2
-{
-	[ $# -ne 1 ] && return 2
-	local IFS=$'\n' abspath
-	if [ -d "$1" ]; then
-		abspath=$(cd -- "$1" 2>/dev/null && pwd)
-	elif [ -e "$1" ]; then
-		abspath=$(cd -- "$(dirname -- "$1")" 2>/dev/null && pwd) &&
-		abspath="${abspath%/}/$(basename -- "$1")"
-	else
-		return 1
-	fi
-	if [ $? -eq 0 ]
-	then echo "$abspath"
-	else return 2
-	fi
-}
-function lnbin #{{2
+
+# create links in bin
+function lnbin
 {
 	[ ! -d "$BIN" ] && return 1
 	local IFS=$'\n'
@@ -170,13 +153,12 @@ function lnbin #{{2
 		for file in $(find "$arg" -maxdepth 1)
 		do
 			if [ -f "$file" -a -x "$file" ]; then
-				ln -fs "$(abspath "$file")" "$BIN" && code=0
+				ln -fs "$(readlink -f "$file")" "$BIN" && code=0
 			fi
 		done
 	done
 	return $code
 }
-#}}
 
 #{{1 bootstrap scripts and set PATH
 function addpath #{{2
@@ -206,7 +188,7 @@ function addsource #{{2
 addpath /usr/local/bin
 addsource "$HOME/.bash_aliases"
 
-if [[ "$TERM" != "dumb" || "$CYGWIN" ]]; then
+if [[ "$TERM" != "dumb" && "${0:0:1}" != "-" || "$CYGWIN" ]]; then
 	addsource "$HOME/.bash_hacks"
 	addpath .
 fi

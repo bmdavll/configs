@@ -63,8 +63,7 @@ function b
 	if [ $code -eq 0 ]; then
 		$GUI dropboxd
 		if [ -n "$disks" ]; then
-			sudo umount /media/disk*
-			echo -e "Unmounted:\n$disks"
+			sudo umount /media/disk* && echo -e "Unmounted:\n$disks"
 		fi
 	fi
 	return $code
@@ -194,7 +193,7 @@ function mp3directcut
 {
 	local paths=()
 	while [ $# -gt 0 ]; do
-		paths+=('Z:'"$(abspath "$1")") && shift
+		paths+=('Z:'"$(readlink -f "$1")") && shift
 	done
 	$GUI wine 'C:\Program Files\mp3DirectCut\mp3DirectCut.exe' "${paths[@]////\\}"
 }

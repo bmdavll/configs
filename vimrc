@@ -134,8 +134,8 @@ set foldmethod=indent	" define folds automatically based on indent level
 function! MyFoldText()	" custom fold text function
 	let indent = repeat(get([ '──', '─╌', '╌╌' ], v:foldlevel-2, '--'), &sw/2).(&sw%2 ? ' ' : '')
 	return repeat(indent, v:foldlevel-1).
-			\tr(v:foldlevel, '0123456789', '⁰¹²³⁴⁵⁶⁷⁸⁹').
-			\substitute(foldtext(), '\v^\+--+(\s*)(\d+) lines:', '\1[\2]', '')
+			\tr(v:foldlevel, '0123456789', '₀₁₂₃₄₅₆₇₈₉').
+			\substitute(foldtext(), '\v^\+--+(\s*\d+) lines:', '\1·ʟ', '')
 endfunction
 set foldtext=MyFoldText()
 " control {{2

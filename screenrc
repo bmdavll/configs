@@ -16,33 +16,22 @@ defscrollback 1000
 bufferfile screen-output
 
 # command key
-escape ^Q^Q
+escape ^Qq
 
-# unbind duplicates
-bind ^A		# other
-bind ^C		# screen	c
-bind ^K		# kill		k
-bind ^V		# digraph
-bind ^H		# prev		p
-bind ^?		# prev
-bind ^@		# next		n
-bind \040	# next
-bind z		# suspend	^Z
-
-## default key bindings
+#+1 default key bindings
 #                                               Command key:  ^A   Literal ^A:  a
 #
-#  break       ^B b        hardcopy    h           monitor     M           remove      X           version     v
-#  clear       C           help        ?           next        ^@ ^N sp n  removebuf   =           width       W
-#  colon       :           history     { }         number      N           reset       Z           windows     ^W w
-#  copy        ^[ [        info        i           only        Q           screen      ^C c        wrap        ^R r
-#  detach      ^D d        kill        ^K k        other       ^A          select      '           writebuf    >
-#  digraph     ^V          lastmsg     ^M m        pow_break   B           silence     _           xoff        ^S s
-#  displays    *           license     ,           pow_detach  D           split       S           xon         ^Q q
-#  dumptermcap .           lockscreen  ^X x        prev        ^H ^P p ^?  suspend     ^Z z
-#  fit         F           log         H           quit        ^\          time        ^T t
-#  flow        ^F f        login       L           readbuf     <           title       A
-#  focus       ^I          meta        a           redisplay   ^L l        vbell       ^G
+# break       ^B b        hardcopy    h           monitor     M           remove      X           version     v
+# clear       C           help        ?           next        ^@ ^N sp n  removebuf   =           width       W
+# colon       :           history     { }         number      N           reset       Z           windows     ^W w
+# copy        ^[ [        info        i           only        Q           screen      ^C c        wrap        ^R r
+# detach      ^D d        kill        ^K k        other       ^A          select      '           writebuf    >
+# digraph     ^V          lastmsg     ^M m        pow_break   B           silence     _           xoff        ^S s
+# displays    *           license     ,           pow_detach  D           split       S           xon         ^Q q
+# dumptermcap .           lockscreen  ^X x        prev        ^H ^P p ^?  suspend     ^Z z
+# fit         F           log         H           quit        ^\          time        ^T t
+# flow        ^F f        login       L           readbuf     <           title       A
+# focus       ^I          meta        a           redisplay   ^L l        vbell       ^G
 #
 # ^]  paste .
 # ]   paste .
@@ -58,28 +47,85 @@ bind z		# suspend	^Z
 # 7   select 7
 # 8   select 8
 # 9   select 9
+#
+#+1 bind
+# start at screen 1
+bind c	screen 1
+bind 0	select 10
 
 # bindings
 bind ^B	digraph
 bind ^C	copy
+bind ^J	focus down
+bind ^K	focus up
+bind ^T	screen 1
+bind ^W	kill
 bind ^V	paste .
+bind ^Q	other
+bind ^O	other
 bind o	other
+bind R	remove
+bind ;	colon
 bind \\	quit
+
+# unbind duplicates
+bind ^A		# other
+bind ^C		# screen	c
+bind ^V		# digraph
+bind ^S		# xoff
+bind s		# xoff
+bind ^H		# prev		p
+bind ^?		# prev
+bind ^@		# next		n
+bind \040	# next
+bind z		# suspend	^Z
+bind X		# remove
+
+#+1 current key bindings
+#                                               Command key:  ^Q   Literal ^Q:  q
+#
+# break       b       fit         F       lastmsg     ^M m    number      N       redisplay   ^L l    time        t
+# clear       C       flow        ^F f    license     ,       only        Q       remove      R       title       A
+# colon       : ;     focus       ^I      lockscreen  ^X x    other       ^O ^Q o removebuf   =       vbell       ^G
+# copy        ^[ [    hardcopy    h       log         H       pow_break   B       reset       Z       version     v
+# detach      ^D d    help        ?       login       L       pow_detach  D       select      '       width       W
+# digraph     ^B      history     { }     meta        q       prev        ^P p    silence     _       windows     w
+# displays    *       info        i       monitor     M       quit        ^\ \    split       S       wrap        ^R r
+# dumptermcap .       kill        ^W k    next        ^N n    readbuf     <       suspend     ^Z      writebuf    >
+#
+# ^J  focus down
+# ^K  focus up
+# ^T  screen 1
+# c   screen 1
+# ^]  paste .
+# ]   paste .
+# "   windowlist -b
+# -   select -
+# 0   select 10
+# 1   select 1
+# 2   select 2
+# 3   select 3
+# 4   select 4
+# 5   select 5
+# 6   select 6
+# 7   select 7
+# 8   select 8
+# 9   select 9
+#-
 
 # copy mode bindings
 markkeys \040=v=y:y=V:@=\040
 
 # messages
-msgwait 3
-sorendition "=s wk"
+msgwait 2
+sorendition "=s kB"
 nethack on
 
 # status line
 hardstatus alwayslastline
-hardstatus string '%{= km}%?%-Lw%?%{R}[%n%f %t%? (%u)%?]%{m}%?%+Lw%?%=%{b}%D %m/%d  %0c%{-}'
+hardstatus string '%{= km}%?%-Lw%?%{R}[%n*%f %t%? (%u)%?]%{m}%?%+Lw%?%=%{b}%?%l  %?%{B}%D %m/%d  %0c%{-}'
 
-# start at screen 1
-bind c	screen 1
-bind 0	select 10
+# create windows
 screen 1
 
+# vim:ts=4 sw=4 noet fdm=marker fmr=#+,#-:
