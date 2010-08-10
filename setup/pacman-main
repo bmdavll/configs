@@ -16,6 +16,7 @@ add dmenu
 add expect
 add gksu
 # add launchy
+add rxvt-unicode-256color
 add screen
 add xbindkeys
 add zenity
@@ -28,12 +29,11 @@ add lesspipe # input filter for less
 add pinfo # alternate info viewer
 add pkgtools
 add pv
+add reflector # pacman mirrorlist fetcher
 # add scrot
 add units
 add xclip
-
-##2 shells
-# add rxvt-unicode-256color
+add xsel
 add zsh
 
 ##1 languages
@@ -75,6 +75,7 @@ add boost
 add gob2
 add librsvg
 add mono
+add openal
 add wine
 add xdg-utils
 add xorg-utils
@@ -111,12 +112,17 @@ add testdisk
 
 ##1 files & documents
 add fdupes # find duplicate files
+add vifm
+
+##2 text processing
+add antiword
 add openoffice-base
 add words
-add antiword
 
 ##2 compression
 add p7zip
+add rar
+add unrar
 add unzip
 add xarchiver
 add zip
@@ -211,6 +217,8 @@ add xfburn
 ##1 misc
 add anki # supermemo alternative
 # add gourmet
+# add lilypond # music notation
+add nethack
 # add pokerth
 # add tuxguitar
 

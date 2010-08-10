@@ -5,15 +5,16 @@ LEGEND
 	+ customization
 
 MINE
-	random.vim
 	session_dialog.vim
+	diff_autoupdate.vim
+	autoload/rand.vim
 
 2010-07-11
 a.vim
-genutils.vim
 repeat.vim
 
 clipbrd.vim
+	genutils.vim
 	* normal with !
 	+ changed buffer name to [Clipboard]
 	+ removed defaut mapping <leader>cb
@@ -71,6 +72,7 @@ speeddating.vim
 vis.vim
 	cecutil.vim
 visincr.vim
+	autoload/calutil.vim
 vissort.vim
 LargeFile.vim
 
@@ -78,3 +80,8 @@ LargeFile.vim
 eregex.vim
 mru.vim
 
+2010-07-26
+autoload/term.vim
+
+2010-08-01
+fakeclip.vim

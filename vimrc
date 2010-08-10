@@ -1,7 +1,7 @@
 " Vim 7.2 vimrc
 " Author:		David Liang
 " Soure:		http://github.com/bmdavll/configs/blob/master/vimrc
-" Last Change:	2010-07-27
+" Last Change:	2010-08-04
 " Section: encoding {{1
 scriptencoding utf-8
 
@@ -127,15 +127,22 @@ set listchars=tab:▏\ ,precedes:‹,extends:›
 						" display characters for tabs and extended lines
 let &showbreak = "\u21aa "
 						" display character for wrapped lines
+let &fillchars = "vert:|"
+						" don't use fill character '-' for folds
 set linebreak			" don't break mid-word when wrapping
 set display+=lastline	" show as much of the last (long) line as possible
 " folding {{2
 set foldmethod=indent	" define folds automatically based on indent level
 function! MyFoldText()	" custom fold text function
-	let indent = repeat(get([ '──', '─╌', '╌╌' ], v:foldlevel-2, '--'), &sw/2).(&sw%2 ? ' ' : '')
-	return repeat(indent, v:foldlevel-1).
-			\tr(v:foldlevel, '0123456789', '₀₁₂₃₄₅₆₇₈₉').
-			\substitute(foldtext(), '\v^\+--+(\s*\d+) lines:', '\1·ʟ', '')
+	let d1 = get([ '─', '─', '╌' ], v:foldlevel-2, '-')
+	let d2 = get([ '─', '╌', '╌' ], v:foldlevel-2, '-')
+	let indent = repeat(d1.d2, &sw/2).(&sw%2 ? d2 : '')
+	let leader = repeat(indent, v:foldlevel-1).tr(v:foldlevel, '0123456789', '₀₁₂₃₄₅₆₇₈₉')
+	let fdtext = split(substitute(foldtext(), '\v^\+--+\s*(\d+) lines:\s*(.*)', '\1\n\2', ''), '\n')
+	let cols = &columns-(&number ? len(line('$'))+1 : 0)
+	let fill = cols - Strlen(leader) - strlen(fdtext[0]) - 2 - cols/7
+	let fdtext[1] = substitute(fdtext[1], '^.\{'.fill.'}\zs.*', '', '')
+	return leader.' '.fdtext[1].repeat('-', fill - Strlen(fdtext[1])).' '.fdtext[0]
 endfunction
 set foldtext=MyFoldText()
 " control {{2
@@ -221,6 +228,10 @@ endif
 " Section: terminal {{1
 if !has('gui_running')
 	set ttimeoutlen=50			" timeout for terminal keycodes (in ms)
+	if &term =~ 'screen'
+		set showtabline=2		" always show tab line
+	endif
+
 	source $VIMRUNTIME/menu.vim	" emenu access
 
 	" keycodes {{2
@@ -423,7 +434,7 @@ endif
 
 " Section: commands {{1
 " diff {{2
-" compare the current buffer and the saved file
+" DiffOrig: compare the current buffer and the saved file
 command! -nargs=0 DiffOrig
 	\	vertical new
 	\|	set buftype=nofile
@@ -466,7 +477,7 @@ endfunction " }}
 
 " registers {{2
 " Reg: check full contents of registers (@", @*, and @+ by default)
-" Usage: Reg abc to see registers a, b, c
+" usage: Reg abc to see registers a, b, c
 command! -nargs=? Reg call s:Reg(<q-args>)
 function! s:Reg(regstr)
 	if a:regstr == ''
@@ -519,17 +530,17 @@ function! s:TabOpen(...)
 	endfor
 endfunction " }}
 
-" change the working directory to the current file's directory
+" CD: change the working directory to the current file's directory
 command! -nargs=0 CD exec 'cd' expand('%:h')
 
-" delete current file from disk
-command! -nargs=0 RmFile echo "rm" @% "(".delete(@%).")"
-
-" delete all buffers
+" BD: delete all buffers
 command! -nargs=0 BD bufdo bdelete
 
+" RmFile: delete current file from disk
+command! -nargs=0 RmFile echo "rm" @% "(".delete(@%).")"
+
 " settings and views {{2
-" highlight with RightMargin beyond a column number
+" Marker: highlight with RightMargin beyond a column number
 command! -nargs=? Marker
 	\	if <q-args> != ''
 	\|		try
@@ -539,7 +550,7 @@ command! -nargs=? Marker
 	\|			match
 	\|	endif
 
-" check/set textwidth
+" TextWidth: check/set textwidth
 command! -nargs=? TextWidth
 	\	if <q-args> != ''
 	\|		setlocal textwidth=<args>
@@ -573,7 +584,7 @@ function! s:FontSize(op)
 	endif
 endfunction
 
-" embiggen font
+" BigFont: embiggen font
 command! -nargs=? BigFont
 	\	if <q-args> != ''
 	\|		call s:FontSize(<args>)
@@ -582,7 +593,7 @@ command! -nargs=? BigFont
 	\|	endif
 	\|	set lines=13 columns=47
 
-" Lines, Columns: check/set the number of usable lines/columns {{3
+" Lines Columns: check/set the number of usable lines/columns {{3
 command! -nargs=? Lines call s:Lines(<q-args>)
 function! s:Lines(arg)
 	let extra = &cmdheight
@@ -611,43 +622,30 @@ command! -nargs=? Columns
 	\|	endif
 
 " editing {{2
-" CopyMatches: copy matches of the last search to a register (default is ") {{3
+" CopyMatches CutMatches: copy/cut matches of the last search to a register (default is ") {{3
 " only works for single-line searches
 " accepts a range (default is the whole file)
 " matches are appended to the register and each match is terminated by \n
 command! -range=% -nargs=0 -register CopyMatches
-	\ call s:CopyMatches(<line1>, <line2>, "<reg>")
-function! s:CopyMatches(line1, line2, reg)
-	let ic_save = &ignorecase
-	set noignorecase
-	let reg = a:reg != '' ? a:reg : '"'
-	exec "let @".reg." = @_"
-	for line in range(a:line1, a:line2)
-		let txt = getline(line)
-		let idx = match(txt, @/)
-		while idx > -1
-			exec "let @".reg." .= matchstr(txt, @/, idx) . \"\n\""
-			let end = matchend(txt, @/, idx)
-			let idx = match(txt, @/, end)
-		endwhile
-	endfor
-	let &ic = ic_save
-endfunction
+	\ call s:GetMatches(<line1>, <line2>, "<reg>", 1)
+command! -range=% -nargs=0 -register CutMatches
+	\ call s:GetMatches(<line1>, <line2>, "<reg>", 0)
 
-" CutMatches: cut matches of the last search to a register (default is ") {{3
-" matches are appended to the register and each match is terminated by \n
-command! -nargs=0 -register CutMatches call s:CutMatches("<reg>")
-function! s:CutMatches(reg)
+function! s:GetMatches(line1, line2, reg, copy)
 	let ic_save = &ignorecase
 	set noignorecase
 	let reg = a:reg != '' ? a:reg : '"'
-	exec "let @".reg." = @_"
-	%s//\=s:CutMatchesSave(reg, submatch(0))/ge
+	call setreg(reg, @_, '')
+	if a:copy
+		try
+			exec 'silent' a:line1.','.a:line2.'s//\=(setreg(reg, submatch(0), "al")?"":submatch(0))/g'
+			silent undo
+		catch /E486/
+		endtry
+	else
+		exec a:line1.','.a:line2.'s//\=(setreg(reg, submatch(0), "al")?"":"")/ge'
+	endif
 	let &ic = ic_save
-endfunction
-function! s:CutMatchesSave(reg, txt)
-	exec "let @".a:reg." .= a:txt . \"\n\""
-	return ''
 endfunction
 
 " Reverse: reverse lines in range {{3
@@ -707,8 +705,7 @@ function! s:InternalTabsToSpaces(line1, line2)
 	endfor
 endfunction
 
-" Overline, Underline, DoubleUnderline, Strikethrough {{3
-" modify selected text using combining diacritics
+" Overline Underline DoubleUnderline Strikethrough: modify selected text using combining diacritics {{3
 command! -range -nargs=0 Overline        call s:CombineSelection(<line1>, <line2>, '0305')
 command! -range -nargs=0 Underline       call s:CombineSelection(<line1>, <line2>, '0332')
 command! -range -nargs=0 DoubleUnderline call s:CombineSelection(<line1>, <line2>, '0333')
@@ -761,7 +758,7 @@ function! s:ToggleHex()
 	let &ma = ma_save
 endfunction
 
-" WordProcess and Ascii: character conversion {{3
+" WordProcess Ascii: character conversion {{3
 " convert quotes, apostrophes, and dashes into their unicode counterparts
 command! -range=% -nargs=0 WordProcess call s:WordProcess(<line1>, <line2>)
 function! s:WordProcess(line1, line2)
@@ -778,7 +775,7 @@ function! s:WordProcess(line1, line2)
 	exec range.'s/'.w.'\zs'."'".'\ze\a/’/ge'
 endfunction
 
-" enforce ASCII-ness
+" Ascii: enforce ASCII-ness
 command! -range=% -nargs=0 Ascii call s:Ascii(<line1>, <line2>)
 function! s:Ascii(line1, line2)
 	let range = a:line1.','.a:line2
@@ -1098,7 +1095,6 @@ map				<C-F4>		:<C-U>Marker<Space>
 imap			<C-F4>		<C-O>:Marker<Space>
 
 " <F5>              remove search highlighting {{3
-" let @/=@_
 map	<silent>	<F5>		:<C-U>nohlsearch<CR>
 vmap<silent>	<F5>		:<C-U>nohlsearch<CR>gv
 imap<silent>	<F5>		<C-O>:nohlsearch<CR>
@@ -1245,33 +1241,69 @@ map	<silent>	<leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{C
 xnoremap		'			<C-C>`>a'<C-C>`<i'<C-C>
 xnoremap		(			<C-C>`>a)<C-C>`<i(<C-C>
 
-" substitution cypher {{4
+" substitution cipher {{4
+function! <SID>Scramble(str)
+	let indexes = range(Strlen(a:str))
+	let pairs = []
+	while !empty(indexes)
+		let i1 = remove(indexes, rand#randRange(len(indexes)))
+		if empty(indexes) | break | endif
+		let i2 = remove(indexes, rand#randRange(len(indexes)))
+		call add(pairs, [i1, i2])
+	endwhile
+	let chars = split(a:str, '\zs')
+	for pair in pairs
+		if rand#randRange(10) > 2
+			let c = chars[pair[0]]
+			let chars[pair[0]] = chars[pair[1]]
+			let chars[pair[1]] = c
+		endif
+	endfor
+	return join(chars, '')
+endfunction
 function! <SID>R()
-	if !exists("*Random") || !exists("*Srand")
-		call <SID>ErrorMsg("Random function not defined")
+	if !exists("*rand#randRange") || !exists("*rand#srand")
+		call <SID>ErrorMsg("rand.vim is not loaded")
 		return
 	endif
-	let input = input('# ')
-	if input[0] == '0' | let input = '1'.input | endif
-	let key = str2nr(input)
-	if key < 1000
-		call <SID>ErrorMsg("Invalid numeric key")
+	let input = inputsecret('> ')
+	if input !~ '^.\{4,}$'
+		call <SID>ErrorMsg("Invalid key")
 		return
 	endif
-	call Srand(key)
+	let key = str2nr(StripFrom(input, '\D'))
+	for char in reverse(split(input, '\zs'))
+		let key = key*((char2nr(char)-32)%95) + 11
+		let key = key*1664525 + 1013904223
+		if key < 0 | let key -= 0x80000000 | endif
+	endfor
+	let @z = <SID>GetSelection()
+	if has('x11')
+		let @* = @_
+	else
+		let @0 = @_
+	endif
+	let hash = str2nr(system('vim-cipher-hash '.key, @z))
+	call rand#srand(key+hash)
 	let ascii = range(33,126)
 	let alpha1 = ''
 	let alpha2 = ''
 	while !empty(ascii)
-		let c1 = nr2char(remove(ascii, Random(len(ascii))))
-		let c2 = nr2char(remove(ascii, Random(len(ascii))))
+		let c1 = nr2char(remove(ascii, rand#randRange(len(ascii))))
+		let c2 = nr2char(remove(ascii, rand#randRange(len(ascii))))
 		let alpha1 .= c1.c2
 		let alpha2 .= c2.c1
 	endwhile
-	let @z = tr(<SID>GetSelection(), alpha1, alpha2)
+	let @z = tr(@z, alpha1, alpha2)
+	let @z = substitute(@z, '[^[:space:]]\+', '\=<SID>Scramble(submatch(0))', 'g')
 	exec 'normal! gv"zp'
+	let @1 = @_
+	let @- = @_
 	let @z = @_
+	let @" = @_
 endfunction
+call exists("*rand#srand")
+call exists("*rand#randRange")
 xmap<silent>	<leader>r		:<C-U>call <SID>R()<CR>
 " }}
 
@@ -1456,9 +1488,9 @@ let g:Tlist_Show_One_File = 1
 
 " YankRing {{2
 if !has('gui_win32')
-	let g:yankring_history_file = ".yankring_history"
+	let g:yankring_history_file = ".vim_yankring_history"
 else
-	let g:yankring_history_file = "_yankring_history"
+	let g:yankring_history_file = "_vim_yankring_history"
 endif
 " rebind custom maps
 function! YRRunAfterMaps()

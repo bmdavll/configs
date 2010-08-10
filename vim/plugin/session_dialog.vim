@@ -349,7 +349,8 @@ function! s:SourceFile(file)
 	endif
 	try
 		exec "source ".fnameescape(a:file)
-	catch /E490/ " ignore fold errors
+	catch /E490/
+		" ignore fold errors
 	catch
 		call s:ErrorMsg("Script error while loading ".s:Quote(s:Shorten(a:file)))
 		call s:ErrorMsg(v:exception)

@@ -9,11 +9,11 @@ term screen-256color
 terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
 
 # use X scrolling
-termcapinfo xterm* ti@:te@
+termcapinfo xterm*	ti@:te@
+termcapinfo rxvt*	ti@:te@
 
 # buffer
-defscrollback 1000
-bufferfile screen-output
+defscrollback 2000
 
 # command key
 escape ^Qq
@@ -62,22 +62,22 @@ bind ^T	screen 1
 bind ^W	kill
 bind ^V	paste .
 bind ^Q	other
-bind ^O	other
-bind o	other
 bind R	remove
 bind ;	colon
 bind \\	quit
 
 # unbind duplicates
 bind ^A		# other
-bind ^C		# screen	c
-bind ^V		# digraph
 bind ^S		# xoff
 bind s		# xoff
 bind ^H		# prev		p
 bind ^?		# prev
 bind ^@		# next		n
 bind \040	# next
+bind [		# copy
+bind ^[		# copy
+bind ]		# paste .
+bind ^]		# paste .
 bind z		# suspend	^Z
 bind X		# remove
 
@@ -86,8 +86,8 @@ bind X		# remove
 #
 # break       b       fit         F       lastmsg     ^M m    number      N       redisplay   ^L l    time        t
 # clear       C       flow        ^F f    license     ,       only        Q       remove      R       title       A
-# colon       : ;     focus       ^I      lockscreen  ^X x    other       ^O ^Q o removebuf   =       vbell       ^G
-# copy        ^[ [    hardcopy    h       log         H       pow_break   B       reset       Z       version     v
+# colon       : ;     focus       ^I      lockscreen  ^X x    other       ^Q      removebuf   =       vbell       ^G
+# copy        ^C      hardcopy    h       log         H       pow_break   B       reset       Z       version     v
 # detach      ^D d    help        ?       login       L       pow_detach  D       select      '       width       W
 # digraph     ^B      history     { }     meta        q       prev        ^P p    silence     _       windows     w
 # displays    *       info        i       monitor     M       quit        ^\ \    split       S       wrap        ^R r
@@ -97,8 +97,7 @@ bind X		# remove
 # ^K  focus up
 # ^T  screen 1
 # c   screen 1
-# ^]  paste .
-# ]   paste .
+# ^V  paste .
 # "   windowlist -b
 # -   select -
 # 0   select 10
@@ -114,16 +113,19 @@ bind X		# remove
 #-
 
 # copy mode bindings
-markkeys \040=v=y:y=V:@=\040
+markkeys \040=v=y:y=V:j=^J:k=^K:@=\040
 
 # messages
 msgwait 2
-sorendition "=s kB"
+sorendition '=s kB'
 nethack on
 
 # status line
 hardstatus alwayslastline
 hardstatus string '%{= km}%?%-Lw%?%{R}[%n*%f %t%? (%u)%?]%{m}%?%+Lw%?%=%{b}%?%l  %?%{B}%D %m/%d  %0c%{-}'
+
+# auto-title
+shelltitle '$ |bash'
 
 # create windows
 screen 1

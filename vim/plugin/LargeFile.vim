@@ -49,9 +49,11 @@ fun! s:LargeFile(force,fname)
    let b:fdmkeep= &fdm
    let b:swfkeep= &swf
    set ei=FileType
-   setlocal noswf bh=unload fdm=manual ul=-1
+"- setlocal noswf bh=unload fdm=manual ul=-1
+   setlocal noswf bh=unload fdm=manual ul=100
    let fname=escape(substitute(a:fname,'\','/','g'),' ')
-   exe "au LargeFile BufEnter ".fname." set ul=-1"
+"- exe "au LargeFile BufEnter ".fname." set ul=-1"
+   exe "au LargeFile BufEnter ".fname." set ul=100"
    exe "au LargeFile BufLeave ".fname." let &ul=".b:ulkeep."|set ei=".b:eikeep
    exe "au LargeFile BufUnload ".fname." au! LargeFile * ". fname
    echomsg "***note*** handling a large file"

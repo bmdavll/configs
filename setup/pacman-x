@@ -105,6 +105,7 @@ add slock
 # fonts
 add ttf-bitstream-vera
 add ttf-dejavu
+add ttf-junicode
 # add ttf-ms-fonts
 # CJK
 add ttf-arphic-uming ttf-arphic-ukai ttf-fireflysung

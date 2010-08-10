@@ -82,8 +82,9 @@ if [ "$TERM" = "linux" ]; then
 	# long prompt (system console)
 	PS1="\u@\h[\#]\W\$ "
 else
-	# short color prompt if possible (xterm etc.)
-	if [ -x /bin/tput -o -x /usr/bin/tput ] && tput setaf 1 &>/dev/null || [ "$CYGWIN" ]
+	# short color prompt if possible
+	if	[[ $(type -p tput) =~ ^(/usr)?/bin/tput$ ]] && tput setaf 1 &>/dev/null \
+		|| [ "$CYGWIN" ]
 	then
 		if type __git_ps1 &>/dev/null
 		then GIT_PS1='\[\e['30';1m\]$(__git_ps1 "·%s")\[\e[0m\]'
@@ -137,13 +138,34 @@ case "$TERM" in
 xterm*|rxvt*)
 	PROMPT_COMMAND+=';echo -ne "\033]0;$USER@${HOSTNAME%%.*}:${PWD/#$HOME/~}\007"'
 	;;
+screen*)
+	PROMPT_COMMAND+=';echo -ne "\033k\033\\"'
+	;;
 esac
 #}}
+export PS1 PROMPT_COMMAND
 
 #{{1 user bin directory
 BIN="$HOME/bin"
 
 # create links in bin
+function abspath
+{
+	[ $# -ne 1 ] && return 2
+	local IFS=$'\n' abspath
+	if [ -d "$1" ]; then
+		abspath=$(cd -- "$1" 2>/dev/null && pwd)
+	elif [ -e "$1" ]; then
+		abspath=$(cd -- "$(dirname -- "$1")" 2>/dev/null && pwd) &&
+		abspath="${abspath%/}/$(basename -- "$1")"
+	else
+		return 1
+	fi
+	if [ $? -eq 0 ]
+	then echo "$abspath"
+	else return 2
+	fi
+}
 function lnbin
 {
 	[ ! -d "$BIN" ] && return 1
@@ -153,7 +175,7 @@ function lnbin
 		for file in $(find "$arg" -maxdepth 1)
 		do
 			if [ -f "$file" -a -x "$file" ]; then
-				ln -fs "$(readlink -f "$file")" "$BIN" && code=0
+				ln -fs "$(abspath "$file")" "$BIN" && code=0
 			fi
 		done
 	done

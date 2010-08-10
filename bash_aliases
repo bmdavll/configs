@@ -384,7 +384,11 @@ function cll
 	done
 	for arg in "${args[@]}"; do
 		if [ ! -d "$arg" ]; then
-			arg=$(dirname -- "$arg")
+			if [ -d "${arg%.*}" ]; then
+				arg="${arg%.*}"
+			else
+				arg=$(dirname -- "$arg")
+			fi
 		fi
 		if [ -d "$arg" -a ! "$arg" -ef "$PWD" -a "$arg" != '/' ]; then
 			cl -- "$arg"
@@ -1133,6 +1137,9 @@ function encrypt
 }
 function decrypt
 { : :
+	if pat_in "$HELP_PAT" "$@"; then
+		echo "Usage: decrypt [-f] file..." && return
+	fi
 	local -i code=0
 	local arg wflag tmp dest
 	split_opts -- "$@" || return $?

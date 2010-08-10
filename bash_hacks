@@ -56,9 +56,9 @@ fi
 #{{1 backups
 function b
 {
-	(ls -d ~/arch && ls -R ~/arch >~/tmp/arch.manifest) &>/dev/null
+	(ls -d ~/tmp && ls -R ~/tmp >~/etc/tmp.manifest) &>/dev/null
 	local TIMEFORMAT=$'\n%2Rs'
-	time BACKUP_LOG=~/tmp/backup.log backup "$@"
+	time BACKUP_LOG=~/etc/backup.log backup "$@"
 	local code=$? disks=$(ls -d /media/disk* 2>/dev/null)
 	if [ $code -eq 0 ]; then
 		$GUI dropboxd
@@ -108,7 +108,7 @@ function mancache
 function pacinstall
 {
 	! pat_in '^[^-]' "$@" && return 1
-	yaourt -S --needed "$@"
+	sudo clyde -S --needed "$@"
 	local code=$?
 	if [ $code -eq 0 ]; then
 		echo Done
@@ -120,7 +120,8 @@ alias pacremove='sudo pacman -Rs'
 
 function pacupdate
 {
-	yaourt -Syu --noconfirm "$@" && sudo pacman-cache-cleanup.py 2
+	sudo clyde -Syu "$@" &&
+	sudo pacman-cache-cleanup.py 2
 }
 _pacsearch() {
 	local results=$(pacman -"$1"s "${@:2}")
@@ -276,7 +277,7 @@ function mp3collect
 	local dir
 	for dir in "$@"; do
 		delete-incomplete-mp3 "$dir" &&
-		findf "$dir" -iname "*.mp3" -exec mv -it "$HOME/arch/unsorted" {} + &&
+		findf "$dir" -iname "*.mp3" -exec mv -it "$HOME/music/unsorted" {} + &&
 		if [ -d "$dir" ]; then
 			findf "$dir" -regextype 'posix-egrep' -iregex '.*\.(m3u|log|cue|nfo|sfv)' -delete &&
 			rmed  "$dir"

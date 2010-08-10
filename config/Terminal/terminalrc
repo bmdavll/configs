@@ -66,6 +66,7 @@ MiscTabCloseMiddleClick=TRUE
 MiscTabPosition=GTK_POS_TOP
 MiscToolbarsDefault=FALSE
 ScrollingBar=TERMINAL_SCROLLBAR_NONE
+ScrollingLines=2000
 ScrollingOnOutput=FALSE
 ShortcutsNoMenukey=TRUE
 ShortcutsNoMnemonics=TRUE
