@@ -1,11 +1,11 @@
-410	t
-273	gvim 
-33	t timer 
-30	f 
-17	firefox 
+435	gvim
+284	t
+35	t timer 
+31	f 
+21	firefox 
 11	dropboxd
+11	chromium
 8	t cpuset 
-8	chromium
 7	gucharmap 
 6	gmpc 
 5	f trash:
@@ -22,6 +22,7 @@
 2	clipboard 
 1	soffice
 1	mirage
+1	audacity
 0	transmission 
 0	thunderbird 
 0	gqview 

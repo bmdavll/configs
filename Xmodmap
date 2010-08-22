@@ -12,19 +12,10 @@ remove Mod1 = Alt_R
 keysym Alt_R = Multi_key
 
 !
-! Remap left Control
-!
-remove Control = Control_L
-keysym Control_L = Super_L
-add Mod4 = Super_L
-
-!
 ! Back and Forward buttons
 !
 keycode 166 = F13
 keycode 167 = F14
-! keycode 234 = F13
-! keycode 233 = F14
 
 !
 ! Lisp hack (swaps brackets and parens)

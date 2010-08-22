@@ -138,8 +138,8 @@ function! MyFoldText()	" custom fold text function
 	let d2 = get([ '─', '╌', '╌' ], v:foldlevel-2, '-')
 	let indent = repeat(d1.d2, &sw/2).(&sw%2 ? d2 : '')
 	let leader = repeat(indent, v:foldlevel-1).tr(v:foldlevel, '0123456789', '₀₁₂₃₄₅₆₇₈₉')
-	let fdtext = split(substitute(foldtext(), '\v^\+--+\s*(\d+) lines:\s*(.*)', '\1\n\2', ''), '\n')
-	let cols = &columns-(&number ? len(line('$'))+1 : 0)
+	let fdtext = split(substitute(foldtext(), '\v^\+--+\s*(\d+) lines:\s*(.*)', '\1\n\2', ''), '\n', 1)
+	let cols = winwidth(winnr())-(&number ? len(line('$'))+1 : 0)
 	let fill = cols - Strlen(leader) - strlen(fdtext[0]) - 2 - cols/7
 	let fdtext[1] = substitute(fdtext[1], '^.\{'.fill.'}\zs.*', '', '')
 	return leader.' '.fdtext[1].repeat('-', fill - Strlen(fdtext[1])).' '.fdtext[0]
@@ -605,7 +605,7 @@ function! s:Lines(arg)
 	if a:arg != ''
 		exec 'set lines='.(a:arg+extra)
 	else
-		echo &lines-extra
+		echo winheight(winnr())
 	endif
 endfunction
 command! -nargs=? Columns
@@ -616,8 +616,8 @@ command! -nargs=? Columns
 	\|			endif
 	\|		catch | endtry
 	\|	else
-	\|			if &number	| echo &columns-len(line('$'))-1
-	\|			else		| echo &columns
+	\|			if &number	| echo winwidth(winnr())-len(line('$'))-1
+	\|			else		| echo winwidth(winnr())
 	\|			endif
 	\|	endif
 

@@ -104,6 +104,7 @@ $endif
 #{{{2 misc
 # spawn gui application
 "\e\C-m":	"\C-agui \C-m"
+"\e\C-j":	"\C-agui \C-m"
 
 # pipe find to xargs
 "\ex":	"\C-e -print0 | xargs -0r "

@@ -377,7 +377,7 @@ function cll
 { : :
 	local args=() arg
 	if [ $# -eq 0 ]; then
-		eval "set -- $(tail -n1 "$HISTFILE" 2>/dev/null | sed 's/[&|!<>$();]//g')"
+		eval "set -- $(history -p '!!' | sed 's/[&|!<>$();]//g')"
 	fi
 	while [ $# -gt 0 ]; do
 		args[$#]="$1" && shift
@@ -987,22 +987,24 @@ complete -F _devlib -o filenames -o default dev lib
 
 #{{3 edit code
 function vc
-{ : :
-	[ "$1" = "--cd" ] && local cd="$1" && shift
+{ : : :
 	if [ $# -eq 0 ] || pat_in "$HELP_PAT" "$@"; then
 		echo "Usage: vc [-s] [vim_option|server|filename]..." && return
 	fi
-	local IFS=$'\n' sudo vopts=() vargs=() arg paths path files=() server=CODE
+	local IFS=$'\n' sudo vopts=() vargs=() arg paths path files=() server=CODE cdflag
 	split_opts 'tq?cSd?ir?TuUwW' \
 		cmd remote-expr remote-send servername socketid -- "$@" || return $?
 	set -- "${ARGV[@]}"
 	for arg in "${OPTS[@]}"; do
-		if [ "$arg" = "-s" ]; then
-			sudo=sudo
-			paths="$PATH:"
-			continue
-		fi
-		vopts+=("$arg")
+		case "$arg" in
+		--cd)	cdflag=1
+				;;
+		-s)		sudo=sudo
+				paths="$PATH:"
+				;;
+		*)		vopts+=("$arg")
+				;;
+		esac
 	done
 	split_opts -c
 	[ "$CODE_PATH" ] && paths+="$CODE_PATH"
@@ -1026,7 +1028,7 @@ function vc
 			fi
 		done
 	done
-	[ "$cd" ] && cd "$(dirname -- "${vargs[0]}")"
+	[ "$cdflag" ] && cd "$(dirname -- "${vargs[0]}")"
 	[ -z "$sudo" ] && sudo=$GUI
 	[ ${#vargs[@]} -gt 0 ] &&
 	(cd "$(dirname -- "${vargs[0]}")" && $sudo gvim --servername "$server" \
@@ -1176,8 +1178,10 @@ function decrypt
 
 #{{2 samba
 function smbmount
-{ :
-	[ $# -lt 2 ] && return 2
+{ : :
+	if [ $# -lt 2 ] || pat_in "$HELP_PAT" "$@"; then
+		echo "Usage: smbmount server share..." && return
+	fi
 	local -i code=0
 	local arg SERVER="$1" && shift
 	[ -z "$SERVER" ] && return 2
@@ -1194,8 +1198,10 @@ function smbmount
 	return $code
 }
 function smbumount
-{ :
-	[ $# -ne 1 ] && return 2
+{ : :
+	if [ $# -ne 1 ] || pat_in "$HELP_PAT" "$@"; then
+		echo "Usage: smbumount server" && return
+	fi
 	local IFS=$'\n' SERVER="$1" && shift
 	local MNT="$HOME/$SERVER.*"
 	[ -z "$SERVER" ] && return 2

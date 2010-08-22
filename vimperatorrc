@@ -21,7 +21,7 @@
 " use zI zO zM zR zZ for full-page zoom instead of text-only zoom
 " C-^			select previously selected tab
 " g0  g$		select first / last tab
-" ;{MODE}		hint mode:
+" ;{MODE}		hint mode:		;	focus element
 "				o	open		t	in new tab		b	in background	F	open multiple
 "				s	save		y	yank link		Y	yank text description
 " A				toggle star (goes into unsorted bookmarks)
