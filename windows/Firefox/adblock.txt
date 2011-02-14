@@ -1,0 +1,8 @@
+[Adblock Plus 1.1]
+! Checksum: +0PONPk+iM2kQ3zgeVYCOw
+@@||reddit.com^$document
+@@||imgur.com^$document
+@@||boston.com^$document
+@@||tineye.com^$document
+@@||redditmedia.com^$document
+@@||freerice.com^$document

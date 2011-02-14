@@ -2,7 +2,7 @@
 # 2010-07-24
 
 # top-level folders to exclude
-EXCLUDE='launchers|misc|setup'
+EXCLUDE='launchers|misc|setup|windows'
 
 IFS=$'\n'
 

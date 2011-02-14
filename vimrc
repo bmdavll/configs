@@ -140,9 +140,9 @@ function! MyFoldText()	" custom fold text function
 	let leader = repeat(indent, v:foldlevel-1).tr(v:foldlevel, '0123456789', '₀₁₂₃₄₅₆₇₈₉')
 	let fdtext = split(substitute(foldtext(), '\v^\+--+\s*(\d+) lines:\s*(.*)', '\1\n\2', ''), '\n', 1)
 	let cols = winwidth(winnr())-(&number ? len(line('$'))+1 : 0)
-	let fill = cols - Strlen(leader) - strlen(fdtext[0]) - 2 - cols/7
+	let fill = cols - strdisplaywidth(leader) - strlen(fdtext[0]) - 2 - cols/7
 	let fdtext[1] = substitute(fdtext[1], '^.\{'.fill.'}\zs.*', '', '')
-	return leader.' '.fdtext[1].repeat('-', fill - Strlen(fdtext[1])).' '.fdtext[0]
+	return leader.' '.fdtext[1].repeat('-', fill - strdisplaywidth(fdtext[1])).' '.fdtext[0]
 endfunction
 set foldtext=MyFoldText()
 " control {{2
@@ -678,13 +678,13 @@ function! s:ExpandTabs(line1, line2, arg)
 	else
 		let fill = a:arg
 	endif
-	let fill_len = Strlen(fill)
+	let fill_len = strdisplaywidth(fill)
 	let last = matchstr(fill, '.$')
 	let tabpat = '\v^([^\t]*)(\t+)'
 	for line in range(a:line1, a:line2)
 		while match(getline(line), tabpat) != -1
 			let list = matchlist(getline(line), tabpat)
-			let len = len(list[2])*&tabstop - Strlen(list[1])%&tabstop
+			let len = len(list[2])*&tabstop - strdisplaywidth(list[1])%&tabstop
 			exec line.'s/^[^\t]*\zs\t\+/'.
 				\repeat(fill, len/fill_len).repeat(last, len%fill_len).'/'
 		endwhile
@@ -700,7 +700,7 @@ function! s:InternalTabsToSpaces(line1, line2)
 		while match(getline(line), tabpat) != -1
 			let list = matchlist(getline(line), tabpat)
 			exec line.'s/^\t*[^\t]\+\zs\t\+/'.
-				\repeat(' ', len(list[2])*&tabstop - Strlen(list[1])%&tabstop).'/'
+				\repeat(' ', len(list[2])*&tabstop - strdisplaywidth(list[1])%&tabstop).'/'
 		endwhile
 	endfor
 endfunction
@@ -1262,10 +1262,6 @@ function! <SID>Scramble(str)
 	return join(chars, '')
 endfunction
 function! <SID>R()
-	if !exists("*rand#randRange") || !exists("*rand#srand")
-		call <SID>ErrorMsg("rand.vim is not loaded")
-		return
-	endif
 	let input = inputsecret('> ')
 	if input !~ '^.\{4,}$'
 		call <SID>ErrorMsg("Invalid key")
@@ -1284,7 +1280,12 @@ function! <SID>R()
 		let @0 = @_
 	endif
 	let hash = str2nr(system('vim-cipher-hash '.key, @z))
-	call rand#srand(key+hash)
+	try
+		call rand#srand(key+hash)
+	catch /E117/
+		call <SID>ErrorMsg("rand.vim is not loaded")
+		return
+	endtry
 	let ascii = range(33,126)
 	let alpha1 = ''
 	let alpha2 = ''
@@ -1302,8 +1303,6 @@ function! <SID>R()
 	let @z = @_
 	let @" = @_
 endfunction
-call exists("*rand#srand")
-call exists("*rand#randRange")
 xmap<silent>	<leader>r		:<C-U>call <SID>R()<CR>
 " }}
 

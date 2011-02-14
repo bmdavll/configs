@@ -2,8 +2,8 @@
 
 /* tabs */
 .tabbrowser-tabs {
-	font-size: 90% !important;
-	height: 28px !important;
+	font-size: 100% !important;
+	height: 30px !important;
 }
 .tabbrowser-tab {
 	max-height: 25px !important;
@@ -19,14 +19,14 @@
 /* bookmarks toolbar */
 #PersonalToolbar {
 	padding: 0px !important;
-	font-size: 90% !important;
+	font-size: 100% !important;
 	height: 29px !important;
 	min-height: 24px !important;
 }
 /* toolbar buttons */
 #PersonalToolbar .toolbarbutton-icon {
-	max-width:  20px !important;
-	max-height: 20px !important;
+	max-width:  32px !important;
+	max-height: 32px !important;
 }
 #PersonalToolbar .toolbarbutton-menu-dropmarker {
 	display: none !important;
@@ -35,7 +35,7 @@
 /* statusbar */
 #status-bar
 {
-	height: 18px !important;
+	height: 20px !important;
 }
 #status-bar > * ,
 #status-bar > * > *
@@ -81,10 +81,12 @@ toolbarbutton[label='@']				.toolbarbutton-icon { list-style-image: url('chrome:
 toolbarbutton[label='Unsorted']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/unsortedBookmarks.png')	!important; display: block !important; -moz-image-region: auto !important; }
 toolbarbutton[label='Macros']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/bookmarksToolbar.png')	!important; display: block !important; -moz-image-region: auto !important; }
 toolbarbutton[label='Show images']		.toolbarbutton-icon { list-style-image: url('reddit.ico')		!important; display: block !important; -moz-image-region: auto !important; }
-toolbarbutton[label='Other']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/allBookmarks.png')		!important; display: block !important; -moz-image-region: auto !important; }
 toolbarbutton[label='Other']			.toolbarbutton-icon { list-style-image: url('bookmarks.png')	!important; display: block !important; -moz-image-region: auto !important; }
+toolbarbutton[label='Other']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/allBookmarks.png')		!important; display: block !important; -moz-image-region: auto !important; }
 
 toolbarbutton							.toolbarbutton-text { display: none   !important; }
+toolbarbutton[label='Macros']			.toolbarbutton-text { display: inline !important; }
+toolbarbutton[label='Other']			.toolbarbutton-text { display: inline !important; }
 
 /* remove context menu items */
 	#context-openlink,                      /*	*/

@@ -16,6 +16,4 @@ xbindkeys
 
 # exec gnome-session
 # exec startkde
-# exec startxfce4
-exec ck-launch-session xfce4-session
-
+exec ck-launch-session startxfce4

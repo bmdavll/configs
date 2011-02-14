@@ -954,10 +954,10 @@ function vs
 		cmd remote-expr remote-send servername socketid -- "$@" || return $?
 	set -- "${ARGV[@]}"
 	local server=()
-	if [ "$1" -a ! -f "$1" ] || str_in "$1" $(gvim --serverlist); then
+	if [ "$1" -a ! -f "$1" ] || str_in "$1" $(gvim --serverlist 2>/dev/null); then
 		server=(--servername "$1") && shift
 	else
-		server=($(gvim --serverlist))
+		server=($(gvim --serverlist 2>/dev/null))
 		if [ ${#server[@]} -gt 0 ]
 		then server=(--servername "${server[0]%%[0-9]*}")
 		else server=()
@@ -972,7 +972,7 @@ function vs
 #{{3 ↪completion
 _vs() { :
 	if [ $COMP_CWORD -eq 1 ]; then
-		COMPREPLY=($(compgen -W "$(gvim --serverlist)" -- "$2"))
+		COMPREPLY=($(compgen -W "$(gvim --serverlist 2>/dev/null)" -- "$2"))
 	fi
 }
 complete -F _vs -o filenames -o default vs
@@ -1050,7 +1050,7 @@ _vc() { : :
 		done
 	fi
 	if [ ${#COMPREPLY[@]} -eq 0 ]; then
-		COMPREPLY=($(compgen -W "$(gvim --serverlist)" -- "$cur"))
+		COMPREPLY=($(compgen -W "$(gvim --serverlist 2>/dev/null)" -- "$cur"))
 	fi
 }
 complete -F _vc -o nospace -o filenames vc vcc

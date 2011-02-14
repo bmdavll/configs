@@ -2,9 +2,10 @@
 [ -z "$PS1" ] && return
 
 # start screen if not a login shell
-if [ -z "$STY" -a "${0:0:1}" != "-" ]; then
+if [ "${0:0:1}" != "-" -a -z "$STY" ] &&
+   ! screen -ls 2>/dev/null | grep -q Attached
+then
 	exec screen -DR
-	:
 fi
 
 umask 0022

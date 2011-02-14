@@ -80,6 +80,12 @@ add wine
 add xdg-utils
 add xorg-utils
 
+##1 services
+add apache
+add mysql
+add php-apache
+add postgresql
+
 ##1 development
 add ctags
 add gdb
@@ -140,6 +146,7 @@ add tor
 add truecrypt
 
 ##1 web
+add filezilla
 add lynx
 add uzbl-tabbed
 add w3m
@@ -217,6 +224,7 @@ add xfburn
 ##1 misc
 add anki # supermemo alternative
 # add gourmet
+# add hedgewars
 # add lilypond # music notation
 add nethack
 # add pokerth

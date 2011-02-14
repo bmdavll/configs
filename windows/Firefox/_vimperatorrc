@@ -168,8 +168,8 @@ noremap<silent>	S			<C-v><C-c>:set act!=tabopen<CR>ts<Space><S-Insert><CR>:set a
 noremap<silent>	W			<C-v><C-c>:set act!=tabopen<CR>td<Space><S-Insert><CR>:set act!=tabopen<CR>
 
 " search with selection or clipboard contents
-noremap			a			<C-v><C-c>o<S-Insert><Home><C-Right><Space>
-noremap			A			<C-v><C-c>t<S-Insert><Home><C-Right><Space>
+noremap			a			<C-v><C-c>o<S-Insert><Home><C-Right><Space><Left>
+noremap			A			<C-v><C-c>t<S-Insert><Home><C-Right><Space><Left>
 
 " tabs {{{2
 " previous/next tab
@@ -246,7 +246,7 @@ noremap<silent>	<C-S-g>		:mpd info<CR>
 
 " external {{{2
 " detach to chrome
-noremap<silent>	<leader>c	yd:!chrome <S-Insert> &<CR>
+noremap<silent>	<leader>c	yd:!chrome <S-Insert><CR>
 
 " play flash videos with vlc
 noremap<silent>	<leader>v	:!vlc /tmp/Flash* &<CR>
@@ -257,7 +257,7 @@ noremap<silent>	<leader>v	:!vlc /tmp/Flash* &<CR>
 " vimperator {{{2
 set complete=l
 set defsearch=gl
-set editor='scim-run gvim -f'
+set editor='gvim -f'
 set followhints=0
 set guioptions+=B
 set guioptions+=n

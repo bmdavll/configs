@@ -4,7 +4,7 @@ FILE="$HOME/.dmenu"
 DMENU=$(cat "$FILE") || exit 2
 CHOICES=$(echo "$DMENU" | grep -v '^#' | perl -pe 's/\S+\t//')
 
-OPTS=( -b -nb '#8c8c88' -nf black -sb '#c7c7c4' -sf black
+OPTS=( -nb '#8c8c88' -nf black -sb '#c7c7c4' -sf black
        -fn '-*-andale mono-medium-r-normal-*-17-*-100-100-*-*-*-*' )
 
 choice=$(echo "$CHOICES" | dmenu "${OPTS[@]}") || exit $?

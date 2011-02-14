@@ -1,11 +1,14 @@
 #!/bin/bash
 
+# window dimensions
+GEOMETRY=88x32
+
 # preferred terminals, in order
 TERMINALS=(
-	# terminal-command directory-option execute-option
-	'Terminal --working-directory -x'
-	'urxvt -cd -e'
-	'gnome-terminal --working-directory -x'
+	# terminal-cmd	directory-option	execute-option
+	'Terminal		--working-directory	-x				--geometry='"$GEOMETRY"
+	'urxvt			-cd					-e				 -geometry '"$GEOMETRY"
+	'gnome-terminal	--working-directory	-x				--geometry='"$GEOMETRY"
 )
 
 for arg in "$@"; do
@@ -47,7 +50,7 @@ for terminal in "${TERMINALS[@]}"; do
 		fi
 		for count in $(seq 1 $count); do
 			# LANG="en_US.UTF-8" LC_ALL="en_US.UTF-8"
-			"${terminal[0]}" "${terminal[1]}" "$dir" "$@"
+			"${terminal[0]}" "${terminal[1]}" "$dir" "${terminal[@]:3}" "$@"
 		done
 		exit
 	fi
