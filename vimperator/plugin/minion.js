@@ -11,7 +11,7 @@
 
 // configuration variables
 var notify   = true;
-var mpd_dir  = '~/music'; // e.g. '~/music'
+var mpd_dir  = '~/music';
 var dest_dir = '~/music/unsorted';
 
 var INFO =

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+[ "${LOG_DIR:-not set}" ] && LOG_DIR="$HOME/doc/txt"
+
+[ ! -d "$LOG_DIR" ] && exit 2
+  ! cd "$LOG_DIR"   && exit 2
+
+LOCK="$HOME/.$(basename -- "$0").lock"
+
+if [ -e "$LOCK" -o ! -r todo ]; then
+	exit 1
+fi
+
+cleanUp() {
+	rm -f "$LOCK"
+	exit $1
+}
+trap "cleanUp 1" 1 2 3 15
+
+>"$LOCK"
+
+gvim -f	-U NONE	+'set columns=64 lines=47'	\
+				+'set t_vb='				\
+				+'tab ball'					\
+				+'silent! tabdo %foldclose!'\
+				+'tabn 1'					\
+\
+todo list log "$LOG_DIR"
+
+cleanUp 0

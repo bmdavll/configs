@@ -14,6 +14,22 @@ xbindkeys
 
 # urxvtd -q -o -f
 
-# exec gnome-session
-# exec startkde
-exec ck-launch-session startxfce4
+DEFAULT_SESSION=xfce4
+
+case "$1" in
+	awesome)
+		exec awesome
+		;;
+	xfce4)
+		exec ck-launch-session startxfce4
+		;;
+	gnome)
+		exec gnome-session
+		;;
+	kde)
+		exec startkde
+		;;
+	*)	exec "$DEFAULT_SESSION"
+		;;
+esac
+

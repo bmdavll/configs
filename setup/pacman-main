@@ -13,28 +13,26 @@ list=()
 
 ##1 UI
 add dmenu
-add expect
 add gksu
 # add launchy
 add rxvt-unicode-256color
 add screen
 add xbindkeys
 add zenity
+add zsh
 
 ##1 command-line
 add bc
-add colordiff
+add expect
 add fbida # image viewer
 add lesspipe # input filter for less
 add pinfo # alternate info viewer
-add pkgtools
 add pv
 add reflector # pacman mirrorlist fetcher
-# add scrot
+add scrot
 add units
 add xclip
 add xsel
-add zsh
 
 ##1 languages
 add clisp
@@ -45,11 +43,12 @@ add parrot
 add perl
 add php
 add python
-add python3
+add python2
 add ruby
 add tcl tk
 
 ##2 perl
+add gtk2-perl
 add mod_perl
 add perl-bit-vector
 add perl-dbd-mysql
@@ -61,21 +60,22 @@ add perl-term-readkey
 add perl-term-readline
 add perl-text-markdown
 add perl-yaml-syck
-add perlxml
 
 ##2 python
 add python-fuse
 add python-numpy
+add python-pygame
 add python-scipy
 add python-simplejson
 add python-webpy
 
-##1 libraries
+##1 libraries/tools
 add boost
 add gob2
 add librsvg
 add mono
 add openal
+add pkgtools
 add wine
 add xdg-utils
 add xorg-utils
@@ -89,10 +89,11 @@ add postgresql
 ##1 development
 add ctags
 add gdb
-add git
 add giggle
+add git
 add mercurial
 add subversion
+add wordpress
 
 ##2 editors
 add emacs
@@ -116,7 +117,7 @@ add partimage
 add sleuthkit
 add testdisk
 
-##1 files & documents
+##1 files/documents
 add fdupes # find duplicate files
 add vifm
 
@@ -133,13 +134,13 @@ add unzip
 add xarchiver
 add zip
 
-##2 pdf & tex
-add epdfview
-add texlive-core
-add texinfo
+##2 pdf/tex
+# add gummi
 # add lyx
+add texinfo
+add texlive-core
 
-##1 privacy
+##1 security
 add gnupg
 add keepassx
 add tor
@@ -152,28 +153,27 @@ add uzbl-tabbed
 add w3m
 
 ##2 email
-add thunderbird
 # add mutt
+add thunderbird
 
 ##2 chat
 add irssi
 add skype
 
 ##2 torrents
-add transmission-gtk # deluge
 add mktorrent
+add transmission-gtk
 
 ##1 graphics
 ##2 viewers
 add gqview # geeqie
-add mirage
+add qiv
 # add comical
-add gphoto2 gtkam
 
 ##2 editors
 add gimp
 add inkscape
-add dia
+# add dia
 
 ##2 utils
 add netpbm
@@ -182,11 +182,12 @@ add optipng
 ##1 multimedia
 ##2 audio
 ##3 players
-add mpg123
-add mpd ncmpcpp # ncmpc mpc
+add clementine
+add cmus
+add deadbeef
 add gmpc # sonata
-# add cmus
-# add xfmedia
+add mpd ncmpcpp # ncmpc mpc
+add mpg123
 add timidity++ # MIDI player
 
 ##3 editors
@@ -210,24 +211,21 @@ add gstreamer0.10-plugins
 add libdvdcss
 
 add flashplugin
-add gecko-mediaplayer
 
 ##2 peripherals
+add gtkam gphoto2
 add gtkpod
 
 ##2 optical
 add cdrkit # includes mkisofs cdda2wav cdrecord etc.
-add cdrdao # for writing cue/bin files
-# add cdemu-client # for cue-bin emulation
+add cdrdao # writing cue/bin files
+# add cdemu-client # cue-bin emulation
 add xfburn
 
 ##1 misc
 add anki # supermemo alternative
 # add gourmet
-# add hedgewars
 # add lilypond # music notation
-add nethack
-# add pokerth
 # add tuxguitar
 
 ##2 i18n
@@ -239,6 +237,11 @@ add stardict
 ##2 math
 add galculator # gcalctool
 add mathomatic
+
+##2 games
+add dosbox
+add dwarffortress
+add nethack
 
 ##1 INSTALL
 [ $(whoami) = root ] && exit 1

@@ -11,9 +11,9 @@ add ()
 
 list=()
 
-add wicd
-add tpb
 add cpufrequtils
+add tpb
+add wicd
 # add laptop-mode-tools
 
 [ $(whoami) = root ] && exit 1

@@ -45,11 +45,11 @@ fi
 add aurvote
 
 ##1 UI
+add awesome
 add xautomation
 
 ##1 command-line
 add ack # grep drop-in
-add archey # screenshot system info
 add ascii
 add sl
 add trash-cli
@@ -57,29 +57,27 @@ add trash-cli
 ##1 languages
 add mit-scheme
 
-##1 libraries
+##1 libraries/tools
 add libsvg
+add rebase
+add svg2png
+add thunar-vcs-plugin
 
 ##1 filesystem
 add foremost # file recovery tool
 
-##1 files & documents
+##1 files/documents
 add detox # clean up filenames
 add dropbox
 
-##2 pdf & tex
+##2 pdf/tex
 add evince-gtk
-# add gummi
 add pdftk
 
 ##1 graphics
-add gpick # on-screen color picker
-add svg2png
 
 ##1 multimedia
 ##2 audio
-add clementine
-# add deadbeef
 add fluidr3 # MIDI soundfont
 
 ##2 video
@@ -96,7 +94,7 @@ add stardict-i2e-es-en
 add stardict-oald
 
 ##1 INSTALL
-if   which clyde  &>/dev/null; then
+if which clyde &>/dev/null; then
 	AUR=(sudo clyde)
 elif which yaourt &>/dev/null; then
 	AUR=(yaourt)

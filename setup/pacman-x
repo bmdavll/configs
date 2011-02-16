@@ -13,26 +13,17 @@ add ()
 
 echo "Installing X ..." ##1
 
-# libraries
 list=()
-add libgl
+add xorg
 
-sudo pacman -Sy $PFLAGS "${list[@]}"
+add xf86-video-ati
 
-# X
-list=()
+# xorg-input-drivers
 add xf86-input-evdev
 add xf86-input-keyboard
 add xf86-input-mouse
 add xf86-input-synaptics
-add xf86-video-ati
-add xf86-video-vesa
-add xorg-fonts-100dpi xorg-fonts-75dpi
-add xorg-res-utils
-add xorg-server
-add xorg-twm
-add xorg-xinit
-add xterm
+
 add mesa
 
 sudo pacman -S $PFLAGS "${list[@]}"
@@ -44,27 +35,33 @@ list=()
 add gtk-xfce-engine
 add terminal
 add thunar
-add xfconf xfdesktop xfprint
 add xfce-utils
-# add xfce4-appfinder
-# add xfce4-icon-theme
 add xfce4-mixer
 add xfce4-panel
 add xfce4-session
 add xfce4-settings
+add xfconf xfdesktop xfprint
 add xfwm4 # xfwm4-themes
+# add xfce4-appfinder
+# add xfce4-icon-theme
 
 sudo pacman -S $PFLAGS "${list[@]}"
 
 ##2 xfce4-goodies
 list=()
-add thunar-archive-plugin thunar-volman thunar-media-tags-plugin
-add verve-plugin
 add xfce4-dev-tools
 add xfce4-notifyd
 add xfce4-power-manager
 add xfce4-screenshooter
 add xfce4-taskmanager
+
+add thunar-archive-plugin
+add thunar-media-tags-plugin
+# add thunar-thumbnailers
+# add thunar-vcs-plugin
+add thunar-vfs
+add thunar-volman
+
 
 ##2 panel plugins
 add xfce4-battery-plugin
@@ -76,19 +73,18 @@ add xfce4-diskperf-plugin
 add xfce4-fsguard-plugin
 add xfce4-genmon-plugin
 add xfce4-mailwatch-plugin
-add xfce4-messenger-plugin
 add xfce4-mount-plugin
 add xfce4-mpc-plugin
 add xfce4-netload-plugin
 add xfce4-notes-plugin
-# add xfce4-playercontrol-plugin
+add xfce4-quicklauncher-plugin
 add xfce4-sensors-plugin
-# add xfce4-smartbookmark-plugin
 add xfce4-systemload-plugin
+# add xfce4-time-out-plugin
 # add xfce4-timer-plugin
+# add xfce4-verve-plugin
 # add xfce4-wavelan-plugin
-# add xfce4-weather-plugin
-# add xfce4-xfapplet-plugin
+add xfce4-xfapplet-plugin
 add xfce4-xkb-plugin
 
 sudo pacman -S $PFLAGS "${list[@]}"
@@ -106,7 +102,6 @@ add slock
 # fonts
 add ttf-bitstream-vera
 add ttf-dejavu
-add ttf-junicode
 # add ttf-ms-fonts
 # CJK
 add ttf-arphic-uming ttf-arphic-ukai ttf-fireflysung

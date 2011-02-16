@@ -41,24 +41,25 @@ complete -F _log_alias \
 list clip recipes birding
 
 export LOG_EDITOR='scim-run gvim'
+export BACKUP_LOG=~/etc/backup.log
 
-if which surfraw &>/dev/null; then
-	export SURFRAW_graphical=no
-	export SURFRAW_text_browser=/usr/bin/w3m
-fi
-
-if (( RANDOM < 1000 )); then
+#{{1 maintenance
+function my-cron
+{
 	cleanup-history.pl --squash
-elif (( RANDOM < 2000 )); then
-	cleanup-history.pl
-fi
+
+	ls -d ~/tmp &>/dev/null &&
+	ls -R ~/tmp >~/etc/tmp.manifest
+
+	log "$BACKUP_LOG" k -10
+}
 
 #{{1 backups
 function b
 {
-	(ls -d ~/tmp && ls -R ~/tmp >~/etc/tmp.manifest) &>/dev/null
+	my-cron &>/dev/null
 	local TIMEFORMAT=$'\n%2Rs'
-	time BACKUP_LOG=~/etc/backup.log backup "$@"
+	time backup "$@"
 	local code=$? disks=$(ls -d /media/disk* 2>/dev/null)
 	if [ $code -eq 0 ]; then
 		$GUI dropboxd
@@ -178,14 +179,9 @@ _smbmount() {
 	COMPREPLY=($(compgen -W "$COMPREPLY" -- "$2"))
 }
 alias doofie='smbmount doofie'
-alias udoofie='smbumount doofie'
 complete -F _smbmount -o filenames doofie
 
 #{{1 wine
-function foobar
-{
-	$GUI wine 'C:\users\david\Desktop\foobar2000\foobar2000.exe' "$@"
-}
 function tagrename
 {
 	$GUI wine 'C:\Program Files\TagRename\TagRename.exe'
@@ -201,9 +197,6 @@ function mp3directcut
 
 #{{1 misc. aliases
 alias histop='history | awk "{print \$2}" | sort | uniq -c | sort -nr | head -n'
-
-alias dash='PS1="\$ " dash'
-alias zsh='PS1="\$ " zsh'
 
 alias tags='ctags --fields=+lS'
 alias irb='irb --simple-prompt'
@@ -257,33 +250,12 @@ function comptest
 }
 complete -F comptest comptest
 
-function cef
-{
-	cd ~/code && ef scripts/ repos/ "$@" ^/.git/
-}
-
 function reorder-here
 {
 	local IFS=$'\n'
 	renumb.py -zl $( find . -maxdepth 1 -mindepth 1 -type f             \
 							-iregex '.*/[0-9]+[^/]*\.\(jpg\|png\|gif\|flv\|avi\|mp4\|wmv\)' \
 					 | cut -c 3- | sort -n ) "$@"
-}
-
-function mp3collect
-{
-	local -i code=0
-	[ $# -eq 0 ] && return 1
-	local dir
-	for dir in "$@"; do
-		delete-incomplete-mp3 "$dir" &&
-		findf "$dir" -iname "*.mp3" -exec mv -it "$HOME/music/unsorted" {} + &&
-		if [ -d "$dir" ]; then
-			findf "$dir" -regextype 'posix-egrep' -iregex '.*\.(m3u|log|cue|nfo|sfv)' -delete &&
-			rmed  "$dir"
-		fi || code+=1
-	done
-	return $code
 }
 #}}
 # vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:

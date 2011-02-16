@@ -30,11 +30,12 @@ add wireless_tools
 
 # extra
 add acpid
-add pm-utils
 add hal
+add pm-utils
+
 add abs
-add rsync
 add bash-completion
+add rsync
 
 # alsa
 add alsa-utils

@@ -1,6 +1,6 @@
 #!/bin/bash
 # bash aliases and command-line functions
-#{{1 patterns
+#{{1 patterns and environment variables
 # help option
 HELP_PAT='^-[?]'
 
@@ -9,6 +9,9 @@ CODE_PAT='?*.@(c|C|cc|cpp|h|H|hh|hpp|java|cs|py|rb|pl|sh|vim|js|php|l|y)'
 TEXT_PAT='@(*README|*INSTALL|?*.@(txt|log|rst))'
 MAKE_PAT='@(*[Mm]akefile|*configure)?(.@(ac|am|in))'
 # (the '*' before a literal is a compgen hack)
+
+# vim
+VIM_HEIGHT=47
 
 #{{1 utility functions
 #{{2 return the maximum integer value from a list
@@ -336,9 +339,9 @@ _ls_special() { :
 	return $code
 }
 #}}
-alias lsc='_ls_special c'
-alias lso='_ls_special o'
-alias lsh='_ls_special h'
+alias ls-c='_ls_special c'
+alias ls-o='_ls_special o'
+alias ls-h='_ls_special h'
 
 alias cls='clear && ls'
 
@@ -505,14 +508,14 @@ _swap() { :
 function swap
 { :
 	if  [[ $# -le 1 || -z "$1" ]] || pat_in "$HELP_PAT" "$@"; then
-		echo "Usage: swap [-s] file_a file_b"
-		echo "       swap [-s] ext_a [ext_b] file..."
+		echo "Usage: swap [--sudo] file_a file_b"
+		echo "       swap [--sudo] ext_a [ext_b] file..."
 		return
 	fi
 	local -i code=0
 	local EXT_A EXT_B S='.' file dest sudo
 	split_opts -- "$@" || return $?
-	str_in '-s' "${OPTS[@]}" && sudo=sudo
+	str_in '--sudo' "${OPTS[@]}" && sudo=sudo
 	set -- "${ARGV[@]}"
 	split_opts -c
 	if [ $# -eq 2 ] && [[ -d "$1" && -d "$2" || -f "$1" && -f "$2" ]]; then
@@ -680,9 +683,6 @@ function psgrep
 	done
 	[ "$procs" ] && echo "$procs" | egrep -e "$arg"
 }
-# killall
-alias ka='killall -u $USER -ir'
-alias ok='sudo killall -9 -ir'
 _psgrep() { :
 	local args
 	if [ $# -gt 3 ]
@@ -692,6 +692,11 @@ _psgrep() { :
 	COMPREPLY=($( compgen -W "$(ps -o comm "${args[@]}" | sort -u |
 				  egrep -v '^(ps|COMMAND|egrep|sort)$')" -- "$2" ))
 }
+
+# killall
+alias ka='killall -u $USER -ir'
+alias ok='sudo killall -9 -ir'
+
 _ka() { :
 	_psgrep "$@" -u "$USER"
 }
@@ -721,8 +726,8 @@ function hist
 			foreach (@patterns) {
 				next LINE if not $cmdline =~ $_;
 			}
-			if (++$cnt > 20) {
-				print STDERR "last 20 matches:\n";
+			if (++$cnt > 25) {
+				print STDERR "last 25 matches:\n";
 				exit;
 			} else {
 				print $1, $/, $cmdline, $/ if not $seen{$cmdline}++;
@@ -861,14 +866,13 @@ complete -c typef
 
 #{{1 etc
 alias cat4='expand -t4'
-alias db='diff -bB'
+alias diffb='diff -bB'
 alias df='df -h'
 alias free='free -m'
 alias pl='perl -de 47'
 alias py='python'
-alias py3='python3'
-alias wcL='wc -L'
 alias wcl='wc -l'
+alias wcL='wc -L'
 
 #{{2 calculators
 _float() { :
@@ -977,8 +981,8 @@ _vs() { :
 }
 complete -F _vs -o filenames -o default vs
 
-alias dev='vs CODE'
-alias lib='vs LIB -R'
+alias dev="vs CODE   -c 'set lines=$VIM_HEIGHT'"
+alias lib="vs LIB -R -c 'set lines=$VIM_HEIGHT'"
 _devlib() { :
 	local cur="$2"
 	file_glob "@($CODE_PAT|$MAKE_PAT|$TEXT_PAT)"
@@ -989,7 +993,7 @@ complete -F _devlib -o filenames -o default dev lib
 function vc
 { : : :
 	if [ $# -eq 0 ] || pat_in "$HELP_PAT" "$@"; then
-		echo "Usage: vc [-s] [vim_option|server|filename]..." && return
+		echo "Usage: vc [--sudo] [vim_option|server|filename]..." && return
 	fi
 	local IFS=$'\n' sudo vopts=() vargs=() arg paths path files=() server=CODE cdflag
 	split_opts 'tq?cSd?ir?TuUwW' \
@@ -999,7 +1003,7 @@ function vc
 		case "$arg" in
 		--cd)	cdflag=1
 				;;
-		-s)		sudo=sudo
+		--sudo)	sudo=sudo
 				paths="$PATH:"
 				;;
 		*)		vopts+=("$arg")
@@ -1031,8 +1035,9 @@ function vc
 	[ "$cdflag" ] && cd "$(dirname -- "${vargs[0]}")"
 	[ -z "$sudo" ] && sudo=$GUI
 	[ ${#vargs[@]} -gt 0 ] &&
-	(cd "$(dirname -- "${vargs[0]}")" && $sudo gvim --servername "$server" \
-	 "${vopts[@]}" --remote-tab-silent "${vargs[@]}")
+	( cd "$(dirname -- "${vargs[0]}")" &&
+	  $sudo gvim --servername "$server" -c 'set lines='"$VIM_HEIGHT" \
+	  "${vopts[@]}" --remote-tab-silent "${vargs[@]}" )
 }
 alias vcc='vc --cd'
 #{{3 ↪completion
