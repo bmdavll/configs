@@ -123,7 +123,7 @@ add vifm
 
 ##2 text processing
 add antiword
-add openoffice-base
+add libreoffice # openoffice-base
 add words
 
 ##2 compression
@@ -162,7 +162,7 @@ add skype
 
 ##2 torrents
 add mktorrent
-add transmission-gtk
+add transmission-gtk # deluge
 
 ##1 graphics
 ##2 viewers
@@ -205,6 +205,7 @@ add vlc # mplayer
 
 ##3 editors
 add handbrake
+add avidemux-gtk
 
 ##2 codecs/plugins
 add gstreamer0.10-plugins
@@ -241,7 +242,9 @@ add mathomatic
 ##2 games
 add dosbox
 add dwarffortress
+add freeciv
 add nethack
+# add wesnoth
 
 ##1 INSTALL
 [ $(whoami) = root ] && exit 1

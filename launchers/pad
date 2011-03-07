@@ -19,12 +19,12 @@ trap "cleanUp 1" 1 2 3 15
 
 >"$LOCK"
 
-gvim -f	-U NONE	+'set columns=64 lines=47'	\
+gvim -f	-U NONE	+'set columns=80 lines=42'	\
 				+'set t_vb='				\
 				+'tab ball'					\
 				+'silent! tabdo %foldclose!'\
 				+'tabn 1'					\
 \
-todo list log "$LOG_DIR"
+todo list clip log
 
 cleanUp 0

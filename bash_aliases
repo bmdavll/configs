@@ -981,13 +981,13 @@ _vs() { :
 }
 complete -F _vs -o filenames -o default vs
 
-alias dev="vs CODE   -c 'set lines=$VIM_HEIGHT'"
+alias cod="vs CODE   -c 'set lines=$VIM_HEIGHT'"
 alias lib="vs LIB -R -c 'set lines=$VIM_HEIGHT'"
-_devlib() { :
+_text() { :
 	local cur="$2"
 	file_glob "@($CODE_PAT|$MAKE_PAT|$TEXT_PAT)"
 }
-complete -F _devlib -o filenames -o default dev lib
+complete -F _text -o filenames -o default cod lib
 
 #{{3 edit code
 function vc

@@ -136,8 +136,13 @@ set foldmethod=indent	" define folds automatically based on indent level
 function! MyFoldText()	" custom fold text function
 	let d1 = get([ '─', '─', '╌' ], v:foldlevel-2, '-')
 	let d2 = get([ '─', '╌', '╌' ], v:foldlevel-2, '-')
-	let indent = repeat(d1.d2, &sw/2).(&sw%2 ? d2 : '')
-	let leader = repeat(indent, v:foldlevel-1).tr(v:foldlevel, '0123456789', '₀₁₂₃₄₅₆₇₈₉')
+	if v:foldlevel == 1
+		let leader = ' '
+	else
+		let leader = repeat(d1.d2, &sw/2).(&sw%2 ? d2 : '')
+		let leader = repeat(leader, v:foldlevel-1)
+	endif
+	let leader .= tr(v:foldlevel, '0123456789', '₀₁₂₃₄₅₆₇₈₉')
 	let fdtext = split(substitute(foldtext(), '\v^\+--+\s*(\d+) lines:\s*(.*)', '\1\n\2', ''), '\n', 1)
 	let cols = winwidth(winnr())-(&number ? len(line('$'))+1 : 0)
 	let fill = cols - strdisplaywidth(leader) - strlen(fdtext[0]) - 2 - cols/7
@@ -343,8 +348,6 @@ if has('gui_running') || &t_Co > 2
 			hi! link CursorColumn CursorLine
 		endif
 		" global highlighting {{3
-		" Marker
-		hi RightMargin						ctermbg=239								guibg=#4e4e4e
 		" diff
 		hi DiffAdd			ctermfg=none	ctermbg=17	cterm=none	guifg=NONE		guibg=#2a0d6a	gui=none
 		hi DiffDelete		ctermfg=234		ctermbg=60	cterm=none	guifg=#242424	guibg=#3e3969	gui=none
@@ -539,21 +542,16 @@ command! -nargs=0 BD bufdo bdelete
 " RmFile: delete current file from disk
 command! -nargs=0 RmFile echo "rm" @% "(".delete(@%).")"
 
-" settings and views {{2
-" Marker: highlight with RightMargin beyond a column number
-command! -nargs=? Marker
-	\	if <q-args> != ''
-	\|		try
-	\|			match RightMargin /\%><args>v.\+/
-	\|		catch | endtry
-	\|	else
-	\|			match
-	\|	endif
-
+" settings {{2
 " TextWidth: check/set textwidth
 command! -nargs=? TextWidth
 	\	if <q-args> != ''
 	\|		setlocal textwidth=<args>
+	\|		if &textwidth != 0
+	\|			setlocal colorcolumn=+1
+	\|		else
+	\|			setlocal colorcolumn=
+	\|		endif
 	\|	else
 	\|		set tw?
 	\|	endif
@@ -1090,9 +1088,19 @@ noremap	<silent><F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR
 vnoremap<silent><F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agv
 inoremap<silent><F4>		<C-C>:let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agi
 
-" <C-F4>            highlight characters beyond column ... {{3
-map				<C-F4>		:<C-U>Marker<Space>
-imap			<C-F4>		<C-O>:Marker<Space>
+" <C-F4>            highlight column {{3
+function! <SID>ToggleMarker()
+	if &colorcolumn == ''
+		set colorcolumn=+1
+		echomsg '  colorcolumn'
+	else
+		set colorcolumn=
+		echomsg 'nocolorcolumn'
+	endif
+endfunction
+map	<silent>	<C-F4>		:<C-U>call <SID>ToggleMarker()<CR>
+vmap<silent>	<C-F4>		:<C-U>call <SID>ToggleMarker()<CR>gv
+imap<silent>	<C-F4>		<C-O>:call <SID>ToggleMarker()<CR>
 
 " <F5>              remove search highlighting {{3
 map	<silent>	<F5>		:<C-U>nohlsearch<CR>
@@ -1212,7 +1220,7 @@ vmap			<S-F14>		:<C-U>redir END<CR>gv
 let mapleader = '\'
 " folding {{3
 " close all folds except this
-nnoremap<silent>ZZ			:exec 'silent! normal! zM'.foldlevel('.').'zozz'<CR>
+nnoremap<silent>zZ			:exec 'silent! normal! zM'.foldlevel('.').'zo'<CR>
 
 " fold top level
 noremap			zT			<C-\><C-N>:%foldclose<CR>
@@ -1376,6 +1384,9 @@ xnoremap<silent>#				<C-C>?\V<C-R>=<SID>FidgetWhitespace(escape(<SID>GetSelectio
 xnoremap<silent><leader>*		<C-C>/\V<C-R>=substitute(escape(<SID>GetSelection(),'/\'),'\n','\\n','g')<CR><CR>
 xnoremap<silent><leader>#		<C-C>?\V<C-R>=substitute(escape(<SID>GetSelection(),'?\'),'\n','\\n','g')<CR><CR>
 
+" search with X selection {{4
+nnoremap<silent><leader>9		/<C-R>*<CR>
+
 " highlight without jumping {{4
 xnoremap<silent><M-8>		:<C-U>let @/="\\V<C-R>=escape(<SID>FidgetWhitespace(escape(<SID>GetSelection(),'\')),'\"')<CR>"<CR>
 "							exec "let @/='\\<".expand("<cword>")."\\>'"
@@ -1388,8 +1399,6 @@ cnoremap		<leader>9		\(\)<Left><Left>
 " brace multi, non-greedy multi
 cnoremap		<leader>{		\{}<Left>
 cnoremap		<leader>-		\{-}
-" flexible whitespace
-cnoremap		<leader>g		\_s\+
 
 " }}2
 

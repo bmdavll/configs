@@ -613,11 +613,11 @@ if !exists("g:surround_no_mappings") || ! g:surround_no_mappings
   else
     vmap    gS   <Plug>VgSurround
   endif
-  if !hasmapto("<Plug>Isurround","i") && "" == mapcheck("<C-S>","i")
-    imap    <C-S> <Plug>Isurround
-  endif
-  imap      <C-G>s <Plug>Isurround
-  imap      <C-G>S <Plug>ISurround
+  "- if !hasmapto("<Plug>Isurround","i") && "" == mapcheck("<C-S>","i")
+  "-   imap    <C-S> <Plug>Isurround
+  "- endif
+  "- imap      <C-G>s <Plug>Isurround
+  "- imap      <C-G>S <Plug>ISurround
   "Implemented internally instead
   "imap      <C-S><C-S> <Plug>ISurround
 endif

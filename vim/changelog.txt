@@ -52,6 +52,7 @@ smartword.vim
 surround.vim
 	+ reversed whether ({[< and )}]> insert spaces
 	+ changed < to add a <> surround instead of tags
+	+ removed Isurround mappings
 
 taglist.vim
 	* catch error if no fold

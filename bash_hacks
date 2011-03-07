@@ -23,7 +23,7 @@ function mkbin
 #{{1 source scripts and set environment variables
 addsource ~/code/repos/[^.]*/*.sh
 addsource ~/code/repos/[^.]*/examples/*.sh
-addsource ~/code/scripts/j.sh
+addsource ~/code/scripts/z.sh
 
 CODE_PATH="$HOME/code:$HOME/code/lang"
 CODE_PATH+=":$HOME/code/configs"
