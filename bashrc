@@ -14,6 +14,7 @@ umask 0022
 [ -t 0 ] && stty -ixon
 
 #{{1 options and environment variables
+export LC_COLLATE=POSIX
 #{{2 bash
 shopt -s no_empty_cmd_completion
 shopt -s checkwinsize	# if necessary, update LINES/COLUMNS after each command

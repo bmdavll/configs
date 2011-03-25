@@ -176,11 +176,12 @@ set wildignore+=*.class
 set wildignore+=*.pyc
 
 " win32 {{2
-if !has('gui_win32')
+if !has('win32')
 	" directories for swap files
 	set directory=~/tmp//,.,/var/tmp//,/tmp//
 else
 	set directory=~//,.
+	set fileformats=unix,dos
 endif
 " }}
 
@@ -234,8 +235,11 @@ endif
 if !has('gui_running')
 	set ttimeoutlen=50			" timeout for terminal keycodes (in ms)
 	if &term =~ 'screen'
-		set showtabline=2		" always show tab line
+	set showtabline=2			" always show tab line
 	endif
+
+	" hack
+	if &t_Co >= 8 | set t_Co=256 | endif
 
 	source $VIMRUNTIME/menu.vim	" emenu access
 
@@ -1310,6 +1314,7 @@ function! <SID>R()
 	let @- = @_
 	let @z = @_
 	let @" = @_
+	let @* = @_
 endfunction
 xmap<silent>	<leader>r		:<C-U>call <SID>R()<CR>
 " }}
@@ -1495,7 +1500,7 @@ map	<silent>	<leader><C-X>	<leader><C-A>
 let g:Tlist_Show_One_File = 1
 
 " YankRing {{2
-if !has('gui_win32')
+if !has('win32')
 	let g:yankring_history_file = ".vim_yankring_history"
 else
 	let g:yankring_history_file = "_vim_yankring_history"

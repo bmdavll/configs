@@ -58,6 +58,7 @@ add trash-cli
 add mit-scheme
 
 ##1 libraries/tools
+add gimp-resynth
 add libsvg
 add rebase
 add svg2png

@@ -32,8 +32,8 @@ syn keyword vimperatorCommand ab[breviate] ab[clear] addo[ns] bN[ext] b[uffer] b
     \ reloada[ll] res[tart] run runt[ime] sa[nitize] sav[eas] sb[ar] sb[open] sbcl[ose] scrip[tnames] se[t] setg[lobal] setl[ocal]
     \ sideb[ar] sil[ent] so[urce] st[op] stopa[ll] sty[le] styd[isable] styled[isable] stye[nable] stylee[nable] styt[oggle]
     \ stylet[oggle] tN[ext] t[open] tab taba[ttach] tabN[ext] tabc[lose] tabd[o] tabde[tach] tabdu[plicate] tabfir[st] tabl[ast]
-    \ tabm[ove] tabn[ext] tabnew tabo[nly] tabopen tabp[revious] tabr[ewind] tabs tbh[ide] tbs[how] tbt[oggle] time tn[ext]
-    \ toolbarh[ide] toolbars[how] toolbart[oggle] tp[revious] u[ndo] una[bbreviate] undoa[ll] unl[et] unm[ap] verb[ose] ve[rsion]
+    \ tabm[ove] tabn[ext] tabnew tabo[nly] tabopen tabp[revious] tabr[ewind] tabs time tn[ext]
+    \ tp[revious] u[ndo] una[bbreviate] undoa[ll] unl[et] unm[ap] verb[ose] ve[rsion]
     \ vie[wsource] viu[sage] vm[ap] vmap[clear] vno[remap] vu[nmap] w[rite] wc[lose] win[open] winc[lose] wind[ow] winon[ly]
     \ wo[pen] wq wqa[ll] xa[ll] zo[om]
     \ contained
@@ -51,12 +51,13 @@ syn match vimperatorAutoEventList "\(\a\+,\)*\a\+" contained contains=vimperator
 syn region vimperatorSet matchgroup=vimperatorCommand start="\%(^\s*:\=\)\@<=\<\%(setl\%[ocal]\|setg\%[lobal]\|set\=\)\=\>"
     \ end="$" keepend oneline contains=vimperatorOption,vimperatorString
 
-syn keyword vimperatorOption act activate cd cdpath complete cpt defsearch ds editor eht ei enc encoding eventignore
+syn keyword vimperatorOption ac act activate autocomplete cd cdpath complete cpt defsearch ds editor eht ei enc encoding eventignore
     \ extendedhinttags fenc fileencoding fh followhints go guioptions helpfile hf hi hin hintinputs hintmatching hinttags
-    \ hinttimeout history hm ht hto laststatus ls maxitems messages msgs newtab nextpattern pa pageinfo popups pps previouspattern
-    \ rtp runtimepath si sanitizeitems sts sanitizetimespan scr scroll sh shcf shell shellcmdflag showstatuslinks showtabline ssli
-    \ stal suggestengines titlestring urlseparator vbs verbose wic wig wildcase wildignore wildmode wildoptions wim wop
+    \ hinttimeout history hm ht hto maxitems messages msgs newtab nextpattern pa pageinfo popups pps previouspattern
+    \ rtp runtimepath si sanitizeitems sts sanitizetimespan scr scroll sh shcf shell shellcmdflag showstatuslinks 
+    \ stal status suggestengines titlestring urlseparator vbs verbose wildmode wim
     \ wordseparators wsp
+    \ toolbars gui tabnumbers tn hintchars hc
     \ contained nextgroup=vimperatorSetMod
 
 " toggle options

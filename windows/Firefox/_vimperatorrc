@@ -65,14 +65,14 @@ inoremap		<C-b>		<C-v>
 cnoremap		<C-b>		<C-v>
 
 " scrolling {{{2
-nnoremap		h			3h
-nnoremap		l			3l
-nnoremap		j			2j
-nnoremap		k			2k
+nnoremap		h			4h
+nnoremap		l			4l
+nnoremap		j			3j
+nnoremap		k			3k
 
-" scroll up/down quarter-page
-nnoremap		f			10k
-nnoremap		v			10j
+" scroll up/down more
+nnoremap		f			15k
+nnoremap		v			15j
 
 " page up
 nnoremap		b			<S-Space>
@@ -155,11 +155,11 @@ noremap<silent>	<C-m>		:jumps<CR>
 noremap			<			[[
 noremap			>			]]
 
-" macros {{{2
 " paste-n-go from selection or clipboard
 noremap			p			<C-v><C-c>p
 noremap			P			<C-v><C-c>gP
 
+" macros {{{2
 " quick search in background tab
 " google/wikipedia/special/dictionary
 noremap<silent>	s			<C-v><C-c>:set act!=tabopen<CR>tg<Space><S-Insert><CR>:set act!=tabopen<CR>
@@ -172,14 +172,6 @@ noremap			a			<C-v><C-c>o<S-Insert><Home><C-Right><Space><Left>
 noremap			A			<C-v><C-c>t<S-Insert><Home><C-Right><Space><Left>
 
 " tabs {{{2
-" previous/next tab
-noremap			<C-A-i>		gT
-noremap			<C-A-o>		gt
-
-" open/close
-noremap			<C-A-t>		<C-T>
-noremap			<C-A-w>		<C-w>
-
 " undo close
 noremap			U			:undo<Space><Tab>
 
@@ -200,10 +192,10 @@ noremap<silent>	<leader>W	:tabattach 1<CR>
 
 " interface {{{2
 " toggle toolbars
-" Menu Bar, Navigation Toolbar
-noremap<silent>	c			:js toggle_bars(["toolbar-menubar","nav-bar"])<CR>
-" Bookmarks Toolbar (PersonalToolbar)
-noremap<silent>	C			:toolbartoggle Bookmarks Toolbar<CR>
+" Add-on Bar
+noremap<silent>	c			:set toolbars=invaddons<CR>
+" Bookmarks Toolbar
+noremap<silent>	C			:set toolbars=invbookmarks<CR>
 
 " vimperator help
 noremap			H			:help<Space>
@@ -211,7 +203,7 @@ noremap			H			:help<Space>
 noremap			!			:!
 
 " function keys {{{2
-noremap<silent>	<F4>		:emenu Bookmarks.Organize Bookmarks…<CR>
+noremap<silent>	<F4>		:emenu Bookmarks.Show All Bookmarks<CR>
 noremap<silent>	<F5>		:nohlsearch<CR>
 noremap			<F13>		<C-o>
 noremap			<F14>		<C-i>
@@ -250,30 +242,29 @@ noremap<silent>	<leader>c	yd:!chrome <S-Insert><CR>
 
 " play flash videos with vlc
 noremap<silent>	<leader>v	:!vlc /tmp/Flash* &<CR>
-
 " }}}
 
 " options {{{1
 " vimperator {{{2
+set noautocomplete
 set complete=l
 set defsearch=gl
 set editor='gvim -f'
 set followhints=0
-set guioptions+=B
-set guioptions+=n
+set hintchars=qwertyuiopasdfghjklzxcvbnm
 set hlsearch
+set status=input,position
+set nextpattern+=\\bsiguiente\\b,\\bposterior\\b
+set previouspattern+=\\banterior\\b
 set newtab=all
-set nextpattern=\\bnext\\b,\\bsiguiente\\b,\\bposterior\\b,^>$,^(>>|»)$,^(>|»),(>|»)$,\\bmore\\b
-set previouspattern=\\b(prev|previous)\\b,\\banterior\\b,^<$,^(<<|«)$,^(<|«),(<|«)$
 set sanitizeitems=cache,commandline,cookies,downloads,formdata,history,macros,marks,offlineapps,sitesettings
-set sanitizetimespan=0
-set showstatuslinks=2
-set showtabline=1
+set sanitizetimespan=2
+set showstatuslinks=0
+set tabnumbers
 set titlestring=Firefox
-set urlseparator=;
+set toolbars=none,tabs,navigation,bookmarks
 set visualbell
 " set wildmode=list:longest
-" set wildoptions=auto
 
 " about:config {{{2
 set! browser.sessionstore.interval=60000
@@ -283,31 +274,14 @@ set! security.dialog_enable_delay=0
 
 " styling {{{1
 hi! Bell			display: none;
-hi! StatusLine		color: black; background: #d0d0d0;
-hi! CmdLine -a		color: black; background: #eeeeee;
-hi! Normal			color: black; background: #eeeeee;
-
-" javascript {{{1
-javascript <<EOF
-
-// toggle toolbars
-toggle_bars = function(bars) {
-	for (var i in bars) document.getElementById(bars[i]).collapsed ^= 1;
-};
-
-// rss feed button
-(function() {
-	var feedPanel = document.createElement("statusbarpanel");
-	feedPanel.setAttribute("id", "feed-panel-clone");
-	feedPanel.appendChild(document.getElementById("feed-button"));
-	feedPanel.firstChild.setAttribute("style", "padding: 0; max-height: 16px;");
-	document.getElementById("status-bar")
-		.insertBefore(feedPanel, document.getElementById("security-button"));
-})();
-
-EOF
+hi! StatusLine		background: #c0c0bd; color: black;
+hi! InfoMsg			background: #c0c0bd; color: gray;
+hi! ModeMsg		-a	background: #c0c0bd;
+hi! MoreMsg		-a	background: #c0c0bd;
+hi! Question	-a	background: #c0c0bd;
+hi! CmdLine			background: #ebe8e4; color: black;
 
 " environment {{{1
-cd ~
+silent cd ~
 
 " vim:set ts=4 sw=4 noet fdm=marker ft=vimperator:

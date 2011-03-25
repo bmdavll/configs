@@ -1,16 +1,16 @@
-505	gvim
-348	t
+510	gvim
+363	t
 35	t timer 
-31	f 
-27	firefox 
-25	dropboxd
+32	f 
+30	firefox 
+28	dropboxd
 13	chromium
 11	gucharmap 
-9	gmpc 
+10	gmpc 
 8	t cpuset 
 7	clementine
 6	calculator
-5	f trash:
+6	f trash:
 4	gimp 
 3	scim-run gvim 
 3	urxvt
@@ -26,7 +26,6 @@
 1	mirage
 1	audacity
 1	avidemux2_gtk
-1	deluge
 0	transmission 
 0	thunderbird 
 0	gqview 

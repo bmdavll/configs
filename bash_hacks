@@ -32,13 +32,23 @@ CODE_PATH+=":$HOME/code/scripts:$HOME/code/scripts/@(perl|python)"
 
 alias log='log -i'
 
-alias list='log -n list'
+alias list='log -wn list'
 alias clip='log clip'
 alias recipes='log recipes'
-alias birding='log -ef birding'
+alias birding='log -wfe birding'
 
-complete -F _log_alias \
-list clip recipes birding
+unalias todo
+function todo
+{
+	if [ $# -eq 0 ]; then
+		log todo -wn p | perl -e '$_ = join("", <>); s/^3—.*//ms; print'
+	else
+		log todo -w "$@"
+	fi
+}
+
+complete -F _log_alias list clip todo \
+recipes birding
 
 export LOG_EDITOR='scim-run gvim'
 export BACKUP_LOG=~/etc/backup.log
@@ -215,6 +225,15 @@ alias more='less'
 alias info='pinfo'
 
 #{{1 misc. functions
+function ol
+{
+	o "$@" && ls
+}
+_ol() {
+	COMPREPLY=($(compgen -W "$(ls ..)" -- "$2"))
+}
+complete -F _ol ol
+
 function caps
 {
 	if [[ "$(xmodmap | grep '0x42')" == control* ]]; then
@@ -253,7 +272,7 @@ complete -F comptest comptest
 function reorder-here
 {
 	local IFS=$'\n'
-	renumb.py -zl $( find . -maxdepth 1 -mindepth 1 -type f             \
+	renumb.py -zl $( find . -maxdepth 1 -mindepth 1 -type f \
 							-iregex '.*/[0-9]+[^/]*\.\(jpg\|png\|gif\|flv\|avi\|mp4\|wmv\)' \
 					 | cut -c 3- | sort -n ) "$@"
 }

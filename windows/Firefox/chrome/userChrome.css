@@ -16,11 +16,16 @@
 	display: none !important;
 }
 
+/* navigation bar */
+#nav-bar {
+	max-height: 28px !important;
+}
+
 /* bookmarks toolbar */
 #PersonalToolbar {
 	padding: 0px !important;
 	font-size: 100% !important;
-	height: 29px !important;
+	height: 28px !important;
 	min-height: 24px !important;
 }
 /* toolbar buttons */
@@ -75,18 +80,15 @@ toolbarbutton[label='NYT']				.toolbarbutton-icon { list-style-image: url('nytim
 toolbarbutton[label='Ars']				.toolbarbutton-icon { list-style-image: url('ars.ico')			!important; display: block !important; -moz-image-region: auto !important; }
 toolbarbutton[label='Torrents']			.toolbarbutton-icon { list-style-image: url('utorrent.ico')		!important; display: block !important; -moz-image-region: auto !important; }
 toolbarbutton[label='Ocio']				.toolbarbutton-icon { list-style-image: url('beh.png')			!important; display: block !important; -moz-image-region: auto !important; }
-toolbarbutton[label='Poker']			.toolbarbutton-icon { list-style-image: url('poker.png')		!important; display: block !important; -moz-image-region: auto !important; }
 
 toolbarbutton[label='@']				.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/preferences/mail.png')			!important; display: block !important; -moz-image-region: auto !important; }
 toolbarbutton[label='Unsorted']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/unsortedBookmarks.png')	!important; display: block !important; -moz-image-region: auto !important; }
 toolbarbutton[label='Macros']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/bookmarksToolbar.png')	!important; display: block !important; -moz-image-region: auto !important; }
 toolbarbutton[label='Show images']		.toolbarbutton-icon { list-style-image: url('reddit.ico')		!important; display: block !important; -moz-image-region: auto !important; }
-toolbarbutton[label='Other']			.toolbarbutton-icon { list-style-image: url('bookmarks.png')	!important; display: block !important; -moz-image-region: auto !important; }
-toolbarbutton[label='Other']			.toolbarbutton-icon { list-style-image: url('chrome://browser/skin/places/allBookmarks.png')		!important; display: block !important; -moz-image-region: auto !important; }
 
 toolbarbutton							.toolbarbutton-text { display: none   !important; }
 toolbarbutton[label='Macros']			.toolbarbutton-text { display: inline !important; }
-toolbarbutton[label='Other']			.toolbarbutton-text { display: inline !important; }
+toolbarbutton[label='Bookmarks']		.toolbarbutton-text { display: inline !important; }
 
 /* remove context menu items */
 	#context-openlink,                      /*	*/

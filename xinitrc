@@ -17,11 +17,11 @@ xbindkeys
 DEFAULT_SESSION=xfce4
 
 case "$1" in
-	awesome)
-		exec awesome
-		;;
 	xfce4)
 		exec ck-launch-session startxfce4
+		;;
+	awesome)
+		exec awesome
 		;;
 	gnome)
 		exec gnome-session

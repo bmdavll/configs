@@ -11,7 +11,7 @@ MAKE_PAT='@(*[Mm]akefile|*configure)?(.@(ac|am|in))'
 # (the '*' before a literal is a compgen hack)
 
 # vim
-VIM_HEIGHT=47
+VIM_HEIGHT=45
 
 #{{1 utility functions
 #{{2 return the maximum integer value from a list

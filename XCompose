@@ -19,7 +19,7 @@
 #	<bracketright>	Roman numerals
 #	<asterisk>		Greek
 #	<plus>			combining character
-#	<backslash>		character sequence (macro) represented by a keyword
+#	<Multi_key>		character sequence (macro) represented by a keyword
 #					of up to 5 letters
 #	<ampersand>		if followed by four hex digits (in lower case),
 #					allows one unicode character from the BMP to be
@@ -224,14 +224,14 @@
 <Multi_key> <c> <r> <o> <s>				: "✝"	U271D # LATIN CROSS
 <Multi_key> <j> <u> <d>					: "✡"	U2721 # STAR OF DAVID
 
-##2 Shapes
+##2 Bullets
 <Multi_key> <asterisk> <asterisk>		: "•"	U2022 # BULLET
 <Multi_key> <asterisk> <greater>		: "‣"	U2023 # TRIANGULAR BULLET
 <Multi_key> <exclam> <asterisk>			: "◘"	U25D8 # INVERSE BULLET
-<Multi_key> <at> <at>					: "◘"	U25D8 # INVERSE BULLET
 <Multi_key> <asterisk> <period>			: "◦"	U25E6 # WHITE BULLET
 <Multi_key> <s> <t> <a> <r>				: "★"	U2605 # BLACK STAR
 
+##2 Shapes
 <Multi_key> <B> <B>						: "█"	U2588 # FULL BLOCK
 <Multi_key> <B> <asciicircum>			: "▀"	U2580 # UPPER HALF BLOCK
 <Multi_key> <B> <underscore>			: "▄"	U2584 # LOWER HALF BLOCK
@@ -402,6 +402,8 @@
 <Multi_key> <asciicircum> <V>			: "ⱽ"	U2C7D # MODIFIER LETTER CAPITAL V
 <Multi_key> <asciicircum> <W>			: "ᵂ"	U1D42 # MODIFIER LETTER CAPITAL W
 
+<Multi_key> <asciicircum> <S>			: "ᶴ"	U1DB4 # MODIFIER LETTER SMALL ESH
+
 <Multi_key> <asciicircum> <asterisk> <a>: "ᵅ"	U1D45 # MODIFIER LETTER SMALL ALPHA
 <Multi_key> <asciicircum> <asterisk> <b>: "ᵝ"	U1D5D # MODIFIER LETTER SMALL BETA
 <Multi_key> <asciicircum> <asterisk> <g>: "ᵞ"	U1D5E # MODIFIER LETTER SMALL GREEK GAMMA
@@ -409,7 +411,9 @@
 <Multi_key> <asciicircum> <asterisk> <e>: "ᵋ"	U1D4B # MODIFIER LETTER SMALL OPEN E
 <Multi_key> <asciicircum> <asterisk> <u>: "ᶿ"	U1DBF # MODIFIER LETTER SMALL THETA
 <Multi_key> <asciicircum> <asterisk> <i>: "ᶥ"	U1DA5 # MODIFIER LETTER SMALL IOTA
+<Multi_key> <asciicircum> <asterisk> <y>: "ᶷ"	U1DB7 # MODIFIER LETTER SMALL UPSILON
 <Multi_key> <asciicircum> <asterisk> <f>: "ᵠ"	U1D60 # MODIFIER LETTER SMALL GREEK PHI
+<Multi_key> <asciicircum> <asterisk> <F>: "ᶲ"	U1DB2 # MODIFIER LETTER SMALL PHI
 <Multi_key> <asciicircum> <asterisk> <x>: "ᵡ"	U1D61 # MODIFIER LETTER SMALL CHI
 
 ##2 Subscripts
@@ -1254,8 +1258,15 @@
 <Multi_key> <plus> <k> <e> <y>					: "⃣"	U20E3 # COMBINING ENCLOSING KEYCAP
 
 ##1 Macros
+<Multi_key> <Multi_key> <space>			: "⤷"	U2937 # ARROW POINTING DOWNWARDS THEN CURVING RIGHTWARDS
+<Multi_key> <Multi_key> <period>		: "·"	U00B7 # MIDDLE DOT
+<Multi_key> <Multi_key> <exclam>		: "◘"	U25D8 # INVERSE BULLET
+
+<Multi_key> <Multi_key> <braceright>	: "⎫\r⎪\r⎬\r⎭"
+
 <Multi_key> <s> <i> <m> <p>				: "⟦⟧"
 <Multi_key> <y> <u> <e>					: "[粵]"
+
 <Multi_key> <d> <u> <r> <k>				: "الله أكبر"
 <Multi_key> <t> <a> <s> <h>				: "བཀྲ་ཤིས་བདེ་ལེགས།"
 
@@ -1279,33 +1290,33 @@
 
 ##1 Templates
 # Scripts
-<Multi_key> <backslash> <s> <c> <r>			: "⁰¹²³⁴⁵⁶⁷⁸⁹⁽⁺⁻⁼⁾ⁱⁿ₀₁₂₃₄₅₆₇₈₉₍₊₋₌₎ₐₑᵢⱼₒᵣᵤᵥₓ"
+<Multi_key> <Multi_key> <s> <c> <r>			: "⁰¹²³⁴⁵⁶⁷⁸⁹⁽⁺⁻⁼⁾ⁱⁿ₀₁₂₃₄₅₆₇₈₉₍₊₋₌₎ₐₑᵢⱼₒᵣᵤᵥₓ"
 # Punctuation
-<Multi_key> <backslash> <q> <u> <o>			: "‘’“”‹›―❛❜❝❞❮❯"
-<Multi_key> <backslash> <b> <r> <a>			: "⎛⎞⎡⎤⎧⎫⎴⏜\r⎜⎟⎢⎥⎪⎪  \r⎜⎟⎢⎥⎨⎬⎶ \r⎝⎠⎣⎦⎩⎭⎵⏝\r❴❵⦃⦄⟦⟧❲❳\r❬❭❰❱⟨⟩⟪⟫\r❨❩❪❫"
-<Multi_key> <backslash> <B> <R> <A>			: "（）︵｛｝︷［］﹈〚〛\r    ︶    ︸    ﹇\r〈〉︿《》︽「」﹁『』﹃\r    ﹀    ︾    ﹂    ﹄\r〔〕︹〘〙  【】︻〖〗\r    ︺          ︼"
+<Multi_key> <Multi_key> <q> <u> <o>			: "‘’“”‹›―❛❜❝❞❮❯"
+<Multi_key> <Multi_key> <b> <r> <a>			: "⎛⎞⎡⎤⎧⎫⎴⏜\r⎜⎟⎢⎥⎪⎪  \r⎜⎟⎢⎥⎨⎬⎶ \r⎝⎠⎣⎦⎩⎭⎵⏝\r❴❵⦃⦄⟦⟧❲❳\r❬❭❰❱⟨⟩⟪⟫\r❨❩❪❫"
+<Multi_key> <Multi_key> <B> <R> <A>			: "（）︵｛｝︷［］﹈〚〛\r    ︶    ︸    ﹇\r〈〉︿《》︽「」﹁『』﹃\r    ﹀    ︾    ﹂    ﹄\r〔〕︹〘〙  【】︻〖〗\r    ︺          ︼"
 # Symbols
-<Multi_key> <backslash> <c> <t> <r> <l>		: "␀␁␂␃␄␅␆␇␈␉␊␋␌␍␎␏␐␑␒␓␔␕␖␗␘␙␚␛␜␝␞␟␠␡␤"
-<Multi_key> <backslash> <a> <s> <t> <r> <o>	: "☉☿♀♁♂♃♄♅♆\r♈♉♊♋♌♍♎♏♐♑♒♓"
-<Multi_key> <backslash> <s> <e> <x>			: "♀♂⚢⚣⚤⚥⚦⚧⚪⚲"
-<Multi_key> <backslash> <c> <h> <e> <s> <s>	: "♔♕♖♗♘♙\r♚♛♜♝♞♟"
-<Multi_key> <backslash> <d> <i> <c> <e>		: "⚀⚁⚂⚃⚄⚅"
-<Multi_key> <backslash> <s> <u> <i> <t>		: "♠♥♦♣♤♡♢♧"
-<Multi_key> <backslash> <h> <e> <a> <r> <t>	: "♡♥❢❣❤❥☙❦❧"
-<Multi_key> <backslash> <m> <u> <s> <i> <c>	: "♩♪♫♬"
-<Multi_key> <backslash> <c> <h> <e> <c> <k>	: "✓✗✔✘"
-<Multi_key> <backslash> <r> <e> <c> <y>		: "♳♴♵♶♷♸♹♺♲♻♼♽"
-<Multi_key> <backslash> <t> <r> <a> <d> <e>	: "⚒⚓⚔⚕⚖⚗⚘⚙⚚"
-<Multi_key> <backslash> <b> <a> <g> <u> <a>	: "☰☱☲☳☴☵☶☷"
+<Multi_key> <Multi_key> <c> <t> <r> <l>		: "␀␁␂␃␄␅␆␇␈␉␊␋␌␍␎␏␐␑␒␓␔␕␖␗␘␙␚␛␜␝␞␟␠␡␤"
+<Multi_key> <Multi_key> <a> <s> <t> <r> <o>	: "☉☿♀♁♂♃♄♅♆\r♈♉♊♋♌♍♎♏♐♑♒♓"
+<Multi_key> <Multi_key> <s> <e> <x>			: "♀♂⚢⚣⚤⚥⚦⚧⚪⚲"
+<Multi_key> <Multi_key> <c> <h> <e> <s> <s>	: "♔♕♖♗♘♙\r♚♛♜♝♞♟"
+<Multi_key> <Multi_key> <d> <i> <c> <e>		: "⚀⚁⚂⚃⚄⚅"
+<Multi_key> <Multi_key> <s> <u> <i> <t>		: "♠♥♦♣♤♡♢♧"
+<Multi_key> <Multi_key> <h> <e> <a> <r> <t>	: "♡♥❢❣❤❥☙❦❧"
+<Multi_key> <Multi_key> <m> <u> <s> <i> <c>	: "♩♪♫♬"
+<Multi_key> <Multi_key> <c> <h> <e> <c> <k>	: "✓✗✔✘"
+<Multi_key> <Multi_key> <r> <e> <c> <y>		: "♳♴♵♶♷♸♹♺♲♻♼♽"
+<Multi_key> <Multi_key> <t> <r> <a> <d> <e>	: "⚒⚓⚔⚕⚖⚗⚘⚙⚚"
+<Multi_key> <Multi_key> <b> <a> <g> <u> <a>	: "☰☱☲☳☴☵☶☷"
 # Shapes
-<Multi_key> <backslash> <b> <o> <x>			: "┌─┬─┐┏━┳━┓┍━┯━┑┎─┰─┒\r│ │ │┃ ┃ ┃│ │ │┃ ┃ ┃\r├─┼─┤┣━╋━┫┝━┿━┥┠─╂─┨\r│ │ │┃ ┃ ┃│ │ │┃ ┃ ┃\r└─┴─┘┗━┻━┛┕━┷━┙┖─┸─┚\r╔═╦═╗╒═╤═╕╓─╥─╖╭╮\r║ ║ ║│ │ │║ ║ ║╰╯\r╠═╬═╣╞═╪═╡╟─╫─╢\r║ ║ ║│ │ │║ ║ ║\r╚═╩═╝╘═╧═╛╙─╨─╜\r┌╌┬╌┐┌┄┬┄┐┌┈┬┈┐\r╎ ╎ ╎┆ ┆ ┆┊ ┊ ┊\r├╌┼╌┤├┄┼┄┤├┈┼┈┤\r╎ ╎ ╎┆ ┆ ┆┊ ┊ ┊\r└╌┴╌┘└┄┴┄┘└┈┴┈┘\r┏╍┳╍┓┏┅┳┅┓┏┉┳┉┓\r╏ ╏ ╏┇ ┇ ┇┋ ┋ ┋\r┣╍╋╍┫┣┅╋┅┫┣┉╋┉┫\r╏ ╏ ╏┇ ┇ ┇┋ ┋ ┋\r┗╍┻╍┛┗┅┻┅┛┗┉┻┉┛"
-<Multi_key> <backslash> <a> <r> <r>			: "⇧⇩⇳⇦⇨⬄⬃⬁⬀⬂\r⬆⬇⬍⬅➡⬌⬋⬉⬈⬊"
-<Multi_key> <backslash> <b> <l> <o>			: "▁▂▃▄▅▆▇▐█▉▊▋▌▍▎▏▕░▒▓\r▗▄▖▝▀▘▝▚▞▘▟▙▜▛"
-<Multi_key> <backslash> <s> <q>				: "▫▪◽◾◻◼□■⬛▣▤▥▨▧▩▦⬚▢\r◳◰◲◱◧◫◨⬓⬒◩◪⬕⬔▮▯▬▭"
-<Multi_key> <backslash> <t> <r> <i>			: "▲△▴▵▶▷▸▹►▻◢◣◿◺◮◭\r▼▽▾▿◀◁◂◃◄◅◥◤◹◸◬"
-<Multi_key> <backslash> <d> <i> <a>			: "▰▱◇◆◈⬗⬖⬘⬙◊"
-<Multi_key> <backslash> <p> <o> <l> <y>		: "⬟⬠⭓⭔⬢⬡⬣"
-<Multi_key> <backslash> <c> <i> <r>			: "⬤◯◌○◍●◉◎◑◐◓◒◔◕◶◵◷◴\r◜◝◟◞◠◡◚◛◙◘◖◗"
-<Multi_key> <backslash> <e> <y> <e> <s>		: "ರರԾԾఠఠסּסּ⨀⨀⊙⊙Ꙭ"
+<Multi_key> <Multi_key> <b> <o> <x>			: "┌─┬─┐┏━┳━┓┍━┯━┑┎─┰─┒\r│ │ │┃ ┃ ┃│ │ │┃ ┃ ┃\r├─┼─┤┣━╋━┫┝━┿━┥┠─╂─┨\r│ │ │┃ ┃ ┃│ │ │┃ ┃ ┃\r└─┴─┘┗━┻━┛┕━┷━┙┖─┸─┚\r╔═╦═╗╒═╤═╕╓─╥─╖╭╮\r║ ║ ║│ │ │║ ║ ║╰╯\r╠═╬═╣╞═╪═╡╟─╫─╢\r║ ║ ║│ │ │║ ║ ║\r╚═╩═╝╘═╧═╛╙─╨─╜\r┌╌┬╌┐┌┄┬┄┐┌┈┬┈┐\r╎ ╎ ╎┆ ┆ ┆┊ ┊ ┊\r├╌┼╌┤├┄┼┄┤├┈┼┈┤\r╎ ╎ ╎┆ ┆ ┆┊ ┊ ┊\r└╌┴╌┘└┄┴┄┘└┈┴┈┘\r┏╍┳╍┓┏┅┳┅┓┏┉┳┉┓\r╏ ╏ ╏┇ ┇ ┇┋ ┋ ┋\r┣╍╋╍┫┣┅╋┅┫┣┉╋┉┫\r╏ ╏ ╏┇ ┇ ┇┋ ┋ ┋\r┗╍┻╍┛┗┅┻┅┛┗┉┻┉┛"
+<Multi_key> <Multi_key> <a> <r> <r>			: "⇧⇩⇳⇦⇨⬄⬃⬁⬀⬂\r⬆⬇⬍⬅➡⬌⬋⬉⬈⬊"
+<Multi_key> <Multi_key> <b> <l> <o>			: "▁▂▃▄▅▆▇▐█▉▊▋▌▍▎▏▕░▒▓\r▗▄▖▝▀▘▝▚▞▘▟▙▜▛"
+<Multi_key> <Multi_key> <s> <q>				: "▫▪◽◾◻◼□■⬛▣▤▥▨▧▩▦⬚▢\r◳◰◲◱◧◫◨⬓⬒◩◪⬕⬔▮▯▬▭"
+<Multi_key> <Multi_key> <t> <r> <i>			: "▲△▴▵▶▷▸▹►▻◢◣◿◺◮◭\r▼▽▾▿◀◁◂◃◄◅◥◤◹◸◬"
+<Multi_key> <Multi_key> <d> <i> <a>			: "▰▱◇◆◈⬗⬖⬘⬙◊"
+<Multi_key> <Multi_key> <p> <o> <l> <y>		: "⬟⬠⭓⭔⬢⬡⬣"
+<Multi_key> <Multi_key> <c> <i> <r>			: "⬤◯◌○◍●◉◎◑◐◓◒◔◕◶◵◷◴\r◜◝◟◞◠◡◚◛◙◘◖◗"
+<Multi_key> <Multi_key> <e> <y> <e> <s>		: "ರರԾԾఠఠסּסּ⨀⨀⊙⊙Ꙭ"
 
 ##1 vim:set ts=4 sw=4 noet fdm=marker fmr=##,## fenc=utf-8:
