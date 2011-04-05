@@ -25,6 +25,6 @@ gvim -f	-U NONE	+'set columns=80 lines=42'	\
 				+'silent! tabdo %foldclose!'\
 				+'tabn 1'					\
 \
-todo list clip log
+todo job list clip log
 
 cleanUp 0

@@ -346,7 +346,8 @@ alias ls-h='_ls_special h'
 alias cls='clear && ls'
 
 # completion
-complete -A directory lh lhl lsc lso lsh
+complete -A directory lh lhl ls-c ls-o ls-h
+complete -o default -F _longopt l
 
 #{{2 changing directories
 alias bd='cd - >/dev/null'
@@ -603,9 +604,9 @@ _finder() { :
 	local args=("${opts[@]}" "${paths[@]}" "${specs[@]}")
 	if [ "$special" ]; then
 		case "$special" in
-		bk)	# backup files
-			find "${args[@]}" \( -name "*~" -o -name "*.bak" -o -name "*.swp" -o \
-								 -name "a.out" -o -name "foo" \) "$@"
+		bk)	# backup/temp files
+			find "${args[@]}" \( -name "*~"    -o -name "*.bak" -o -name "*.swp" -o \
+								 -name "a.out" -o -name "foo"   -o -name "foo.*" \) "$@"
 			;;
 		bl)	# broken links
 			find -L "${args[@]}" -type l "$@"
@@ -761,20 +762,6 @@ function hist
 	fi
 	history -p "!$num"
 	history -s  "$cmd"
-}
-
-#{{2 file browser/terminal
-function f
-{ : :
-	local fileman
-	for fileman in Thunar "nautilus --no-desktop"; do
-		if type "${fileman%% *}" &>/dev/null; then
-			[ $# -eq 0 ] && set "$PWD"
-			$fileman "$@"
-			return
-		fi
-	done
-	return 1
 }
 
 #{{2 help

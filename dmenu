@@ -1,12 +1,12 @@
-510	gvim
-363	t
+512	gvim
+366	t
 35	t timer 
 32	f 
-30	firefox 
-28	dropboxd
+31	firefox 
+30	dropboxd
 13	chromium
+12	gmpc 
 11	gucharmap 
-10	gmpc 
 8	t cpuset 
 7	clementine
 6	calculator

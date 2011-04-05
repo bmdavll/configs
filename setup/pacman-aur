@@ -35,7 +35,7 @@ if false; then
 	echo -n "Make package and install? [y/N] "
 	read reply
 	if [[ "$reply" == [Yy]* ]]; then
-		makepkg PKGBUILD && sudo pacman -U yaourt-*.pkg.tar.gz
+		makepkg PKGBUILD && sudo pacman -U yaourt-*.pkg.tar.?z
 	fi
 
 	rm -rf $TMP/yaourt
@@ -45,8 +45,14 @@ fi
 add aurvote
 
 ##1 UI
-add awesome
 add xautomation
+
+##1 fonts
+# add ttf-ms-fonts
+# add ttf-ms-extrafonts
+# add ttf-tahoma
+# add ttf-vista-fonts
+add ttf-google-webfonts
 
 ##1 command-line
 add ack # grep drop-in
@@ -60,20 +66,16 @@ add mit-scheme
 ##1 libraries/tools
 add gimp-resynth
 add libsvg
-add rebase
 add svg2png
-add thunar-vcs-plugin
+# add thunar-vcs-plugin
 
 ##1 filesystem
 add foremost # file recovery tool
 
 ##1 files/documents
 add detox # clean up filenames
-add dropbox
 
 ##2 pdf/tex
-add evince-gtk
-add pdftk
 
 ##1 graphics
 
@@ -88,11 +90,8 @@ add fluidr3 # MIDI soundfont
 # add cdrtools # alternative to cdrkit
 
 ##1 misc
+# add brainworkshop
 add mbrola # text-to-speech
-
-##2 i18n
-add stardict-i2e-es-en
-add stardict-oald
 
 ##1 INSTALL
 if which clyde &>/dev/null; then
@@ -108,7 +107,7 @@ for pkg in "${list[@]}"; do
 	echo -n "Download, make, and install $pkg? [Y/n] "
 	read reply
 	if [[ "$reply" != [Nn]* ]]; then
-		"${AUR[@]}" -S --needed --noconfirm $pkg
+		"${AUR[@]}" -S --noconfirm $pkg
 	fi
 done
 

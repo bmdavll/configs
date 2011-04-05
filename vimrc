@@ -225,7 +225,7 @@ if has('gui_running')
 	if has('gui_win32')
 		let s:font_select = [ ['Consolas', 9], ['DejaVu Sans Mono', 8] ]
 	else
-		let s:font_select = [ ['DejaVu Sans Mono', 9], ['Consolas', 10.5] ]
+		let s:font_select = [ ['DejaVu Sans Mono', 9.5], ['Consolas', 10.5] ]
 	endif
 	call <SID>AdvanceFont(0)
 	" }}
@@ -237,9 +237,6 @@ if !has('gui_running')
 	if &term =~ 'screen'
 	set showtabline=2			" always show tab line
 	endif
-
-	" hack
-	if &t_Co >= 8 | set t_Co=256 | endif
 
 	source $VIMRUNTIME/menu.vim	" emenu access
 

@@ -1,20 +1,27 @@
 #!/bin/bash
 
-FILEMAN=(Thunar 'nautilus --no-desktop')
+OPEN=( Thunar 'nautilus --no-desktop' )
+FILE=( exo-open gnome-open )
 
 if [[ -d "$1" || "$1" =~ (:|/)$ ]]; then
-	dir="$1"
-	shift
-elif [ -e "$1" ]; then
-	dir=$(dirname -- "$1")
-	shift
+	:
+
+elif [ -f "$1" ]; then
+	OPEN=( "${FILE[@]}" )
+
+elif [ $# -gt 0 ]; then
+	[ "$1" = "--dir" ] && shift
+	set -- "$(dirname -- "$1")" "${@:2}"
+
 else
-	dir="$HOME"
+	set -- "$PWD"
+
 fi
 
-for fileman in "${FILEMAN[@]}"; do
-	if type "${fileman%% *}" &>/dev/null; then
-		$fileman "$dir" "$@"
+
+for cmd in "${OPEN[@]}"; do
+	if type "${cmd%% *}" &>/dev/null; then
+		$cmd "$@" &>/dev/null
 		exit
 	fi
 done

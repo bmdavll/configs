@@ -11,10 +11,13 @@ add ()
 
 list=()
 
+add xf86-video-ati
+add xf86-input-synaptics
+
 add cpufrequtils
-add tpb
 add wicd
-# add laptop-mode-tools
+add tpb
+add laptop-mode-tools
 
 [ $(whoami) = root ] && exit 1
 

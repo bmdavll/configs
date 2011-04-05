@@ -14,8 +14,6 @@ list=()
 ##1 UI
 add dmenu
 add gksu
-# add launchy
-add rxvt-unicode-256color
 add screen
 add xbindkeys
 add zenity
@@ -28,7 +26,6 @@ add fbida # image viewer
 add lesspipe # input filter for less
 add pinfo # alternate info viewer
 add pv
-add reflector # pacman mirrorlist fetcher
 add scrot
 add units
 add xclip
@@ -70,6 +67,7 @@ add python-simplejson
 add python-webpy
 
 ##1 libraries/tools
+add blueman
 add boost
 add gob2
 add librsvg
@@ -123,12 +121,11 @@ add vifm
 
 ##2 text processing
 add antiword
-add libreoffice # openoffice-base
+add libreoffice
 add words
 
 ##2 compression
 add p7zip
-add rar
 add unrar
 add unzip
 add xarchiver
@@ -147,7 +144,8 @@ add tor
 add truecrypt
 
 ##1 web
-add filezilla
+# add filezilla
+add firefox
 add lynx
 add uzbl-tabbed
 add w3m
@@ -173,7 +171,7 @@ add qiv
 ##2 editors
 add gimp
 add inkscape
-# add dia
+add dia
 
 ##2 utils
 add netpbm
@@ -204,7 +202,7 @@ add vlc # mplayer
 # add miro
 
 ##3 editors
-add handbrake
+# add handbrake
 add avidemux-gtk
 
 ##2 codecs/plugins
@@ -214,18 +212,17 @@ add libdvdcss
 add flashplugin
 
 ##2 peripherals
-add gtkam gphoto2
+add gphoto2
 add gtkpod
 
 ##2 optical
 add cdrkit # includes mkisofs cdda2wav cdrecord etc.
 add cdrdao # writing cue/bin files
 # add cdemu-client # cue-bin emulation
-add xfburn
 
 ##1 misc
 add anki # supermemo alternative
-# add gourmet
+add gourmet
 # add lilypond # music notation
 # add tuxguitar
 
@@ -236,7 +233,6 @@ add scim-pinyin scim-tables
 add stardict
 
 ##2 math
-add galculator # gcalctool
 add mathomatic
 
 ##2 games

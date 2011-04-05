@@ -176,7 +176,7 @@ function lnbin
 	for arg in "$@"; do
 		for file in $(find "$arg" -maxdepth 1)
 		do
-			if [ -f "$file" -a -x "$file" ]; then
+			if [[ -f "$file" && -x "$file" && "$(file -L "$file")" =~ executable ]]; then
 				ln -fs "$(abspath "$file")" "$BIN" && code=0
 			fi
 		done
@@ -187,8 +187,10 @@ function lnbin
 #{{1 bootstrap scripts and set PATH
 function addpath #{{2
 {
-	[ $# -ne 1 ] && return 2
-	if ! echo "$PATH" | grep '\(:\|^\)'"$1"'\(:\|$\)' >/dev/null
+	if [ $# -ne 1 -o ! -d "$1" ]; then
+		return 2
+	fi
+	if [[ ! "$PATH" =~ (^|:)"$1"(:|$) ]]
 	then PATH="$PATH:$1"
 	else return 1
 	fi
@@ -209,6 +211,7 @@ function addsource #{{2
 }
 #}}
 
+addpath "$BIN"
 addpath /usr/local/bin
 addsource "$HOME/.bash_aliases"
 

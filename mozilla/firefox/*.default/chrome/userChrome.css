@@ -40,7 +40,7 @@
 /* statusbar */
 #status-bar
 {
-	height: 18px !important;
+	height: 20px !important;
 }
 #status-bar > * ,
 #status-bar > * > *

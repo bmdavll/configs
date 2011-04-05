@@ -21,9 +21,12 @@
 " use zI zO zM zR zZ for full-page zoom instead of text-only zoom
 " C-^			select previously selected tab
 " g0  g$		select first / last tab
-" ;{MODE}		hint mode:		;	focus element
-"				o	open		t	in new tab		b	in background	F	open multiple
-"				s	save		y	yank link		Y	yank text description
+" ;{MODE}		hint mode:				;		focus element
+"				[oO]	open			[tT]	in new tab
+"				b		in background	F		open multiple
+"				s		save link		S		save media
+"				y		yank link		Y		yank text description
+"				i		open media		I		in new tab
 " A				toggle star (goes into unsorted bookmarks)
 " {a-zA-Z0-9}	quickmarks for URLs (persistent across sessions)
 " M   go  gn	quickmark current page / open quickmark / open in new tab
@@ -35,7 +38,6 @@
 let mapleader = ','
 
 " no-ops {{{2
-map				F			<Nop>
 map				L			<Nop>
 
 map				<C-y>		<Nop>
@@ -69,10 +71,6 @@ nnoremap		h			4h
 nnoremap		l			4l
 nnoremap		j			3j
 nnoremap		k			3k
-
-" scroll up/down more
-nnoremap		f			15k
-nnoremap		v			15j
 
 " page up
 nnoremap		b			<S-Space>
@@ -254,8 +252,8 @@ set followhints=0
 set hintchars=qwertyuiopasdfghjklzxcvbnm
 set hlsearch
 set status=input,position
-set nextpattern+=\\bsiguiente\\b,\\bposterior\\b
-set previouspattern+=\\banterior\\b
+set nextpattern^=\\bsiguiente\\b,\\bposterior\\b,中文
+set previouspattern^=\\banterior\\b
 set newtab=all
 set sanitizeitems=cache,commandline,cookies,downloads,formdata,history,macros,marks,offlineapps,sitesettings
 set sanitizetimespan=2
@@ -278,7 +276,9 @@ hi! StatusLine		background: #c0c0bd; color: black;
 hi! InfoMsg			background: #c0c0bd; color: gray;
 hi! ModeMsg		-a	background: #c0c0bd;
 hi! MoreMsg		-a	background: #c0c0bd;
+hi! Normal		-a	background: #c0c0bd;
 hi! Question	-a	background: #c0c0bd;
+hi! WarningMsg	-a	background: #c0c0bd;
 hi! CmdLine			background: #ebe8e4; color: black;
 
 " environment {{{1

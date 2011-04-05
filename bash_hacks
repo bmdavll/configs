@@ -223,6 +223,7 @@ alias xcc='xterm-color-chart.py -n -x 3 -y 2'
 # override commands
 alias more='less'
 alias info='pinfo'
+alias vi='vim'
 
 #{{1 misc. functions
 function ol

@@ -14,103 +14,141 @@ add ()
 echo "Installing X ..." ##1
 
 list=()
-add xorg
-
-add xf86-video-ati
+add xorg-server
+add xorg-xinit
+add xorg-utils
+add xorg-server-utils
+add xterm
+add gvim
 
 # xorg-input-drivers
-add xf86-input-evdev
-add xf86-input-keyboard
-add xf86-input-mouse
-add xf86-input-synaptics
-
-add mesa
 
 sudo pacman -S $PFLAGS "${list[@]}"
 
-echo "Installing Xfce ..." ##1
+##1 Xfce
+xfce ()
+{
+	echo "Installing Xfce ..."
 
-##2 xfce4
+	list=()
+	add gtk-xfce-engine
+	add terminal
+	add thunar
+	add xfce-utils
+	add xfce4-mixer
+	add xfce4-panel
+	add xfce4-session
+	add xfce4-settings
+	add xfconf xfdesktop xfprint
+	add xfwm4 # xfwm4-themes
+	# add xfce4-appfinder
+	# add xfce4-icon-theme
+
+	sudo pacman -S $PFLAGS "${list[@]}"
+
+	##2 xfce4-goodies
+	list=()
+	add xfce4-dev-tools
+	add xfce4-notifyd
+	add xfce4-power-manager
+	add xfce4-screenshooter
+	add xfce4-taskmanager
+
+	add thunar-archive-plugin
+	add thunar-media-tags-plugin
+	# add thunar-thumbnailers
+	# add thunar-vcs-plugin
+	add thunar-vfs
+	add thunar-volman
+
+	##2 panel plugins
+	add xfce4-battery-plugin
+	add xfce4-clipman-plugin
+	add xfce4-cpufreq-plugin
+	add xfce4-cpugraph-plugin
+	add xfce4-datetime-plugin
+	add xfce4-diskperf-plugin
+	add xfce4-fsguard-plugin
+	add xfce4-genmon-plugin
+	add xfce4-mailwatch-plugin
+	add xfce4-mount-plugin
+	add xfce4-mpc-plugin
+	add xfce4-netload-plugin
+	add xfce4-notes-plugin
+	add xfce4-quicklauncher-plugin
+	add xfce4-sensors-plugin
+	add xfce4-systemload-plugin
+	# add xfce4-time-out-plugin
+	# add xfce4-timer-plugin
+	# add xfce4-verve-plugin
+	# add xfce4-wavelan-plugin
+	add xfce4-xfapplet-plugin
+	add xfce4-xkb-plugin
+
+	##2 login manager
+	add slim
+	add slock
+
+	sudo pacman -S $PFLAGS "${list[@]}"
+	#=
+}
+
+##1 GNOME
+gnome ()
+{
+	echo "Installing GNOME ..."
+
+	list=()
+	add gnome
+
+	sudo pacman -S $PFLAGS "${list[@]}"
+
+	##2 extras
+	add alacarte
+	add dasher
+	add evince
+	add file-roller
+	add gcalctool
+	add gconf-editor
+	add gdm
+	add gksu
+	add gnome-audio
+	# add gnome-do
+	# add gnome-do-plugins
+	add gnome-games
+	add gnome-games-extra-data
+	add gnome-nettool gnome-netstatus
+	add gnome-system-monitor
+	add gnome-system-tools
+	add gnome-utils
+	add gok
+	add gucharmap
+	add nautilus-actions
+	add nautilus-open-terminal
+
+	sudo pacman -S $PFLAGS "${list[@]}"
+	#=
+
+	list=()
+	add epiphany
+
+	sudo pacman -Rdsn --noconfirm "${list[@]}"
+}
+
+echo "Installing fonts ..." ##1
 list=()
-add gtk-xfce-engine
-add terminal
-add thunar
-add xfce-utils
-add xfce4-mixer
-add xfce4-panel
-add xfce4-session
-add xfce4-settings
-add xfconf xfdesktop xfprint
-add xfwm4 # xfwm4-themes
-# add xfce4-appfinder
-# add xfce4-icon-theme
-
-sudo pacman -S $PFLAGS "${list[@]}"
-
-##2 xfce4-goodies
-list=()
-add xfce4-dev-tools
-add xfce4-notifyd
-add xfce4-power-manager
-add xfce4-screenshooter
-add xfce4-taskmanager
-
-add thunar-archive-plugin
-add thunar-media-tags-plugin
-# add thunar-thumbnailers
-# add thunar-vcs-plugin
-add thunar-vfs
-add thunar-volman
-
-
-##2 panel plugins
-add xfce4-battery-plugin
-add xfce4-clipman-plugin
-add xfce4-cpufreq-plugin
-add xfce4-cpugraph-plugin
-add xfce4-datetime-plugin
-add xfce4-diskperf-plugin
-add xfce4-fsguard-plugin
-add xfce4-genmon-plugin
-add xfce4-mailwatch-plugin
-add xfce4-mount-plugin
-add xfce4-mpc-plugin
-add xfce4-netload-plugin
-add xfce4-notes-plugin
-add xfce4-quicklauncher-plugin
-add xfce4-sensors-plugin
-add xfce4-systemload-plugin
-# add xfce4-time-out-plugin
-# add xfce4-timer-plugin
-# add xfce4-verve-plugin
-# add xfce4-wavelan-plugin
-add xfce4-xfapplet-plugin
-add xfce4-xkb-plugin
-
-sudo pacman -S $PFLAGS "${list[@]}"
-
-echo "Installing the rest ..." ##1
-list=()
-
-# login manager
-add slim
-
-# utils
-add blueman
-add slock
 
 # fonts
 add ttf-bitstream-vera
 add ttf-dejavu
-# add ttf-ms-fonts
+add ttf-inconsolata
 # CJK
-add ttf-arphic-uming ttf-arphic-ukai ttf-fireflysung
-add wqy-zenhei wqy-bitmapfont
-
-# apps
-add gvim
-add firefox
+add ttf-arphic-ukai
+add ttf-arphic-uming
+add ttf-fireflysung
+add wqy-zenhei
+add wqy-bitmapfont
 
 sudo pacman -S $PFLAGS "${list[@]}"
 
-##1 vim:set ts=4 sw=4 noet fdm=marker fmr=##,##:
+##1 vim:set ts=4 sw=4 noet fdm=marker fmr=##,#=:

@@ -1261,6 +1261,7 @@
 <Multi_key> <Multi_key> <space>			: "⤷"	U2937 # ARROW POINTING DOWNWARDS THEN CURVING RIGHTWARDS
 <Multi_key> <Multi_key> <period>		: "·"	U00B7 # MIDDLE DOT
 <Multi_key> <Multi_key> <exclam>		: "◘"	U25D8 # INVERSE BULLET
+<Multi_key> <Multi_key> <asterisk>		: "•"	U2022 # BULLET
 
 <Multi_key> <Multi_key> <braceright>	: "⎫\r⎪\r⎬\r⎭"
 

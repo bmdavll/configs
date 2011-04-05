@@ -33,10 +33,10 @@ mkbin ()
 	else
 		find "\$BIN" -maxdepth 1 -mindepth 1 -type l -delete
 	fi
-	lnbin /home/$ADMIN/code/repos/[^.]*
+	lnbin /home/$ADMIN/code/repos/*
 	lnbin /home/$ADMIN/code/scripts
 	lnbin /home/$ADMIN/code/bin
 }
 
-addsource /home/$ADMIN/code/repos/[^.]*/*.sh
+addsource /home/$ADMIN/code/repos/*/*.sh
 -EOF-
