@@ -1,5 +1,6 @@
 #!/bin/bash
 # 2010-07-24
+# 2011-04-05
 
 # top-level folders to exclude
 EXCLUDE='launchers|misc|setup|windows'
@@ -9,24 +10,27 @@ IFS=$'\n'
 exec >&2
 declare -i code=0
 
-# no action
-if [ "$1" = "-n" ]; then
-	dry_run=echo
-else
-	dry_run=
-fi
+# dry run
+[ "$1" = "-n" ] && nflag=1
+
+echodo() {
+	echo "$1" "$2"$'\t'"${3/#$HOME/~}" "${4/#$HOME/~}"
+	if [ ! "$nflag" ]; then
+		"$@"
+	fi
+}
 
 recurse() {
 	local wd="$PWD" file target
 
 	for file in *
 	do
-		if	[[ -z "$1" && "$file" =~ ^("$this"|$EXCLUDE)$ ]]; then
+		if [[ -z "$1" && "$file" =~ ^("$this"|$EXCLUDE)$ ]]; then
 			continue
 		fi
 		target="${1:-$HOME/.}$file"
 
-		if [[ "$file" =~ [*?] ]]
+		if [[ "$file" =~ [*?$] ]]
 		then
 			glob=$(ls -d $target 2>/dev/null)
 			if [[ $? -ne 0 || ! -e "$glob" ]]; then
@@ -43,11 +47,11 @@ recurse() {
 			# silently re-link matching or non-existent symlinks
 			if   [[ -d "$file" && -d "$target" ]]
 			then
-				$dry_run ln -sfT "$wd/$file" "$target"
+				echodo ln -sfT "$wd/$file" "$target"
 
 			elif [[ -f "$file" && -f "$target" || ! -e "$target" ]]
 			then
-				$dry_run ln -sf  "$wd/$file" "$target"
+				echodo ln -sf  "$wd/$file" "$target"
 			else
 				! echo "File-directory mismatch: $target"
 			fi
@@ -60,7 +64,7 @@ recurse() {
 				if ! cd "$file"; then
 					false
 				else
-					# append a level
+					# descend a level
 					recurse "$target/"
 					cd "$wd"
 				fi
@@ -74,17 +78,19 @@ recurse() {
 			ls -lh "$target"
 			echo -n "Remove and link? [y/N] " && read
 			if [[ "$REPLY" == [Yy]* ]]; then
-				$dry_run ln -sf "$wd/$file" "$target"
+				echodo ln -sf "$wd/$file" "$target"
 			else
 				continue
 			fi
 
 		else
 			# new link
-			$dry_run ln -s "$wd/$file" "$target"
+			echodo ln -s "$wd/$file" "$target"
 		fi
 
-		code+=$?
+		if [ $? -ne 0 ]; then
+			code+=1
+		fi
 	done
 }
 
@@ -94,5 +100,6 @@ this=$(basename -- "$path")
 cd "${path%$this}"
 
 recurse
+
 exit $code
 

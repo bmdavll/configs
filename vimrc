@@ -1,7 +1,7 @@
-" Vim 7.2 vimrc
+" Vim 7.3 vimrc
 " Author:		David Liang
 " Soure:		http://github.com/bmdavll/configs/blob/master/vimrc
-" Last Change:	2010-08-04
+" Last Change:	2011-04-08
 " Section: encoding {{1
 scriptencoding utf-8
 
@@ -595,30 +595,30 @@ command! -nargs=? BigFont
 " Lines Columns: check/set the number of usable lines/columns {{3
 command! -nargs=? Lines call s:Lines(<q-args>)
 function! s:Lines(arg)
-	let extra = &cmdheight
-	if &showtabline
-		if &showtabline == 2 || tabpagenr('$') > 1
-			let extra += 1
-		endif
-	endif
 	if a:arg != ''
-		exec 'set lines='.(a:arg+extra)
+		if a:arg =~ '^[+-]'
+			exec 'set lines'.a:arg[0].'='.a:arg[1:]
+		else
+			exec 'set lines='.(a:arg+&cwh+( &stal==2 || &stal==1&&tabpagenr('$')>1 ))
+		endif
 	else
 		echo winheight(winnr())
 	endif
 endfunction
-command! -nargs=? Columns
-	\	if <q-args> != ''
-	\|		try
-	\|			if &number	| exec 'set columns='.(len(line('$'))+1+<args>)
-	\|			else		| set columns=<args>
-	\|			endif
-	\|		catch | endtry
-	\|	else
-	\|			if &number	| echo winwidth(winnr())-len(line('$'))-1
-	\|			else		| echo winwidth(winnr())
-	\|			endif
-	\|	endif
+
+command! -nargs=? Columns call s:Columns(<q-args>)
+function! s:Columns(arg)
+	if a:arg != ''
+		if a:arg =~ '^[+-]' | exec 'set columns'.a:arg[0].'='.a:arg[1:]
+		elseif &number      | exec 'set columns='.(len(line('$'))+1+a:arg)
+		else                | exec 'set columns='.a:arg
+		endif
+	else
+		if &number | echo winwidth(winnr())-len(line('$'))-1
+		else       | echo winwidth(winnr())
+		endif
+	endif
+endfunction
 
 " editing {{2
 " CopyMatches CutMatches: copy/cut matches of the last search to a register (default is ") {{3
@@ -1179,10 +1179,16 @@ noremap			<C-F10>		<C-\><C-N>3<C-W><
 vnoremap		<C-F10>		<C-\><C-N>3<C-W><gv
 noremap			<C-F11>		<C-\><C-N>3<C-W>>
 vnoremap		<C-F11>		<C-\><C-N>3<C-W>>gv
+
 noremap			<S-F10>		<C-\><C-N>3<C-W>-
 vnoremap		<S-F10>		<C-\><C-N>3<C-W>-gv
 noremap			<S-F11>		<C-\><C-N>3<C-W>+
 vnoremap		<S-F11>		<C-\><C-N>3<C-W>+gv
+
+noremap			<C-S-F10>	<C-\><C-N>:Columns -3<CR>
+vnoremap		<C-S-F10>	<C-\><C-N>:Columns -3<CR>gv
+noremap			<C-S-F11>	<C-\><C-N>:Columns +3<CR>
+vnoremap		<C-S-F11>	<C-\><C-N>:Columns +3<CR>gv
 
 " <F12>             toggle spellcheck and autocorrect {{3
 function! <SID>ToggleSpellCorrect()
@@ -1244,6 +1250,8 @@ map				<leader>u		:<C-U>source  $MYVIMRC<CR>
 map	<silent>	<leader>b		:<C-U>TabOpen ~/.bash{rc,_aliases,_hacks}<CR>:tabnext 2<CR>
 map	<silent>	<leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{Content,Chrome}.css
 											\ ~/Application\ Data/Mozilla/Firefox/Profiles/*.default/chrome/userChrome.css<CR>
+" launch external {{3
+vmap<silent>	<leader>F		y:silent ! firefox <C-R>"<CR>
 
 " changing text {{3
 " surround selected area (obsoleted by surround.vim)

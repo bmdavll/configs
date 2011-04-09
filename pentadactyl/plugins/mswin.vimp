@@ -1,0 +1,25 @@
+" emulate windows shortcuts
+
+" select all
+noremap		<A-a>		<C-v><C-a>
+inoremap	<A-a>		<C-v><C-a>
+cnoremap	<A-a>		<C-v><C-a>
+
+" cut
+inoremap	<A-x>		<C-v><C-x>
+cnoremap	<A-x>		<C-v><C-x>
+
+" copy
+noremap		<A-c>		<C-v><C-c>
+inoremap	<A-c>		<C-v><C-c>
+cnoremap	<A-c>		<C-v><C-c>
+
+noremap		<C-c>		<C-v><C-c>
+
+" paste
+inoremap	<A-v>		<C-v><C-v>
+cnoremap	<A-v>		<C-v><C-v>
+
+inoremap	<C-v>		<C-v><C-v>
+cnoremap	<C-v>		<C-v><C-v>
+

@@ -93,7 +93,7 @@ $endif
 "\ev":	"\C-e| vim +'set bt=nofile' +'normal zR' -"
 
 # egrep
-"\ee":	"\C-e| g ''\C-b"
+"\ee":	"\C-e| e ''\C-b"
 
 # awk
 "\ea":	"\C-e| awk '{print }'\C-b\C-b"

@@ -1,0 +1,232 @@
+" Pentadactyl 1.0b6 {{{1
+" mappings {{{1
+" no-ops {{{2
+map				r			<Nop>
+map				L			<Nop>
+
+map				<C-y>		<Nop>
+
+map				<C-p>		<Nop>
+map				<C-n>		<Nop>
+
+imap			<C-p>		<Nop>
+imap			<C-n>		<Nop>
+
+imap			<C-f>		<Nop>
+cmap			<C-f>		<Nop>
+
+cmap			<C-o>		<Nop>
+
+" basics {{{2
+noremap			<C-Space>	<Esc>
+inoremap		<C-Space>	<Esc>
+cnoremap		<C-Space>	<Esc>
+
+inoremap		<C-m>		<CR>
+inoremap		<C-j>		<CR>
+
+nnoremap		<CR>		:
+
+" scrolling {{{2
+nnoremap -count	h			<count>1h
+nnoremap -count	l			<count>1l
+nnoremap -count	j			<count>1j
+nnoremap -count	k			<count>1k
+
+nnoremap		<C-h>		9h
+nnoremap		<C-l>		9l
+nnoremap		<C-j>		6j
+nnoremap		<C-k>		6k
+
+" page up
+nnoremap -count	b			<count><C-b>
+
+" jump to last position
+nnoremap		``			`'
+
+" search {{{2
+noremap			<C-f>		/
+noremap			*			<C-v><C-c>/<S-Insert><CR>
+noremap			#			<C-v><C-c>?<S-Insert><CR>
+
+" command line {{{2
+" recall and position cursor behind command
+cnoremap		<A-p>		<PageUp><C-a><C-Right>
+cnoremap		<A-n>		<PageDown><C-a><C-Right>
+" recall matching commands
+cnoremap		<A-j>		<Down>
+cnoremap		<A-k>		<Up>
+
+" cycle thru completion list
+cnoremap		<C-m>		<Tab>
+cnoremap		<C-i>		<S-Tab>
+
+" address completion
+cnoremap		<C-CR>		<End>.com<CR>
+cnoremap		<S-CR>		<End>.net<CR>
+cnoremap		<C-S-CR>	<End>.org<CR>
+
+" text entry {{{2
+" edit with external editor
+inoremap		<C-g>		<C-i>
+
+" cursor movement {{{3
+inoremap		<A-j>		<Down>
+inoremap		<A-k>		<Up>
+
+inoremap		<A-h>		<Left>
+cnoremap		<A-h>		<Left>
+
+inoremap		<A-l>		<Right>
+cnoremap		<A-l>		<Right>
+
+inoremap		<C-l>		<Right>
+cnoremap		<C-l>		<Right>
+
+" word-wise movement/deletion {{{3
+inoremap		<A-b>		<C-Left>
+cnoremap		<A-b>		<C-Left>
+
+inoremap		<A-f>		<C-Right>
+cnoremap		<A-f>		<C-Right>
+
+inoremap		<A-d>		<C-Del>
+cnoremap		<A-d>		<C-Del>
+
+inoremap		<A-BS>		<C-BS>
+cnoremap		<A-BS>		<C-BS>
+
+" navigation {{{2
+" stop
+noremap			x			<C-c>
+
+" go back/forward starting in non-normal modes
+inoremap		<C-o>		<Esc><C-o>
+inoremap		<C-i>		<Esc><C-i>
+
+" view jump list
+noremap -ex		<C-m>		jumps
+
+" follow previous/next links
+noremap			<			[[
+noremap			>			]]
+
+" paste-n-go from selection or clipboard
+noremap			p			<C-v><C-c>p
+noremap			P			<C-v><C-c>gP
+
+" macros {{{2
+" quick search in background tab
+" google/wikipedia/special/dictionary
+noremap -silent	s			<C-v><C-c>:set act!=tabopen<CR>tg<Space><S-Insert><CR>:set act!=tabopen<CR>
+noremap -silent	w			<C-v><C-c>:set act!=tabopen<CR>tw<Space><S-Insert><CR>:set act!=tabopen<CR>
+noremap -silent	S			<C-v><C-c>:set act!=tabopen<CR>ts<Space><S-Insert><CR>:set act!=tabopen<CR>
+noremap -silent	W			<C-v><C-c>:set act!=tabopen<CR>td<Space><S-Insert><CR>:set act!=tabopen<CR>
+
+" search with selection or clipboard contents
+if !window.navigator.platform.match(/^Win/)
+noremap			a			<C-v><C-c>o<S-Insert><Home><C-Right><Space>
+noremap			A			<C-v><C-c>t<S-Insert><Home><C-Right><Space>
+else
+noremap			a			<C-v><C-c>o<S-Insert><Home><C-Right><Space><Left>
+noremap			A			<C-v><C-c>t<S-Insert><Home><C-Right><Space><Left>
+endif
+
+" tabs {{{2
+" undo close
+noremap			U			:undo<Space><Tab>
+
+" previous/next tab
+noremap -count	<A-h>		<count>gT
+noremap -count	<A-l>		<count>gt
+
+" tab switching by buffer number
+noremap -count	e			<count>b
+noremap			<C-e>		B:buffer!<Space>
+
+" move the current tab
+noremap -ex			<leader>H	tabmove 0
+noremap -ex			<leader>L	tabmove
+noremap -ex -count	<leader>h	if "<count>"
+								\	tabmove -<count>
+								\else
+								\	tabmove -1
+								\endif
+noremap -ex -count	<leader>l	if "<count>"
+								\	tabmove +<count>
+								\else
+								\	tabmove +1
+								\endif
+
+" duplicate, detach, attach
+noremap -ex -count	<leader>d	<count>tabduplicate
+noremap -ex			<leader>w	tabdetach
+noremap -ex			<leader>W	tabattach 1
+
+" interface {{{2
+" toggle toolbars
+noremap -ex		c			set guioptions!=Tm
+noremap -ex		C			set guioptions!=B
+
+" run command
+noremap			!			:!
+
+" function keys {{{2
+noremap -ex		<F4>		emenu Bookmarks.Show All Bookmarks
+noremap -ex		<F5>		nohlfind
+noremap -count	<F13>		<count><C-o>
+noremap -count	<F14>		<count><C-i>
+
+" bookmarks/history {{{2
+" search bookmarks
+noremap			B			:bmarks<Space>
+" search history
+noremap			H			:history<Space>
+
+" toggle bookmark
+noremap			<leader>b	A
+
+" readability
+noremap -ex		<leader>r	open readability
+" }}}
+
+" options {{{1
+" pentadactyl {{{2
+set autocomplete=
+set complete=l
+set defsearch=gl
+set editor='gvim -f +<line> <file>'
+set guioptions=BCbrsn
+set hintkeys=qwertyuiopasdfghjklzxcvbnm
+set hlfind
+set loadplugins='\.(js|vimp)$'
+set mapleader=,
+set newtab=all
+set nextpattern^='\bsiguiente\b','\bposterior\b','中文'
+set previouspattern^='\banterior\b'
+set sanitizeitems=cache,commandline,cookies,downloads,formdata,history,macros,marks,offlineapps,sitesettings
+set sanitizetimespan=2h
+set showmode=!'^(normal|ex|find.*|menu)$'
+set showstatuslinks=command
+set titlestring=Firefox
+set urlseparator=;
+
+if window.navigator.platform.match(/^Linux/)
+set editor^='scim-run '
+endif
+
+" about:config {{{2
+set! browser.sessionstore.interval=60000
+set! browser.tabs.closeWindowWithLastTab=false
+set! browser.tabs.loadInBackground=true
+set! middlemouse.paste=true
+set! security.dialog_enable_delay=0
+
+" styling {{{1
+hi					StatusLineNormal	color: black !important; background: #c0c0bd !important;
+hi -append			Hint				text-transform: uppercase;
+hi -link=HintElem	HintActive
+
+" environment {{{1
+silent cd ~
+" vim:set ts=4 sw=4 noet fdm=marker ft=vimperator:

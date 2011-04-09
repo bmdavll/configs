@@ -357,7 +357,8 @@ function c
 { : :
 	local IFS=$'\n'
 	if [ $# -gt 0 -a ! -d "$1" ]; then
-		local try=$(ls -d $1* 2>/dev/null | perl -lne 'print if -d')
+		local try=$( shopt -u nocaseglob
+					 ls -d $1* 2>/dev/null | perl -lne 'print if -d' )
 		[ ! -d "$try" ] && try=$(dirname -- "$1")
 		if [ -d "$try" -a ! "$try" -ef "$PWD" ]; then
 			shift
@@ -825,8 +826,8 @@ function ahelp
 alias ?='echo $?'
 alias p='pwd'
 alias x='xargs -r'
-alias g='egrep -i'
-alias gv='egrep -iv'
+alias e='egrep -i'
+alias ev='egrep -iv'
 alias ch='chmod'
 
 # list path

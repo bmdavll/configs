@@ -1,9 +1,9 @@
-512	gvim
-366	t
+521	gvim
+370	t
+40	dropboxd
+36	firefox 
 35	t timer 
 32	f 
-31	firefox 
-30	dropboxd
 13	chromium
 12	gmpc 
 11	gucharmap 
@@ -14,6 +14,7 @@
 4	gimp 
 3	scim-run gvim 
 3	urxvt
+3	pad
 2	inkscape 
 2	easytag
 2	galculator 

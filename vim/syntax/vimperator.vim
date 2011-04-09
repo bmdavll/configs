@@ -37,6 +37,7 @@ syn keyword vimperatorCommand ab[breviate] ab[clear] addo[ns] bN[ext] b[uffer] b
     \ vie[wsource] viu[sage] vm[ap] vmap[clear] vno[remap] vu[nmap] w[rite] wc[lose] win[open] winc[lose] wind[ow] winon[ly]
     \ wo[pen] wq wqa[ll] xa[ll] zo[om]
     \ contained
+    \ if elsei[f] el[se] en[dif]
 
 syn match vimperatorCommand "!" contained
 
@@ -54,10 +55,11 @@ syn region vimperatorSet matchgroup=vimperatorCommand start="\%(^\s*:\=\)\@<=\<\
 syn keyword vimperatorOption ac act activate autocomplete cd cdpath complete cpt defsearch ds editor eht ei enc encoding eventignore
     \ extendedhinttags fenc fileencoding fh followhints go guioptions helpfile hf hi hin hintinputs hintmatching hinttags
     \ hinttimeout history hm ht hto maxitems messages msgs newtab nextpattern pa pageinfo popups pps previouspattern
-    \ rtp runtimepath si sanitizeitems sts sanitizetimespan scr scroll sh shcf shell shellcmdflag showstatuslinks 
+    \ rtp runtimepath si sanitizeitems sts sanitizetimespan scr scroll sh shcf shell shellcmdflag showstatuslinks
     \ stal status suggestengines titlestring urlseparator vbs verbose wildmode wim
     \ wordseparators wsp
-    \ toolbars gui tabnumbers tn hintchars hc
+    \ hintchars tabnumbers toolbars gui
+    \ hintkeys hlfind mapleader
     \ contained nextgroup=vimperatorSetMod
 
 " toggle options

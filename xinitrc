@@ -14,7 +14,7 @@ xbindkeys
 
 # urxvtd -q -o -f
 
-DEFAULT_SESSION=xfce4
+DEFAULT_SESSION=startxfce4
 
 case "$1" in
 	xfce4)
@@ -29,7 +29,7 @@ case "$1" in
 	kde)
 		exec startkde
 		;;
-	*)	exec "$DEFAULT_SESSION"
+	*)	exec ck-launch-session "$DEFAULT_SESSION"
 		;;
 esac
 

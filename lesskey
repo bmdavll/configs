@@ -54,8 +54,10 @@ m		set-mark
 `		goto-mark
 
 E		examine
-^N		next-file
-^P		prev-file
+gt		next-file
+gT		prev-file
+>		next-file
+<		prev-file
 :bd		remove-file
 
 -		toggle-option

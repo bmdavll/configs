@@ -30,7 +30,6 @@ add wireless_tools
 
 # extra
 add acpid
-add hal
 add pm-utils
 
 add abs

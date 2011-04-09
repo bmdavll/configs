@@ -14,7 +14,7 @@ list=()
 [ $(whoami) = root ] && exit 1
 
 ##1 yaourt
-if false; then
+if true; then
 	echo -n "Install yaourt? [Y/n] "
 	read reply
 	if [[ "$reply" == [Nn]* ]]; then
@@ -28,6 +28,7 @@ if false; then
 		mkdir -p $TMP
 	fi
 	cd $TMP && \
+		# wget tarball
 		wget http://aur.archlinux.org/packages/yaourt/$YAOURT && \
 		tar xzvf $YAOURT && rm $YAOURT && cd yaourt && \
 		vi PKGBUILD yaourt.install
@@ -35,6 +36,7 @@ if false; then
 	echo -n "Make package and install? [y/N] "
 	read reply
 	if [[ "$reply" == [Yy]* ]]; then
+		# make and install
 		makepkg PKGBUILD && sudo pacman -U yaourt-*.pkg.tar.?z
 	fi
 
@@ -64,9 +66,6 @@ add trash-cli
 add mit-scheme
 
 ##1 libraries/tools
-add gimp-resynth
-add libsvg
-add svg2png
 # add thunar-vcs-plugin
 
 ##1 filesystem
@@ -78,10 +77,14 @@ add detox # clean up filenames
 ##2 pdf/tex
 
 ##1 graphics
+add gimp-resynth
+add libsvg
+add svg2png
 
 ##1 multimedia
 ##2 audio
 add fluidr3 # MIDI soundfont
+add flac2mp3
 
 ##2 video
 # add winff

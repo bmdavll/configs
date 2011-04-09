@@ -184,7 +184,7 @@ noremap<silent>	<leader>h	:tabmove! -1<CR>
 noremap<silent>	<leader>l	:tabmove! +1<CR>
 
 " duplicate, detach, attach
-noremap<silent>	<leader>d	ygP
+noremap<silent>	<leader>d	:tabduplicate<CR>
 noremap<silent>	<leader>w	:tabdetach<CR>
 noremap<silent>	<leader>W	:tabattach 1<CR>
 
@@ -236,7 +236,7 @@ noremap<silent>	<C-S-g>		:mpd info<CR>
 
 " external {{{2
 " detach to chrome
-noremap<silent>	<leader>c	yd:!chrome <S-Insert><CR>
+noremap<silent>	<leader>c	yd:!chrome <S-Insert> &<CR>
 
 " play flash videos with vlc
 noremap<silent>	<leader>v	:!vlc /tmp/Flash* &<CR>
@@ -251,13 +251,13 @@ set editor='gvim -f'
 set followhints=0
 set hintchars=qwertyuiopasdfghjklzxcvbnm
 set hlsearch
-set status=input,position
+set newtab=all
 set nextpattern^=\\bsiguiente\\b,\\bposterior\\b,中文
 set previouspattern^=\\banterior\\b
-set newtab=all
 set sanitizeitems=cache,commandline,cookies,downloads,formdata,history,macros,marks,offlineapps,sitesettings
 set sanitizetimespan=2
 set showstatuslinks=0
+set status=input,position
 set tabnumbers
 set titlestring=Firefox
 set toolbars=none,tabs,navigation,bookmarks
@@ -266,6 +266,7 @@ set visualbell
 
 " about:config {{{2
 set! browser.sessionstore.interval=60000
+set! browser.tabs.closeWindowWithLastTab=false
 set! browser.tabs.loadInBackground=true
 set! middlemouse.paste=true
 set! security.dialog_enable_delay=0
