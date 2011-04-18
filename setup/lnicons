@@ -1,0 +1,63 @@
+#!/bin/bash
+##1 hicolor
+declare -A hicolor
+hicolor[startcenter]=stock/generic/stock_openoffice
+sudo MAP="$(declare -p hicolor)" icolinkify GartoonRedux \
+$(ls -d /usr/share/icons/hicolor/*/apps)
+
+##1 pixmaps
+declare -A pixmaps
+pixmaps[Thunar-fallback-icon]=mimetypes/application-x-generic
+pixmaps[emacs-icon]=apps/emacs
+pixmaps[gksu-icon]=apps/gksu-debian
+pixmaps[gksu]=apps/gksu-debian
+pixmaps[gtkam-camera]=apps/gtkam
+pixmaps[rxvt-unicode]=apps/Terminal
+pixmaps[xarchiver-add]=actions/archive-insert
+pixmaps[xarchiver-extract]=actions/archive-extract
+pixmaps[xarchiver-html]=mimetypes/text-html
+pixmaps[xfdesktop-fallback-icon]=mimetypes/application-x-generic
+sudo MAP="$(declare -p pixmaps)" icolinkify GartoonRedux \
+/usr/share/pixmaps{,/Thunar,/xarchiver,/xfdesktop}
+
+##1 firefox
+declare -A firefox
+firefox[default16]=apps/firefox
+firefox[default32]=apps/firefox
+firefox[default48]=apps/firefox
+sudo MAP="$(declare -p firefox)" icolinkify GartoonRedux /usr/lib/firefox*/chrome/icons/default
+
+##1 vlc
+declare -A vlc
+vlc[vlc16x16]=apps/vlc
+vlc[vlc32x32]=apps/vlc
+vlc[vlc48x48]=apps/vlc
+vlc[vlc128x128]=apps/vlc
+sudo MAP="$(declare -p vlc)" icolinkify GartoonRedux /usr/share/vlc
+
+##1 gmpc
+sudo icolinkify GartoonRedux $(find /usr/share/gmpc/icons/hicolor/* -type d)
+
+##1 scim
+declare -A scim
+scim[help]=categories/system-help
+scim[keyboard]=devices/keyboard
+scim[menu]=actions/help-about
+scim[setup]=categories/preferences-desktop
+scim[trademark]=apps/scim-setup
+sudo MAP="$(declare -p scim)" icolinkify GartoonRedux /usr/share/scim/icons 2>/dev/null
+
+##1 zenity
+declare -A zenity
+zenity[zenity-calendar]=mimetypes/x-office-calendar
+zenity[zenity-entry]=actions/edit-rename
+zenity[zenity-file]=places/folder
+zenity[zenity-list]=mimetypes/text-x-generic
+zenity[zenity-notification]=status/dialog-information
+zenity[zenity-progress]=apps/gnome-panel-clock
+zenity[zenity-scale]=gtk/gtk-configure
+zenity[zenity-text]=mimetypes/text-x-generic
+sudo MAP="$(declare -p zenity)" icolinkify GartoonRedux /usr/share/zenity
+
+exit 0 ##1
+# vim:set fdm=marker fmr=##,##:

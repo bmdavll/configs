@@ -27,8 +27,6 @@ shopt -s nocaseglob		# case-insensitive matching
 # ignore 2 EOF's before exiting
 IGNOREEOF=1
 
-# history file
-export HISTFILE="$HOME/.commandline_history"
 # max number of lines in history file
 HISTFILESIZE=50000
 # max number of commands
@@ -213,6 +211,7 @@ function addsource #{{2
 
 addpath "$BIN"
 addpath /usr/local/bin
+addsource "$HOME/.bash_completion"
 addsource "$HOME/.bash_aliases"
 
 if [[ "$TERM" != "dumb" && "${0:0:1}" != "-" || "$CYGWIN" ]]; then

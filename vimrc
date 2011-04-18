@@ -1,7 +1,7 @@
 " Vim 7.3 vimrc
 " Author:		David Liang
 " Soure:		http://github.com/bmdavll/configs/blob/master/vimrc
-" Last Change:	2011-04-08
+" Last Change:	2011-04-16
 " Section: encoding {{1
 scriptencoding utf-8
 
@@ -223,9 +223,9 @@ if has('gui_running')
 
 	" display fonts (:set guifont=* to select interactively)
 	if has('gui_win32')
-		let s:font_select = [ ['Consolas', 9], ['DejaVu Sans Mono', 8] ]
+		let s:font_select = [ ['Consolas',9], ['DejaVu Sans Mono',9] ]
 	else
-		let s:font_select = [ ['DejaVu Sans Mono', 9.5], ['Consolas', 10.5] ]
+		let s:font_select = [ ['DejaVu Sans Mono',9.5], ['Inconsolata',11.5] ]
 	endif
 	call <SID>AdvanceFont(0)
 	" }}
@@ -616,6 +616,22 @@ function! s:Columns(arg)
 	else
 		if &number | echo winwidth(winnr())-len(line('$'))-1
 		else       | echo winwidth(winnr())
+		endif
+	endif
+endfunction
+
+" ColorColumn: set colorcolumn at specified column or at 'textwidth' {{3
+command! -nargs=? ColorColumn call s:ColorColumn(<q-args>)
+function! s:ColorColumn(arg)
+	if a:arg != ''
+		exec 'set colorcolumn='.a:arg
+	else
+		if &colorcolumn == ''
+			set colorcolumn=+1
+			echo '  colorcolumn'
+		else
+			set colorcolumn=
+			echo 'nocolorcolumn'
 		endif
 	endif
 endfunction
@@ -1090,18 +1106,8 @@ vnoremap<silent><F4>		:<C-U>let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR
 inoremap<silent><F4>		<C-C>:let @z=@/<CR>maHmz:call <SID>Trim()<CR>:let @/=@z<CR>`zzt`agi
 
 " <C-F4>            highlight column {{3
-function! <SID>ToggleMarker()
-	if &colorcolumn == ''
-		set colorcolumn=+1
-		echomsg '  colorcolumn'
-	else
-		set colorcolumn=
-		echomsg 'nocolorcolumn'
-	endif
-endfunction
-map	<silent>	<C-F4>		:<C-U>call <SID>ToggleMarker()<CR>
-vmap<silent>	<C-F4>		:<C-U>call <SID>ToggleMarker()<CR>gv
-imap<silent>	<C-F4>		<C-O>:call <SID>ToggleMarker()<CR>
+map				<C-F4>		:<C-U>ColorColumn<Space>
+imap			<C-F4>		<C-O>:ColorColumn<Space>
 
 " <F5>              remove search highlighting {{3
 map	<silent>	<F5>		:<C-U>nohlsearch<CR>
@@ -1248,10 +1254,11 @@ map	<silent>	<leader>v		:<C-U>TabOpen $MYVIMRC<CR>:if has('gui_running') \| exec
 map				<leader>u		:<C-U>source  $MYVIMRC<CR>
 " load config files for editing
 map	<silent>	<leader>b		:<C-U>TabOpen ~/.bash{rc,_aliases,_hacks}<CR>:tabnext 2<CR>
-map	<silent>	<leader>f		:<C-U>TabOpen ~/.mozilla/firefox/*.default/chrome/user{Content,Chrome}.css
-											\ ~/Application\ Data/Mozilla/Firefox/Profiles/*.default/chrome/userChrome.css<CR>
+
 " launch external {{3
-vmap<silent>	<leader>F		y:silent ! firefox <C-R>"<CR>
+let g:url_breakat = '[][();:,"' . "'" . ']+'
+map	<silent>	<leader>f		"fyiW:exec 'silent ! firefox '.StripFrom(getreg('f'), '\v^'.g:url_breakat.'<bar>'.g:url_breakat.'$')<CR>
+vmap<silent>	<leader>f		"fy:silent ! firefox <C-R>f<CR>
 
 " changing text {{3
 " surround selected area (obsoleted by surround.vim)
@@ -1423,6 +1430,9 @@ let g:EchoFuncMaxBalloonDeclarations = 6
 
 " eregex {{2
 nnoremap		<M-/>		:M/
+
+" MRU {{2
+let g:MRU_Exclude_Files = '^/tmp/.*\|^/home/[^/]\+/tmp/.*\|^/var/tmp/.*'
 
 " NERD Commenter {{2
 let g:NERDBlockComIgnoreEmpty = 1

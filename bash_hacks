@@ -52,14 +52,15 @@ recipes birding
 
 export LOG_EDITOR='scim-run gvim'
 export BACKUP_LOG=~/etc/backup.log
+export DROPBOX_DIR=~/etc/Dropbox
 
 #{{1 maintenance
 function my-cron
 {
 	cleanup-history.pl --squash
 
-	ls -d ~/tmp &>/dev/null &&
-	ls -R ~/tmp >~/etc/tmp.manifest
+	ls -R ~/tmp					>~/etc/tmp.manifest
+	ls -R ~/music/{new,podcasts}>~/etc/music.manifest
 
 	log "$BACKUP_LOG" k -10
 }
@@ -68,6 +69,16 @@ function my-cron
 function b
 {
 	my-cron &>/dev/null
+	if psgrep dropbox &>/dev/null; then
+		echo >&2 "Is dropbox running?"
+		return
+	else
+		rm -rf "$DROPBOX_DIR"/.dropbox.cache/*
+	fi
+	if [ -b /dev/sdb1 ] && ! mount | grep '/dev/sdb1\|/media/disk' &>/dev/null
+	then
+		sudo mount /dev/sdb1 /media/disk
+	fi
 	local TIMEFORMAT=$'\n%2Rs'
 	time backup "$@"
 	local code=$? disks=$(ls -d /media/disk* 2>/dev/null)
@@ -131,7 +142,10 @@ alias pacremove='sudo pacman -Rs'
 
 function pacupdate
 {
-	sudo clyde -Syu "$@" &&
+	sudo clyde -Syu \
+		--ignore kernel26 \
+		--ignore kernel26-headers \
+		--ignoregroup xorg "$@" &&
 	sudo pacman-cache-cleanup.py 2
 }
 _pacsearch() {
@@ -206,6 +220,7 @@ function mp3directcut
 }
 
 #{{1 misc. aliases
+alias ccls='clear && echo -n $(ls ~|wc -l)"	" && ls ~ && cl $DROPBOX_DIR'
 alias histop='history | awk "{print \$2}" | sort | uniq -c | sort -nr | head -n'
 
 alias tags='ctags --fields=+lS'

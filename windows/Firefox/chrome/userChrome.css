@@ -7,6 +7,7 @@
 }
 .tabbrowser-tab {
 	max-height: 25px !important;
+	text-shadow: none !important;
 }
 /* disable close tab, new tab, and list all tabs buttons */
 .tab-close-button,
@@ -40,7 +41,7 @@
 /* statusbar */
 #status-bar
 {
-	height: 20px !important;
+	height: 22px !important;
 }
 #status-bar > * ,
 #status-bar > * > *

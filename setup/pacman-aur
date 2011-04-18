@@ -14,33 +14,42 @@ list=()
 [ $(whoami) = root ] && exit 1
 
 ##1 yaourt
-if true; then
-	echo -n "Install yaourt? [Y/n] "
+echodo () { echo "$@" && "$@"; }
+
+aur ()
+{
+	echo -n "Install $1? [Y/n] "
 	read reply
 	if [[ "$reply" == [Nn]* ]]; then
-		exit 0
+		return 0
 	fi
 
-	TMP=~/tmp
-	YAOURT=yaourt.tar.gz
+	URL="$2"
+	PKG=$(echo "$URL" | sed 's|^.*/||')
+	cd $TMP && \
+		# wget tarball
+		echodo wget "$URL" && \
+		echodo tar xvf $PKG && rm $PKG && \
+		cd $1
+	[ $? -ne 0 ] && return 1
 
+	echo -n "Make package and install? [Y/n] "
+	read reply
+	if [[ "$reply" != [Nn]* ]]; then
+		# make and install
+		echodo makepkg PKGBUILD && echodo sudo pacman -U $1-*.pkg.tar.?z
+		[ $? -ne 0 ] && return 1
+	fi
+	rm -rf $TMP/$1
+}
+
+if ! which yaourt &>/dev/null; then
+	TMP=~/tmp
 	if [ ! -d $TMP ]; then
 		mkdir -p $TMP
 	fi
-	cd $TMP && \
-		# wget tarball
-		wget http://aur.archlinux.org/packages/yaourt/$YAOURT && \
-		tar xzvf $YAOURT && rm $YAOURT && cd yaourt && \
-		vi PKGBUILD yaourt.install
-
-	echo -n "Make package and install? [y/N] "
-	read reply
-	if [[ "$reply" == [Yy]* ]]; then
-		# make and install
-		makepkg PKGBUILD && sudo pacman -U yaourt-*.pkg.tar.?z
-	fi
-
-	rm -rf $TMP/yaourt
+	aur package-query http://aur.archlinux.org/packages/package-query/package-query.tar.gz || exit 1
+	aur yaourt        http://aur.archlinux.org/packages/yaourt/yaourt.tar.gz               || exit 1
 	[ -z "$(ls -A $TMP)" ] && rmdir $TMP
 fi
 
@@ -50,16 +59,14 @@ add aurvote
 add xautomation
 
 ##1 fonts
-# add ttf-ms-fonts
-# add ttf-ms-extrafonts
-# add ttf-tahoma
-# add ttf-vista-fonts
 add ttf-google-webfonts
+add ttf-ms-fonts
+add ttf-tahoma
+# add ttf-vista-fonts
 
 ##1 command-line
 add ack # grep drop-in
 add ascii
-add sl
 add trash-cli
 
 ##1 languages
@@ -94,6 +101,7 @@ add flac2mp3
 
 ##1 misc
 # add brainworkshop
+add galculator
 add mbrola # text-to-speech
 
 ##1 INSTALL

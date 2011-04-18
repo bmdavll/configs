@@ -1,0 +1,57 @@
+#!/bin/bash
+# vim:ts=4 sw=4 et:
+
+! which gconftool-2 &>/dev/null && exit 1
+
+metacity=/apps/metacity
+
+gconfMetacity() {
+    gconftool-2 -t $1 -s "$metacity/$2" "$3"
+}
+
+disableKeybinding() {
+    for binding in "$@"
+    do
+        gconfMetacity string "$binding" "disabled"
+    done
+}
+
+disableKeybinding $(gconftool-2 -R $metacity/global_keybindings | perl -pe 's/^\s*(\S+)\s*=.*/$1/')
+disableKeybinding $(gconftool-2 -R $metacity/window_keybindings | perl -pe 's/^\s*(\S+)\s*=.*/$1/')
+
+gconfMetacity string window_keybindings/begin_resize                    '<Alt>F1'
+gconfMetacity string window_keybindings/begin_move                      '<Alt>F2'
+gconfMetacity string global_keybindings/run_command_terminal            '<Alt>F3'
+gconfMetacity string window_keybindings/close                           '<Alt>F4'
+gconfMetacity string window_keybindings/toggle_maximized                '<Alt>F5'
+gconfMetacity string global_keybindings/panel_run_dialog                '<Alt>F6'
+gconfMetacity string window_keybindings/maximize_horizontally           '<Alt>F7'
+gconfMetacity string window_keybindings/maximize_vertically             '<Alt>F8'
+gconfMetacity string window_keybindings/toggle_shaded                   '<Alt>F9'
+gconfMetacity string window_keybindings/minimize                        '<Alt>F10'
+gconfMetacity string window_keybindings/toggle_fullscreen               '<Alt>F11'
+gconfMetacity string window_keybindings/toggle_above                    '<Alt>F12'
+
+gconfMetacity string global_keybindings/run_command_screenshot          'Print'
+gconfMetacity string global_keybindings/run_command_window_screenshot   '<Alt>Print'
+
+gconfMetacity string global_keybindings/cycle_windows                   '<Alt>Tab'
+gconfMetacity string global_keybindings/switch_windows                  '<Alt>Escape'
+gconfMetacity string window_keybindings/activate_window_menu            '<Mod4>space'
+
+gconfMetacity string window_keybindings/move_to_side_w                  '<Mod4>h'
+gconfMetacity string window_keybindings/move_to_side_e                  '<Mod4>l'
+gconfMetacity string window_keybindings/move_to_side_s                  '<Mod4>j'
+gconfMetacity string window_keybindings/move_to_side_n                  '<Mod4>k'
+
+gconfMetacity string global_keybindings/show_desktop                    '<Control><Alt>d'
+
+gconfMetacity string global_keybindings/switch_to_workspace_left        '<Control><Alt>h'
+gconfMetacity string global_keybindings/switch_to_workspace_right       '<Control><Alt>l'
+gconfMetacity string global_keybindings/switch_to_workspace_down        '<Control><Alt>j'
+gconfMetacity string global_keybindings/switch_to_workspace_up          '<Control><Alt>k'
+
+gconfMetacity string window_keybindings/move_to_workspace_left          '<Shift><Control><Alt>h'
+gconfMetacity string window_keybindings/move_to_workspace_right         '<Shift><Control><Alt>l'
+gconfMetacity string window_keybindings/move_to_workspace_down          '<Shift><Control><Alt>j'
+gconfMetacity string window_keybindings/move_to_workspace_up            '<Shift><Control><Alt>k'

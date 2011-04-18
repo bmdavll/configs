@@ -71,12 +71,13 @@ add blueman
 add boost
 add gob2
 add librsvg
-add mono
+# add mono
 add openal
 add pkgtools
 add wine
 add xdg-utils
 add xorg-utils
+add yajl
 
 ##1 services
 add apache
@@ -237,9 +238,9 @@ add mathomatic
 
 ##2 games
 add dosbox
-add dwarffortress
-add freeciv
-add nethack
+# add dwarffortress
+# add freeciv
+# add nethack
 # add wesnoth
 
 ##1 INSTALL
@@ -251,11 +252,11 @@ sudo pacman -Sy --needed "${list[@]}"
 list=()
 add fam
 
-sudo pacman -Rdsn --noconfirm "${list[@]}"
+sudo pacman -Rdsn "${list[@]}"
 
 list=()
 add gamin
 
-sudo pacman -S --needed --noconfirm "${list[@]}"
+sudo pacman -S --needed "${list[@]}"
 
 ##1 vim:set ts=4 sw=4 noet fdm=marker fmr=##,##:

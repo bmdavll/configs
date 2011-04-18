@@ -1,0 +1,6 @@
+#!/bin/bash
+# custom bash completion
+
+if [[ "$(type -t _longopt)" == "function" ]]; then
+	complete -o default -F _longopt zenity
+fi

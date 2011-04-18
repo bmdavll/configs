@@ -4,6 +4,7 @@
 map				r			<Nop>
 map				L			<Nop>
 
+map				<C-q>		<Nop>
 map				<C-y>		<Nop>
 
 map				<C-p>		<Nop>
@@ -25,24 +26,24 @@ cnoremap		<C-Space>	<Esc>
 inoremap		<C-m>		<CR>
 inoremap		<C-j>		<CR>
 
-nnoremap		<CR>		:
+noremap			<CR>		:
 
 " scrolling {{{2
-nnoremap -count	h			<count>1h
-nnoremap -count	l			<count>1l
-nnoremap -count	j			<count>1j
-nnoremap -count	k			<count>1k
+nnoremap		h			6h
+nnoremap		l			6l
+nnoremap		j			4j
+nnoremap		k			4k
 
-nnoremap		<C-h>		9h
-nnoremap		<C-l>		9l
-nnoremap		<C-j>		6j
-nnoremap		<C-k>		6k
+nnoremap -count	<C-h>		<count>1h
+nnoremap -count	<C-l>		<count>1l
+nnoremap -count	<C-j>		<count>1j
+nnoremap -count	<C-k>		<count>1k
 
 " page up
-nnoremap -count	b			<count><C-b>
+noremap -count	b			<count><C-b>
 
 " jump to last position
-nnoremap		``			`'
+noremap			``			`'
 
 " search {{{2
 noremap			<C-f>		/
@@ -223,7 +224,10 @@ set! middlemouse.paste=true
 set! security.dialog_enable_delay=0
 
 " styling {{{1
-hi					StatusLineNormal	color: black !important; background: #c0c0bd !important;
+hi -append			StatusLineNormal	background: transparent !important; color: black !important;
+hi -append			ErrorMsg			background: transparent !important; color: red   !important;
+hi -append			WarningMsg			background: transparent !important;
+hi -append			CmdLine				background: transparent !important;
 hi -append			Hint				text-transform: uppercase;
 hi -link=HintElem	HintActive
 

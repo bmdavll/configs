@@ -40,8 +40,8 @@ xfce ()
 	add xfce4-session
 	add xfce4-settings
 	add xfconf xfdesktop xfprint
-	add xfwm4 # xfwm4-themes
-	# add xfce4-appfinder
+	add xfwm4
+	# add xfwm4-themes
 	# add xfce4-icon-theme
 
 	sudo pacman -S $PFLAGS "${list[@]}"
@@ -115,8 +115,8 @@ gnome ()
 	add gnome-audio
 	# add gnome-do
 	# add gnome-do-plugins
-	add gnome-games
-	add gnome-games-extra-data
+	# add gnome-games
+	# add gnome-games-extra-data
 	add gnome-nettool gnome-netstatus
 	add gnome-system-monitor
 	add gnome-system-tools
@@ -139,9 +139,12 @@ echo "Installing fonts ..." ##1
 list=()
 
 # fonts
+add xorg-fonts-75dpi
+add xorg-fonts-100dpi
 add ttf-bitstream-vera
 add ttf-dejavu
-add ttf-inconsolata
+add ttf-indic-otf
+# add ttf-inconsolata
 # CJK
 add ttf-arphic-ukai
 add ttf-arphic-uming

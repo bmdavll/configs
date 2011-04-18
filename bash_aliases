@@ -14,6 +14,10 @@ MAKE_PAT='@(*[Mm]akefile|*configure)?(.@(ac|am|in))'
 VIM_HEIGHT=45
 
 #{{1 utility functions
+function echodo
+{
+	echo "$@" && "$@"
+}
 #{{2 return the maximum integer value from a list
 function max
 { :
@@ -469,9 +473,6 @@ function rmf
 }
 
 #{{2 mv
-_echodo() { :
-	echo "$@" && "$@"
-}
 _swap() { :
 	[ $# -ne 2 -o ! -e "$1" ] && return 1
 	local PREF_A PREF_B BASE_A BASE_B mv
@@ -494,14 +495,14 @@ _swap() { :
 	else mv=mv
 	fi
 	if [ ! -e "${PREF_B}$BASE_B" ]; then
-		_echodo $sudo $mv "${PREF_A}$BASE_A" "${PREF_B}$BASE_B"
+		echodo $sudo $mv "${PREF_A}$BASE_A" "${PREF_B}$BASE_B"
 	elif [ "$mv" != "mv" ]; then
-		_echodo $sudo $mv -Ti "${PREF_A}$BASE_A" "${PREF_B}$BASE_B"
+		echodo $sudo $mv -Ti "${PREF_A}$BASE_A" "${PREF_B}$BASE_B"
 	else
-		_echodo $sudo mv -Ti "${PREF_A}$BASE_A" "${PREF_A}__${BASE_A}__"
+		echodo $sudo mv -Ti "${PREF_A}$BASE_A" "${PREF_A}__${BASE_A}__"
 		if [ ! -e "${PREF_A}$BASE_A" ]; then
-			_echodo $sudo mv -Ti "${PREF_B}$BASE_B" "${PREF_A}$BASE_A" &&
-			_echodo $sudo mv -Ti "${PREF_A}__${BASE_A}__" "${PREF_B}$BASE_B"
+			echodo $sudo mv -Ti "${PREF_B}$BASE_B" "${PREF_A}$BASE_A" &&
+			echodo $sudo mv -Ti "${PREF_A}__${BASE_A}__" "${PREF_B}$BASE_B"
 		else
 			return 1
 		fi
@@ -535,11 +536,11 @@ function swap
 			! echo >&2 "$file: No such file or directory"
 		elif [ "$EXT_B" ]; then
 			if [ -e "$file${S}$EXT_A" ]; then
-				_echodo $sudo mv -Ti "$file" "$file${S}$EXT_B" &&
-				_echodo $sudo mv -Ti "$file${S}$EXT_A" "$file"
+				echodo $sudo mv -Ti "$file" "$file${S}$EXT_B" &&
+				echodo $sudo mv -Ti "$file${S}$EXT_A" "$file"
 			elif [ -e "$file${S}$EXT_B" ]; then
-				_echodo $sudo mv -Ti "$file" "$file${S}$EXT_A" &&
-				_echodo $sudo mv -Ti "$file${S}$EXT_B" "$file"
+				echodo $sudo mv -Ti "$file" "$file${S}$EXT_A" &&
+				echodo $sudo mv -Ti "$file${S}$EXT_B" "$file"
 			elif [[ "$file" == *"${S}$EXT_A" ]]; then
 				_swap "$file" "${file%${S}$EXT_A}${S}$EXT_B"
 			elif [[ "$file" == *"${S}$EXT_B" ]]; then

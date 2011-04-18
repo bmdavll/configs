@@ -38,19 +38,21 @@
 let mapleader = ','
 
 " no-ops {{{2
+map				r			<Nop>
 map				L			<Nop>
 
 map				<C-y>		<Nop>
-map				<C-j>		<Nop>
-map				<C-k>		<Nop>
+
 map				<C-p>		<Nop>
 map				<C-n>		<Nop>
 
 imap			<C-p>		<Nop>
 imap			<C-n>		<Nop>
-imap			<C-f>		<Nop>
 
+imap			<C-f>		<Nop>
 cmap			<C-f>		<Nop>
+
+cmap			<C-o>		<Nop>
 
 " basics {{{2
 noremap			<C-Space>	<Esc>
@@ -61,24 +63,24 @@ inoremap		<C-m>		<CR>
 inoremap		<C-j>		<CR>
 cnoremap		<C-j>		<CR>
 
-" use as another <C-v>
-noremap			<C-b>		<C-v>
-inoremap		<C-b>		<C-v>
-cnoremap		<C-b>		<C-v>
-
 " scrolling {{{2
-nnoremap		h			4h
-nnoremap		l			4l
-nnoremap		j			3j
-nnoremap		k			3k
+nnoremap		h			6h
+nnoremap		l			6l
+nnoremap		j			4j
+nnoremap		k			4k
+
+nnoremap		<C-h>		1h
+nnoremap		<C-l>		1l
+nnoremap		<C-j>		1j
+nnoremap		<C-k>		1k
 
 " page up
-nnoremap		b			<S-Space>
+noremap			b			<C-b>
 
 " mark before jumping
-nnoremap		gg			mzgg
-nnoremap		G			mzG
-nnoremap		``			`z
+noremap			gg			mzgg
+noremap			G			mzG
+noremap			``			`z
 
 " search {{{2
 noremap			/			mz/
@@ -100,8 +102,8 @@ cnoremap		<A-j>		<Down>
 cnoremap		<A-k>		<Up>
 
 " cycle thru completion list
-cnoremap		<C-i>		<Tab>
-cnoremap		<C-o>		<S-Tab>
+cnoremap		<C-m>		<Tab>
+cnoremap		<C-i>		<S-Tab>
 
 " address completion
 cnoremap		<C-CR>		<End>.com<CR>
@@ -173,6 +175,10 @@ noremap			A			<C-v><C-c>t<S-Insert><Home><C-Right><Space><Left>
 " undo close
 noremap			U			:undo<Space><Tab>
 
+" previous/next tab
+noremap			<A-h>		gT
+noremap			<A-l>		gt
+
 " tab switching by buffer number
 noremap			e			b
 noremap			<C-e>		B:buffer!<Space>
@@ -195,8 +201,6 @@ noremap<silent>	c			:set toolbars=invaddons<CR>
 " Bookmarks Toolbar
 noremap<silent>	C			:set toolbars=invbookmarks<CR>
 
-" vimperator help
-noremap			H			:help<Space>
 " run command
 noremap			!			:!
 
@@ -206,9 +210,11 @@ noremap<silent>	<F5>		:nohlsearch<CR>
 noremap			<F13>		<C-o>
 noremap			<F14>		<C-i>
 
-" bookmarks {{{2
+" bookmarks/history {{{2
 " search bookmarks
 noremap			B			:bmarks<Space>
+" search history
+noremap			H			:history<Space>
 
 " toggle bookmark
 noremap			<leader>b	A
@@ -284,5 +290,4 @@ hi! CmdLine			background: #ebe8e4; color: black;
 
 " environment {{{1
 silent cd ~
-
 " vim:set ts=4 sw=4 noet fdm=marker ft=vimperator:
