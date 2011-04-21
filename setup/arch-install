@@ -1,0 +1,703 @@
+# Arch Linux on Thinkpad R40
+# [wiki.archlinux.org]
+# setup {{{1
+# partitions
+sda1    9G      xp/share
+sda2    1G      swap
+sda4    ——      extended
+sda5    92M     /boot
+sda6    9G      /
+sda7    18G     /home
+
+/etc/rc.conf:
+HOSTNAME="perro"
+
+# first boot
+pacman-db-upgrade
+pacman -Syu
+pacman -S kernel26-headers xorg-server base-devel
+
+arch-root-users
+
+# as user
+pacman-essential
+pacman-x
+pacman-thinkpad
+pacman-main
+pacman-aur
+
+# X
+restore ~/code
+~/code/configs/lndotfiles
+lesskey ~/.lesskey
+# restore home
+
+# as root
+arch-root-dotfiles
+mkbin
+
+tune2fs -m 0 #/dev/sda7
+restore root confs
+
+# superceded by wicd [wireless setup]
+iwconfig # wlan0?
+ifconfig wlan0 up
+iwlist wlan0 scan
+iwconfig wlan0 essid "Cecily"
+arch-root-wpa
+wpa_supplicant -Bd -Dwext -i wlan0 -c /etc/wpa_supplicant.conf
+dhcpcd wlan0
+# profile
+/etc/network.d # chmod 0600
+
+# misc {{{1
+# [SLIM]
+# extract themes to /usr/share/slim/themes
+
+# vim
+if [ -x /usr/bin/vim ]; then
+   if [ -h /usr/bin/vi ]
+   then sudo rm    /usr/bin/vi
+   else sudo mv -i /usr/bin/vi /usr/bin/vi.tiny
+   fi
+fi
+sudo ln -s vim /usr/bin/vi # sudo vi hack
+
+# gpm
+sudo vi /etc/conf.d/gpm
+GPM_ARGS="-m /dev/input/mice -t ps2"
+
+# [acpid]
+# acpi_listen
+
+# [cpufrequtils]
+sudo vi /etc/conf.d/cpufreq
+min_freq="1.2GHz"
+max_freq="2GHz"
+
+# [tpb]
+su -c - root "echo 'KERNEL==\"nvram\", NAME=\"misc/%k\", SYMLINK+=\"%k\", GROUP=\"kmem\", MODE=\"0666\"' \
+>> /etc/udev/rules.d/51-arch.rules"
+
+# input method
+sudo -s
+cat >>/etc/profile << -EOF-
+
+# SCIM
+# export XMODIFIERS=@im=SCIM
+# export GTK_IM_MODULE='scim'
+# export QT_IM_MODULE='scim'
+
+# XIM
+export XMODIFIERS=@im=local
+export GTK_IM_MODULE='xim'
+export QT_IM_MODULE='xim'
+-EOF-
+
+mkdir ~/.gnupg
+
+# fonts {{{1
+# [font configuration]
+tar xvf vista-fonts.tar.bz2 &&
+mkdir -p ~/.fonts && vista-fonts-installer.sh &&
+rm -r vista-fonts vista-fonts-installer.sh
+
+cd /usr/share/fonts/TTF &&
+   sudo rm -f fonts.* &&
+   sudo mkfontscale &&
+   sudo mkfontdir
+
+sudo ln -s /usr/share/fonts/{encodings/encodings.dir,TTF}
+
+sudo fc-cache -vf
+
+# gnome settings {{{1
+pacman -S gtk-engine-murrine
+yaourt -S gnome-colors-icon-theme \
+          gnome-colors-icon-theme-extras
+
+Appearance
+   Theme
+      Black-Diamond
+      Glossy
+      Gnome-Brave
+   Fonts
+      DejaVu Sans 9
+      DejaVu Sans Condensed Bold 10
+      DejaVu Sans Mono 10
+
+File Management
+   Views
+      List View
+   Behavior
+      View executable text files
+   Display
+      Format: YYYY-MM-DD HH:MM:SS
+   List Columns
+      +Permissions
+
+Window Preferences
+   Movement Key: Super
+
+gconf-editor /apps/nautilus/desktop
+
+# set keybindings
+~/code/configs/setup/gconf-metacity
+
+# enable editable application accelerators
+gconftool-2 -t bool -s /desktop/gnome/interface/can_change_accels true
+
+# xfce4 settings {{{1
+Appearance
+   Style: Xfce-dawn
+   Icons: Gartoon Redux
+   Fonts
+      Default Font: DejaVu Sans Book 9
+      Rendering
+         Enable anti-aliasing
+   Settings
+      Menus and Buttons
+         Enable editable accelerators
+
+Desktop
+   Menus
+      Desktop Menu
+         !Show applications menu
+   Icons
+      Icon size: 21
+      !Default Icons
+
+File Manager
+   Display
+      Icon View->Text beside icons
+      Date->Format: YYYY-MM-DD HH:MM:SS
+   Side Pane
+      (Shortcuts|Tree) Pane
+         Icon Size: Very Small
+
+Keyboard
+   Application Shortcuts
+      my-dmenu: <Alt>space
+      t: <Alt>F3
+      xfce4-screenshooter: Print
+      xfrun4: <Alt>F6
+      xrandr --auto: XF86Display
+   Layout
+      Use system defaults
+
+Notifications
+   Theme: Smoke
+   Default position: Bottom right
+
+Power Manager
+   General
+      System tray icon: When battery is present
+      When (power|sleep) button is pressed: Nothing
+   On AC
+      Actions
+         When laptop lid is closed: Nothing
+      Monitor
+         Sleep,Switch off: 15,30
+   On Battery
+      Actions
+         When battery power is critical: Ask
+         When laptop lid is closed: Nothing
+      Monitor
+         Sleep,Switch off: 4,8
+         Brightness->Reduce: 30 seconds
+   Extended
+      Consider the computer on low power at: 5%
+      !Enable CPU frequency control
+
+Removable
+   Storage
+      Removable Storage
+         Mount... (only)
+
+Window Manager
+   Style
+      Theme: Shiki-Colors
+      Title font: DejaVu Sans Condensed Bold 9
+   Keyboard
+      Window operations menu: <Super>space*
+      Maximize window horizontally: <Alt>F7
+      Maximize window vertically: <Alt>F8
+      Maximize window: <Alt>F5
+      Move window: <Alt>F2
+      Resize window: <Alt>F1
+      Shade window: <Alt>F9
+      Toggle above: <Alt>F12
+      Toggle fullscreen: <Alt>F11
+      Move window to (upper|bottom|left|right) workspace: <Control><Shift><Alt>[kjhl]
+      Show desktop: <Control><Alt>d
+      (Upper|Bottom|Left|Right) workspace: <Control><Alt>[kjhl]
+   Focus
+      New window focus
+      Automatically give focus to newly created windows
+   Advanced
+      Windows snapping
+         Snap to other windows
+      !Wrap workspaces
+
+Window Manager Tweaks
+   Cycling
+      !Draw frame
+   Focus
+      !Activate focus stealing prevention
+      When a window raises itself: Do nothing
+   Accessibility
+      Key used to grab and move windows: Super
+   Workspaces
+      !Wrap workspaces...
+
+Workspaces
+   Number of workspaces: 2 {Main,Side}
+
+Thunar
+   View->Configure Columns
+      Visible Columns: +Permissions
+
+# gnome panels {{{1
+Launcher
+   PAD:pad
+―
+Main Menu
+File Browser
+Terminal
+gVim
+Galculator
+Firefox
+―
+Window List
+⇤―⇥
+Notification Area
+Volume Control
+Trash
+System Monitor:30 px,1000 ms
+   Processor
+   Memory
+      Cached->V:24
+   Network
+      In->H:52
+      Out->H:47
+      Local->H:42
+   Harddisk
+      Read->H:24
+      Write->H:30
+Clock
+Show Desktop
+
+# xfce4 panels {{{1
+Display
+   Lock panel
+   Size: 23
+# top {{{2
+Applications Menu
+   Icon: /usr/share/icons/GartoonRedux/48x48/extras/distribution-arch-xfce.png
+―
+Directory Menu
+   File Pattern: *
+␣
+# launchers {{{3
+Launcher
+   Terminal:uxim-run t %f
+␣
+Launcher
+   Calculator:calculator
+   LibreOffice:libreoffice
+Launcher
+   Editor:gvim -p %F
+   SCIM:scim-setup:scim-run gvim -p %F
+   Character Map:gucharmap
+   Dictionary:scim-run stardict
+Launcher
+   Firefox:firefox %F
+   Thunderbird:thunderbird
+   Chromium:chromium
+# }}}
+―
+Clipman
+Mixer
+Trash applet
+―
+Notification Area
+Launcher
+   Play/Pause:qdbus org.mpris.MediaPlayer2.clementine /Player Pause
+Generic Monitor
+   Command: clementine-info
+   !Label: Clementine
+   Period: 5
+   DejaVu Sans 6
+⇤―⇥
+Generic Monitor
+   Command: cpuinfo
+   !Label: CPU Frequency
+   Period: 3
+   DejaVu Sans 5
+CPU Graph
+   Appearance
+      Color: #5A5D8A #7B8CC2 #8AACDF
+      Background: #202046
+   Advanced
+      Update Interval: Slow (~1s)
+      Width: 32
+      !Show border
+      !Associated command
+System Load Monitor
+   !CPU monitor
+   (Memory|Swap) monitor
+      Text to display: m|s
+      Bar color: #BECCD9(blue)
+                 #B7FF80(green)
+   !Uptime monitor
+Network Monitor
+   Text to display: n
+   Network device: wlan0|eth0
+   Update interval: 1.0
+   Bar color (incoming): #FFAC7F(red)
+   Bar color (outgoing): #FFF680(yellow)
+Workspace Switcher
+   Number of rows: 1
+Window Menu
+   Button Layout: Arrow
+   !Show workspace names
+# bottom {{{2
+Launcher
+   PAD:text-editor:pad
+―
+Window Buttons
+   Appearance
+      Show flat buttons
+      !Show handle
+⇤―⇥
+DateTime
+   Layout
+      Format: Time, then date
+   Date
+      Font: DejaVu Sans Semi-Condensed 7
+      Format: Custom... %a %-m/%-d
+   Time
+      Font: DejaVu Sans Bold Semi-Condensed 7.5
+Show Desktop
+# }}}
+
+# customization {{{1
+# themes
+sudo tar xvf Shiki-Colors.tar.gz -C /usr/share/themes
+
+# gartoon
+configure # include size 128
+make all
+sudo make install
+
+~/code/configs/setup/lnicons
+
+# gmpc
+./build.sh &&
+   sudo cp *.png /usr/share/gmpc/icons &&
+   rm *.png
+
+sudo icopatch GartoonRedux $(find . -mindepth 2 -type f -name '*.svg')
+
+# wicd
+./build.sh &&
+   sudo cp wicd/* /usr/share/pixmaps/wicd &&
+   rm -r wicd
+
+sudo cp wired.svg /usr/share/pixmaps/wicd/wired-gui.svg
+
+# stardict
+./build.sh &&
+   sudo cp stardict/* /usr/share/stardict/pixmaps &&
+   rm -r stardict
+
+# applications {{{1
+# firefox {{{2
+Preferences
+   General
+      When Firefox starts: Show my windows and tabs from last time
+   Content
+      JavaScript
+         Advanced: !Move or resize
+      Fonts
+         Serif[16]
+         DejaVu Serif
+         DejaVu Sans
+         DejaVu Mono[13]
+
+Persona
+   GreenLeafs v.2
+
+# addons
+Adblock Plus
+   Options
+      !Show tabs on Flash and Java
+bug489729
+DOM Inspector
+DownloadHelper
+   Appearance
+      !(all)
+   Services
+      Download->Storage directory
+      !(services)
+Download Statusbar
+   General
+      Features
+         Clear ... when the browser closes
+         Automatically clear: +torrent
+DownThemAll!
+   Interface
+      Integration: !Add DownThemAll! to the 'Save File' window
+      Context menu: !dTa OneClick
+Firebug
+Fire.fm
+Greasemonkey
+Show Just Image 2
+   !flickr
+   !imgur
+Reddit Enhancement Suite
+LastPass
+   General
+      Disable insecure Firefox Password Manager
+      !Highlight input boxes
+   !Hotkeys
+LiveClick
+   General
+      Check for new items every: 30 minutes
+   Appearance
+      Reading->New: Boldface|Boldface
+   Menus
+      Keep menu open after middle clicking items
+Movable Firefox Button
+Stay-Open Menu
+   Compatibility/Additional Enhancements: Redisplay menu after Properties dialog closes
+userChromeJS
+Xmarks
+   Sync
+      !Sync on Shutdown
+   !Discovery
+
+# chromium {{{2
+Vimium
+   Scroll step size: 40 px
+# mappings {{{
+unmapAll
+
+map j scrollDown
+map k scrollUp
+map h scrolljeft
+map l scrollRight
+map gg scrollToTop
+map G scrollToBottom
+map H scrollToLeft
+map L scrollToRight
+map <c-d> scrollPageDown
+map <c-u> scrollPageUp
+map b scrollFullPageUp
+map r reload
+map gf toggleViewSource
+map zi zoomIn
+map zo zoomOut
+map y copyCurrentUrl
+map gu goUp
+map i enterInsertMode
+map gi focusInput
+map f activateLinkHintsMode
+map F activateLinkHintsModeToOpenInNewTab
+map < goPrevious
+map > goNext
+
+map / enterFindMode
+map n performFind
+map N performBackwardsFind
+map <c-o> goBack
+map <c-i> goForward
+map gt nextTab
+map gT previousTab
+map t createTab
+map d removeTab
+map u restoreTab
+
+map ? showHelp
+# }}}
+
+AdBlock
+Google Mail Checker Plus
+Show Just Image 2
+Reddit Enhancement Suite
+
+# clementine {{{2
+Playback
+   Fading
+      !Cross-fade when changing tracks manually
+   Replay Gain
+      Use Replay Gain
+Global Shortcuts: Ctrl+Shift
+   Volume [FV]
+   (Next|Previous) [JK]
+   Play/Pause [P]
+   Seek [HL]
+   Show OSD [G]
+   Show/Hide [M]
+Notifications
+   Show a popup
+   Popup duration: 3 seconds
+Music Library
+   Preferred album art filenames: front,cover,folder
+
+# gimp {{{2
+Tools
+   Undo History
+   —
+   Navigation
+   —
+   Brushes
+
+Environment
+   Maximum undo memory: 1024 M
+Tool Options
+   Save Tool Options Now
+   Default interpolation: Sinc
+Default Image: !Comment
+Image Windows
+   Appearance
+      !Show layer boundary
+Window Management
+   !Save window positions on exit
+   Save Window Positions Now
+
+# gnome-do {{{2
+Keyboard
+   Summon GNOME Do: <Alt>space
+   Alternate Escape: <Control>space
+   (Previous|Next) Pane:   <Control>[hl]
+   (Previous|Next) Result: <Control>[kj]
+   (First|Last) Result: <Control>[im]
+Plugins
+   Files and Folders
+      ~              1
+      ~/etc/Dropbox  2
+      ~/bin          1
+      ~/img/info     1
+
+# gqview {{{2
+General
+   Startup
+      Change to folder: /home/david/img
+   Slide show
+      Delay: 5
+Image
+   When new image is selected: Leave zoom at previous setting
+   Convenience
+      Auto rotate image using Exif information
+Windows
+   Remember window positions
+Editors
+   Touch: touch %f
+   Gimp: gimp -n %f
+   Terminal: t %f
+   File Manager: f --dir %f
+Advanced
+   Delete
+      !Confirm file delete
+      Safe delete: /home/david/.local/share/Trash/files
+                   500MB
+   Miscellaneous
+      Custom similarity threshold: 95
+
+# scim {{{2
+FrontEnd
+   Global Setup
+      Hotkeys
+         Trigger: Control+semicolon
+IMEngine
+   Global Setup
+      CJK + Other
+   Smart Pinyin
+      Pinyin
+         Use tone
+      Keyboard
+         Full width punctuation: Control+period
+         Full width letter: Control+comma
+         Mode switch: Shift+Control_L,Control+(Shift_L|Shift_R)
+         Chinese mode switch: Control+backslash
+         Page up: Alt+h,Control+h
+         Page down: Alt+l,Control+l
+Panel
+   GTK
+      ToolBar
+         !Show input method name
+         !Show property label
+         !Show help icon
+
+# stardict {{{2
+# http://stardict.sourceforge.net/
+stardict-BritannicaConcise
+stardict-cdict-big5
+stardict-cdict-gb
+stardict-cedict-big5
+stardict-cedict-gb
+stardict-dictd_www.dict.org_foldoc
+stardict-langdao-ce-big5
+stardict-langdao-ec-big5
+stardict-oxford-big5
+stardict-oxford-gb-formated
+stardict-quick_eng-spa
+stardict-quick_spa-eng
+stardict-thesaurus-ee
+
+mkdir -p /usr/share/stardict/dic &&
+for file in *; do sudo tar xf "$file" -C /usr/share/stardict/dic; done
+
+# segfault fix
+sudo mv /usr/lib/stardict/plugins/stardict_spell.so{,.bak}
+
+# manage dictionaries
+Dict.cn
+I2E
+CDICT5英漢辭典
+CEDICT漢英辭典
+牛津英汉双解美化版
+OALD
+English Thesaurus
+FOLDOC
+Britannica Concise
+quick
+朗道
+CDICT5英汉辞典
+CEDICT汉英辞典
+牛津現代英漢雙解双解詞典
+
+Dictionary
+   Scan Selection
+      Only scan when modifier key is being pressed
+      Hide floating window when modifier key released
+      Scan modifier key: Win
+   Export
+      File name: /home/david/documents/txt/wotd
+Main window
+   Input
+      !Show the first word when not found
+   Search website:
+      CantoDict http://www.cantonese.sheik.co.uk/dictionary http://www.cantonese.sheik.co.uk/dictionary/search/?searchtype=1&text=%s
+      Dictionary.com
+      Wiktionary http://en.wiktionary.org/wiki http://en.wiktionary.org/w/index.php?title=Special:Search&search=%s
+      Google
+Floating window
+   Options
+      !Show floating window if word not found
+# }}}
+
+# galculator
+Display
+   Appearance->Font: 22/12/8
+Numbers
+   Show thousands separator
+
+# samba
+smbpasswd -a david
+
+# wine
+wine-fonts-smoothing.sh
+
+# {{{1 vim:set ts=3 sw=3 sts=3 et ft=conf syn=conf fdm=marker:

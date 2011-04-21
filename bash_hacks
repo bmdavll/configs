@@ -48,7 +48,7 @@ function todo
 }
 
 complete -F _log_alias list clip todo \
-recipes birding
+	recipes birding
 
 export LOG_EDITOR='scim-run gvim'
 export BACKUP_LOG=~/etc/backup.log
@@ -58,6 +58,7 @@ export DROPBOX_DIR=~/etc/Dropbox
 function my-cron
 {
 	cleanup-history.pl --squash
+	cp -au ~/.bash_history "$DROPBOX_DIR"/Public
 
 	ls -R ~/tmp					>~/etc/tmp.manifest
 	ls -R ~/music/{new,podcasts}>~/etc/music.manifest
@@ -145,7 +146,9 @@ function pacupdate
 	sudo clyde -Syu \
 		--ignore kernel26 \
 		--ignore kernel26-headers \
-		--ignoregroup xorg "$@" &&
+		--ignore xorg-server-common \
+		--ignoregroup xorg \
+		"$@" &&
 	sudo pacman-cache-cleanup.py 2
 }
 _pacsearch() {
@@ -205,20 +208,6 @@ _smbmount() {
 alias doofie='smbmount doofie'
 complete -F _smbmount -o filenames doofie
 
-#{{1 wine
-function tagrename
-{
-	$GUI wine 'C:\Program Files\TagRename\TagRename.exe'
-}
-function mp3directcut
-{
-	local paths=()
-	while [ $# -gt 0 ]; do
-		paths+=('Z:'"$(readlink -f "$1")") && shift
-	done
-	$GUI wine 'C:\Program Files\mp3DirectCut\mp3DirectCut.exe' "${paths[@]////\\}"
-}
-
 #{{1 misc. aliases
 alias ccls='clear && echo -n $(ls ~|wc -l)"	" && ls ~ && cl $DROPBOX_DIR'
 alias histop='history | awk "{print \$2}" | sort | uniq -c | sort -nr | head -n'
@@ -228,11 +217,10 @@ alias irb='irb --simple-prompt'
 alias pd='perldoc'
 eval $(complete -p perldoc 2>/dev/null | sed 's/perldoc$/pd/')
 
-alias mpdupdate='rm -f ~/.mpd/mpd.db && mpd --create-db >/dev/null'
-alias mpdrestart='sudo /etc/rc.d/mpd stop && sudo /etc/rc.d/mpd start'
-
 alias dr='diffr'
+alias bak='swap bak ""'
 alias rename='rename.py -e'
+alias downsize-jpg='downsize-jpg -p'
 alias xcc='xterm-color-chart.py -n -x 3 -y 2'
 
 # override commands
@@ -241,15 +229,39 @@ alias info='pinfo'
 alias vi='vim'
 
 #{{1 misc. functions
+# backup copy
+function cbak
+{
+	local -i code=0
+	local file dest
+	for file in "$@"; do
+		dest="$(echo "$file"|sed 's|/*$||').bak"
+		if [ -e "$dest" ]; then
+			echo >&2 -n "cp: overwrite \`$dest'? " && read
+			[[ "$REPLY" != [Yy]* ]] && continue
+			if ! rm -rf "$dest"; then
+				code+=1
+				continue
+			fi
+		fi
+		echodo cp -a "$file" "$dest" || code+=1
+	done
+	return $code
+}
+
+# ocd and ls
 function ol
 {
 	o "$@" && ls
 }
 _ol() {
-	COMPREPLY=($(compgen -W "$(ls ..)" -- "$2"))
+	set -- o "${@:2}"
+	COMP_WORDS=(o "${COMP_WORD[@]:2}")
+	_o
 }
-complete -F _ol ol
+complete -o nospace -o filenames -F _ol ol
 
+# switch capslock functionality
 function caps
 {
 	if [[ "$(xmodmap | grep '0x42')" == control* ]]; then
@@ -263,34 +275,28 @@ function caps
 	fi
 }
 
+# bash completion debugging
 function comptest
 {
 	[ -z "$COMP_POINT" ] && return
 	[ -z "$2" ] && set -- "$1" '""' "$3"
 	echo
-	echo "ARGS[$#]:" "$@"
-	echo "KEY:$COMP_KEY" "TYPE:$COMP_TYPE"
-	echo "WORDBREAKS[${#COMP_WORDBREAKS}]:$COMP_WORDBREAKS"
+	echo "\$@[$#]:" "$@"
+	echo "COMP_KEY:$COMP_KEY" "COMP_TYPE:$COMP_TYPE"
+	echo "COMP_WORDBREAKS[${#COMP_WORDBREAKS}]:$COMP_WORDBREAKS"
 	var COMP_WORDS
-	echo "CWORD:$COMP_CWORD"
-	echo "LINE:$COMP_LINE"
+	echo "COMP_CWORD:$COMP_CWORD"
+	echo "COMP_LINE:$COMP_LINE"
 	if [ $COMP_POINT -gt 0 ]; then
-		echo -n "     "
+		echo -n "          "
 		local i
 		for (( i = 0; i < COMP_POINT; ++i )); do
 			echo -n $((i%10))
 		done
-		echo "^POINT:$COMP_POINT"
+		echo "^COMP_POINT:$COMP_POINT"
 	fi
 }
 complete -F comptest comptest
 
-function reorder-here
-{
-	local IFS=$'\n'
-	renumb.py -zl $( find . -maxdepth 1 -mindepth 1 -type f \
-							-iregex '.*/[0-9]+[^/]*\.\(jpg\|png\|gif\|flv\|avi\|mp4\|wmv\)' \
-					 | cut -c 3- | sort -n ) "$@"
-}
 #}}
 # vim:ts=4 sw=4 noet fdm=marker fmr={{,}} fdl=0:

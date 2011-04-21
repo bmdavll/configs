@@ -26,91 +26,94 @@ set bind-tty-special-chars off
 
 #{{{1 commands
 # unbound by default:
-# C-\ C-^ M-a M-e M-g M-h M-i M-j M-k M-m M-o M-q M-s M-v M-w M-x M-z
-# unused: M-t M-u M-w M-y M-z
+# C-\ C-^
+# M-a M-e M-g M-h M-i M-j M-k M-m M-o M-q M-s M-v M-w M-x M-z
 # terminal sends Esc prefix for Meta, so use \e in place of \M-
-#{{{2 basics
+#{{{2 basic
 # use space to perform history expansion
 $if Bash
 space:	magic-space
 $endif
 
 # delete words separated by both whitespace and slashes
-"\C-w":	unix-filename-rubout
-"\ew":	unix-word-rubout
+"\C-w":		unix-filename-rubout
+"\ew":		unix-word-rubout
 
 # cycle thru possible completions
-"\C-t":	menu-complete
+"\C-t":		menu-complete
 
 # vi-style movement
-"\eh":	backward-char
-"\el":	forward-char
-"\C-l":	forward-char
+"\eh":		backward-char
+"\el":		forward-char
+"\C-l":		forward-char
 
 #{{{2 history
 # recall previous command and position cursor behind command
-"\ep":	"\C-p\C-a\ef"
-"\en":	"\C-n\C-a\ef"
+"\ep":		"\C-p\C-a\ef"
+"\en":		"\C-n\C-a\ef"
 
 # recall commands matching partial command line
-"\ej":	history-search-forward
-"\ek":	history-search-backward
-
-# yank-last-arg, but insert a space
-"\e.":	" !$ \C-h"
+"\ej":		history-search-forward
+"\ek":		history-search-backward
 
 # search history
-"\eq":	"\C-a\C-khist "
+"\eq":		"\C-ahist "
 
 #{{{2 previous command
 # command substitute (output from last command here)
-"\e`":	" $(!!) \C-h"
+"\e`":		" $(!!) \C-h"
 
 # make fifo from last command
-"\e,":	" <(!!) \C-h"
+"\e,":		" <(!!) \C-h"
 
 # repeat last command with sudo
-"\es":	"\C-p\C-asudo \ef\C-f"
+"\es":		"\C-p\C-asudo \ef\C-f"
 
 # cd to a sensible place based on last command
-"\eg":	"\C-a\C-kcll\C-m"
+"\eg":		"\C-a\C-kcll\C-m"
+
+# yank-last-arg, but insert a space
+"\e.":		" !$ \C-h"
 
 #{{{2 previous directory
 # cd
-"\eo":	"\C-a\C-kbd\C-m"
+"\eo":		"\C-a\C-kbd\C-m"
 
 # insert
-"\ei":	"$OLDPWD/\t"
+"\e\C-o":	"$OLDPWD/"
 
 #{{{2 piping output
 # /dev/null
-"\ez":	">/dev/null\eb\eb\C-b\C-b"
+"\ez":		">/dev/null\eb\eb\C-b\C-b"
 
 # less
-"\em":	"\C-e| less\C-m"
+"\em":		"\C-e| less\C-m"
 
 # vim
-"\ev":	"\C-e| vim +'set bt=nofile' +'normal zR' -"
+"\ev":		"\C-e| vim +'set bt=nofile' +'normal zR' -"
 
 # egrep
-"\ee":	"\C-e| e ''\C-b"
+"\ee":		"\C-e| e ''\C-b"
 
 # awk
-"\ea":	"\C-e| awk '{print }'\C-b\C-b"
+"\ea":		"\C-e| awk '{print }'\C-b\C-b"
 
 # perl
-"\e;":	"\C-e| perl -lane 'print '\C-b"
+"\e;":		"\C-e| perl -lane 'print '\C-b"
 
 #{{{2 misc
 # spawn gui application
 "\e\C-m":	"\C-agui \C-m"
 "\e\C-j":	"\C-agui \C-m"
 
+# add interactive flag
+"\ei":		"\C-a\ef -i"
+
 # pipe find to xargs
-"\ex":	"\C-e -print0 | xargs -0r "
+"\ex":		"\C-e -print0 | xargs -0r "
 
 # calculator
-"\ec":	'\C-acalc "\C-e"\C-b'
+"\ec":		'\C-acalc "\C-e"\C-b'
 
 #}}}
 #}}}1

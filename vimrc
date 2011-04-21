@@ -624,7 +624,7 @@ endfunction
 command! -nargs=? ColorColumn call s:ColorColumn(<q-args>)
 function! s:ColorColumn(arg)
 	if a:arg != ''
-		exec 'set colorcolumn='.a:arg
+		exec 'set colorcolumn='.(a:arg+1)
 	else
 		if &colorcolumn == ''
 			set colorcolumn=+1

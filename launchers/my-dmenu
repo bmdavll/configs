@@ -18,6 +18,8 @@ else
 	code=$?
 fi
 
+TEMP=$(mktemp)
+
 echo "$DMENU" | perl -e '
 $found = 0;
 $choice = qq('"$choice"');
@@ -41,6 +43,12 @@ if (! $found && $choice =~ m/^[\w-]+$/
           sort { $b->[1] <=> $a->[1] }
           map  { [ $_, ($_ =~ m/^(\d+)/)[0] ] }
           @lines;
-print @sorted;' >"$FILE"
+print @sorted;' >"$TEMP"
+
+if [ -s "$TEMP" ] && ! cmp -s "$TEMP" "$FILE"
+then
+	mv  "$TEMP" "$(readlink -f "$FILE")"
+fi
+rm -rf  "$TEMP"
 
 exit $code

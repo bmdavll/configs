@@ -41,8 +41,8 @@ HISTCONTROL=ignoreboth
 # time builtin format
 TIMEFORMAT=$'\n%3lR\t%P%%'
 
-# allow scripts access to window dimensions
-export LINES COLUMNS
+# allow scripts access to variables
+export LINES COLUMNS HISTFILE
 
 #{{2 pager
 export PAGER=less

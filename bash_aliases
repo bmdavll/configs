@@ -51,7 +51,7 @@ function gui
 		return $?
 	fi
 } && GUI=gui
-complete -c gui
+complete -o default -c gui
 
 #{{2 check if a string is among or if a pattern matches any of the arguments that follow
 function str_in
@@ -73,8 +73,8 @@ function pat_in
 
 #{{2 function to split an argument list into options and non-options
 # clears and fills arrays OPTS and ARGV (use `split_opts -c' to unset)
-# first parameter: one-character options that take arguments
-#                  follow an option with '?' if the argument to it is optional
+# first parameter: list of single-character options that take arguments
+#                  follow an option with '?' if the argument is optional
 # parameters until first '--': list of long options that require an argument
 # e.g. split_opts 'tq?cSd?ir?s' cmd servername -- "$@"
 #      split_opts -- "$@"
@@ -203,14 +203,15 @@ then :
 fi
 
 #{{2 ls
-#{{ fuzzy ls
+# fuzzy ls with colors
 function l
 { :
+	#{{
 	local IFS=$'\n' arg
 	split_opts 'IkpTw' -- "$@" || return $?
 	set -- "${ARGV[@]}"
 	if [ $# -eq 0 ]; then
-		ls "${OPTS[@]}"
+		ls --color=always "${OPTS[@]}"
 	else
 		ARGV=()
 		for arg in "$@"; do
@@ -219,69 +220,48 @@ function l
 			else ARGV+=($arg*)
 			fi
 		done
-		ls "${OPTS[@]}" "${ARGV[@]}"
+		ls --color=always "${OPTS[@]}" "${ARGV[@]}"
 	fi
 	split_opts -c
-} #}}
+	#}}
+}
 alias la='l -A'
 alias ll='l -lh'
 alias lla='l -lhA'
+alias lld='l -lhd'
 alias lt='l -lhtr'
 alias lS='l -lhSr'
 alias lR='l -R'
 
-#{{ pipe to less with colors
-function _lsl
-{ :
-	local code=0 output cmd="$1" && shift
-	if [ "$(type -t "$cmd")" = "alias" ]; then
-		cmd=($(alias "$cmd" | sed 's/^alias [^=]\+=.\(.*\).$/\1/'))
-	else
-		cmd=($cmd)
-	fi
-	output=$([ "$cmd" ] && "${cmd[@]}" --color=always "$@") || code=$?
-	if [ "$output" ]; then
-		printf "%s" "$output" | less -R
-	fi
-	return $code
-} #}}
-alias lsl='_lsl l'
-alias lal='_lsl la'
-alias lll='_lsl ll'
-alias llal='_lsl lla'
-alias ltl='_lsl lt'
-alias lSl='_lsl lS'
-alias lRl='_lsl lR'
-
-#{{ ls links
+# ls links
 function lh
-{ :
+{ : :
+	#{{
 	if pat_in "$HELP_PAT" "$@"; then
 		echo "Usage: lh [ls_argument|--soft|--hard]..." && return
 	fi
 	local soft='$1 ~ /^l/'
 	local hard='$1 ~ /^-/ && $2 > 1'
-	local arg argv=() unset
+	local arg argv=() pattern
 	for arg in "$@"; do
-		if [ "$arg" = "--hard" ]; then
-			[ ! "$unset" ] && unset soft && unset=1
+		if [ "$arg" = "--soft" ]; then
+			[ -n "$soft" ] && pattern+="${pattern:+ || }${soft}" && soft=
 			shift
-		elif [ "$arg" = "--soft" ]; then
-			[ ! "$unset" ] && unset hard && unset=1
+		elif [ "$arg" = "--hard" ]; then
+			[ -n "$hard" ] && pattern+="${pattern:+ || }${hard}" && hard=
 			shift
 		else
 			argv+=("$arg")
 		fi
 	done
-	[ ! "$unset" ] && soft+=' || '
-	ls --color=always -lh "${argv[@]}" | awk '{
+	ls --color -lh "${argv[@]}" | awk '{
 		if ($0 ~ /^total[[:blank:]]+[[:alnum:].]+$/) {
 			next;
 		} else if ( length($1) != 10 || $1 !~ /^.[r-][w-][xsS-]/ ) {
 			if (header ~ /:\n$/)
 				header = "";
 			header = header $0 "\n";
-		} else if ('"${soft}${hard}"') {
+		} else if ('"$pattern"') {
 			if (header != "") {
 				sub(/\n$/, "", header);
 				if (! sep)
@@ -293,8 +273,8 @@ function lh
 		}
 	}'
 	return ${PIPESTATUS[0]}
-} #}}
-alias lhl='_lsl lh'
+	#}}
+}
 
 #{{ selective ls: code, other, hidden
 # option -R will be ignored
@@ -305,11 +285,11 @@ _lsmode() { :
 		;;
 	o)	ls -d "$@" !($CODE_PAT|$MAKE_PAT) 2>/dev/null
 		;;
-	h)	ls -d "$@" .[^.]* 2>/dev/null
+	d)	ls -d "$@" .[^.]* 2>/dev/null
 		;;
 	esac
 }
-_ls_special() { :
+_ls_select() { :
 	if pat_in "$HELP_PAT" "$@"; then
 		echo "Usage: ls$1 [ls_option|directory]..." && return
 	fi
@@ -343,14 +323,22 @@ _ls_special() { :
 	return $code
 }
 #}}
-alias ls-c='_ls_special c'
-alias ls-o='_ls_special o'
-alias ls-h='_ls_special h'
+alias lsc='_ls_select c'
+alias lso='_ls_select o'
+alias lsd='_ls_select h'
 
-alias cls='clear && ls'
+function cls
+{
+	clear
+	if [ $# -eq 0 ]; then
+		ls
+	else
+		cd "$@" && ls
+	fi
+}
 
 # completion
-complete -A directory lh lhl ls-c ls-o ls-h
+complete -A directory lh ls{c,o,d} cls
 complete -o default -F _longopt l
 
 #{{2 changing directories
@@ -393,13 +381,13 @@ function cll
 	done
 	for arg in "${args[@]}"; do
 		if [ ! -d "$arg" ]; then
-			if [ -d "${arg%.*}" ]; then
-				arg="${arg%.*}"
+			if [ -d "${arg%%.*}" ]; then
+				arg="${arg%%.*}"
 			else
 				arg=$(dirname -- "$arg")
 			fi
 		fi
-		if [ -d "$arg" -a ! "$arg" -ef "$PWD" -a "$arg" != '/' ]; then
+		if [[ -d "$arg" && ! "$arg" -ef "$PWD" && "$arg" != / ]]; then
 			cl -- "$arg"
 			return
 		else
@@ -430,6 +418,7 @@ function rcd
 }
 
 #{{2 rm
+alias rmi='rm -I'
 alias rmr='rm -r'
 
 #{{3 secure rm with shred
@@ -472,99 +461,6 @@ function rmf
 	return $code
 }
 
-#{{2 mv
-_swap() { :
-	[ $# -ne 2 -o ! -e "$1" ] && return 1
-	local PREF_A PREF_B BASE_A BASE_B mv
-	PREF_A=$(dirname -- "$1") && BASE_A=$(basename -- "$1")
-	PREF_B=$(dirname -- "$2") && BASE_B=$(basename -- "$2")
-	shift 2
-	if [[ "$BASE_A" =~ ^'..'?$ || "$BASE_B" =~ ^'..'?$ ]]; then
-		return 1
-	fi
-	if [ "$PREF_A" = "." ]
-	then PREF_A=
-	else PREF_A="$PREF_A/"
-	fi
-	if [ "$PREF_B" = "." ]
-	then PREF_B=
-	else PREF_B="$PREF_B/"
-	fi
-	if [ "${_swap_hook:+set}" ]
-	then mv="$_swap_hook"
-	else mv=mv
-	fi
-	if [ ! -e "${PREF_B}$BASE_B" ]; then
-		echodo $sudo $mv "${PREF_A}$BASE_A" "${PREF_B}$BASE_B"
-	elif [ "$mv" != "mv" ]; then
-		echodo $sudo $mv -Ti "${PREF_A}$BASE_A" "${PREF_B}$BASE_B"
-	else
-		echodo $sudo mv -Ti "${PREF_A}$BASE_A" "${PREF_A}__${BASE_A}__"
-		if [ ! -e "${PREF_A}$BASE_A" ]; then
-			echodo $sudo mv -Ti "${PREF_B}$BASE_B" "${PREF_A}$BASE_A" &&
-			echodo $sudo mv -Ti "${PREF_A}__${BASE_A}__" "${PREF_B}$BASE_B"
-		else
-			return 1
-		fi
-	fi
-}
-function swap
-{ :
-	if  [[ $# -le 1 || -z "$1" ]] || pat_in "$HELP_PAT" "$@"; then
-		echo "Usage: swap [--sudo] file_a file_b"
-		echo "       swap [--sudo] ext_a [ext_b] file..."
-		return
-	fi
-	local -i code=0
-	local EXT_A EXT_B S='.' file dest sudo
-	split_opts -- "$@" || return $?
-	str_in '--sudo' "${OPTS[@]}" && sudo=sudo
-	set -- "${ARGV[@]}"
-	split_opts -c
-	if [ $# -eq 2 ] && [[ -d "$1" && -d "$2" || -f "$1" && -f "$2" ]]; then
-		_swap "$@"
-		return
-	fi
-	EXT_A="$1" && shift
-	if [[ -e "$1" || "$1" == */* ]]
-	then EXT_B=
-	else EXT_B="$1" && shift
-	fi
-	for file in "$@"; do
-		file=$(echo "$file" | sed 's|/*$||')
-		if [ ! -e "$file" ]; then
-			! echo >&2 "$file: No such file or directory"
-		elif [ "$EXT_B" ]; then
-			if [ -e "$file${S}$EXT_A" ]; then
-				echodo $sudo mv -Ti "$file" "$file${S}$EXT_B" &&
-				echodo $sudo mv -Ti "$file${S}$EXT_A" "$file"
-			elif [ -e "$file${S}$EXT_B" ]; then
-				echodo $sudo mv -Ti "$file" "$file${S}$EXT_A" &&
-				echodo $sudo mv -Ti "$file${S}$EXT_B" "$file"
-			elif [[ "$file" == *"${S}$EXT_A" ]]; then
-				_swap "$file" "${file%${S}$EXT_A}${S}$EXT_B"
-			elif [[ "$file" == *"${S}$EXT_B" ]]; then
-				_swap "$file" "${file%${S}$EXT_B}${S}$EXT_A"
-			else
-				! echo >&2 "$file: No match"
-			fi
-		else
-			if [[ "$file" == *"${S}$EXT_A" ]]; then
-				dest="${file%${S}$EXT_A}"
-			elif [[ "$file" =~ (.+)"${S}$EXT_A${S}"(.+) ]]; then
-				dest="${BASH_REMATCH[1]}${S}${BASH_REMATCH[2]}"
-			else
-				dest="$file${S}$EXT_A"
-			fi
-			_swap "$file" "$dest"
-		fi
-		[ $? -ne 0 ] && code+=1
-	done
-	return $code
-}
-alias bak='swap bak ""'
-alias cbak='_swap_hook="cp -a" swap bak ""'
-
 #{{2 find
 _finder() { :
 	if pat_in "$HELP_PAT" "$@"; then
@@ -575,8 +471,8 @@ _finder() { :
 	#{{ parse
 	if [[ "$1" && "$1" != [-\!\(]* || "$1" == -[PLHO]* ]]; then
 		gflag=1
-	elif [[ "$1" == -special* ]]; then
-		special="${1#-special }" && shift
+	elif [[ "$1" == -select* ]]; then
+		special="${1#-select }" && shift
 	else
 		specs=(${1// /$IFS}) && shift
 	fi
@@ -647,13 +543,13 @@ alias findf='_finder "-type f"'
 alias findd='_finder "-depth -type d"'
 alias findl='_finder "-maxdepth 1 -mindepth 1"'
 
-alias findbk='_finder "-special bk"'
-alias findbl='_finder "-special bl"'
-alias finded='_finder "-special ed"'
+alias findbk='_finder "-select bk"'
+alias findbl='_finder "-select bl"'
+alias finded='_finder "-select ed"'
 
-_rm_special() { :
+_rm_select() { :
 	local -i code=0
-	local line spec="-special $1" && shift
+	local line spec="-select $1" && shift
 	_finder "$spec" "$@" | while read line
 	do
 		[ "$line" = "." ] && line="$PWD"
@@ -662,49 +558,23 @@ _rm_special() { :
 	[ ! -e "$PWD" ] && cd ..
 	return $code
 }
-alias rmbk='_rm_special bk'
-alias rmbl='_rm_special bl'
-alias rmed='_rm_special ed'
+alias rmbk='_rm_select bk'
+alias rmbl='_rm_select bl'
+alias rmed='_rm_select ed'
 
 complete -F _find -o filenames -o default \
 findg findn findf findd findl findbk findbl finded rmbk rmbl rmed
 
-#{{2 jobs
-function psgrep
-{ :
-	if pat_in "$HELP_PAT" "$@"; then
-		echo "Usage: psgrep [-ps_option] [pattern]..." && return
+#{{2 grep
+# extended grep
+function e
+{
+	if ( shopt -u nocaseglob; [[ "$1" =~ [A-Z] ]] ); then
+		grep -P --color=always    "$@"
+	else
+		grep -P --color=always -i "$@"
 	fi
-	local psopts
-	if [[ "$1" == -* ]]
-	then psopts="$1" && shift
-	else psopts="-o comm"
-	fi
-	local arg procs=$(ps -e $psopts | egrep -v '^(ps|COMMAND|egrep)$')
-	for arg in "$@"; do
-		procs=$(echo "$procs" | egrep -e "$arg")
-	done
-	[ "$procs" ] && echo "$procs" | egrep -e "$arg"
 }
-_psgrep() { :
-	local args
-	if [ $# -gt 3 ]
-	then args=("${@:4}")
-	else args=(-e)
-	fi
-	COMPREPLY=($( compgen -W "$(ps -o comm "${args[@]}" | sort -u |
-				  egrep -v '^(ps|COMMAND|egrep|sort)$')" -- "$2" ))
-}
-
-# killall
-alias ka='killall -u $USER -ir'
-alias ok='sudo killall -9 -ir'
-
-_ka() { :
-	_psgrep "$@" -u "$USER"
-}
-complete -F _ka ka
-complete -F _psgrep psgrep ok
 
 #{{2 history
 # search history for commands matching each perl pattern
@@ -827,9 +697,13 @@ function ahelp
 alias ?='echo $?'
 alias p='pwd'
 alias x='xargs -r'
-alias e='egrep -i'
-alias ev='egrep -iv'
-alias ch='chmod'
+alias cp='cp --preserve=timestamps'
+
+# killall
+alias ka='killall -u $USER -ir'
+alias ok='sudo killall -9 -ir'
+
+complete -F _pgrep ka ok
 
 # list path
 function path
@@ -851,6 +725,19 @@ function typef
 	return $code
 }
 complete -c typef
+
+# save in history the modified timestamps of files
+function timestamp
+{
+	local -i code=0
+	local file
+	for file in "$@"; do
+		stat "$file" >/dev/null &&
+			history -s touch -mcd "'$(stat -c %y "$file")'" "$file"
+		[ $? -ne 0 ] && code+=1
+	done
+	return $code
+}
 #}}2
 
 #{{1 etc
